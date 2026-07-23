@@ -44,6 +44,14 @@ def main():
     # Wait for Vite dev server to boot and bind
     time.sleep(4)
     
+    # Tell Windows this is a separate app, not just a generic 'python.exe' process.
+    # This forces the taskbar to use the desktop shortcut's icon (or the one we pass).
+    import ctypes
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('sprav.job.ai.app')
+    except Exception:
+        pass
+    
     # Create the native desktop window using Windows Webview2
     window = webview.create_window(
         "SPrav Job AI", 
@@ -54,8 +62,10 @@ def main():
         zoomable=True
     )
     
-    # Start the UI loop
-    webview.start(private_mode=False)
+    # Start the UI loop (passing the icon for the window title bar and taskbar)
+    import os
+    icon_path = os.path.join(os.path.dirname(__file__), 'app_icon.ico')
+    webview.start(private_mode=False, icon=icon_path)
     
     # Clean up when the window is closed
     print("Shutting down AI engine...")
