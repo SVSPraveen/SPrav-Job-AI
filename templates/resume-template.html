@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<!--
+  SPrav ATS-Optimised Resume Template — v4.0 (Single-Page Dense)
+  ================================================================
+  Architectural decisions:
+  ─ SINGLE PAGE: margins tightened to 8mm/10mm; font 10pt body / 9pt bullets.
+    All spacing tokens are CSS vars so html_compiler can scale them down
+    programmatically if content overflows.
+  ─ NO FLEX/GRID on content rows. Two-column rows use float so ATS reads
+    left→right in natural DOM order.
+  ─ BLOCK-LEVEL PLACEHOLDERS. Each {{*_BLOCK}} is a complete <section> div
+    (or empty string). Formatter omits the entire block if there is no data,
+    so there is no blank whitespace from an empty section title.
+  ─ SYSTEM FONTS ONLY. No @font-face / .woff2 dependency.
+    Stack: Calibri → Carlito (Linux metric-compatible clone) → Arial → sans-serif.
+  ─ font-variant-ligatures: none prevents fi/fl glyph substitution that
+    breaks ATS keyword searches in PDF text extraction.
+  ─ break-inside: avoid on every entry to prevent mid-entry page splits.
+  ─ No images, icons, or SVG. One <hr> accent line is the only non-text
+    decorative element.
+-->
+<html lang="{{LANG}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{NAME}} — Resume</title>
+<style>
+  /* ── CSS Custom Properties (density tokens) ────────────────── */
+  :root {
+    --accent:        #0e7490;   /* teal — one colour used sparingly */
+    --text-primary:  #111111;
+    --text-secondary:#444444;
+    --text-muted:    #666666;
+    --rule-color:    #d1d5db;
+
+    /* Spacing tokens — html_compiler may lower these for overflow */
+    --section-gap:   7pt;
+    --entry-gap:     7pt;
+    --entry-inner:   2pt;
+    --title-gap:     4pt;
+    --line-height:   1.38;
+  }
+
+  /* ── Reset ─────────────────────────────────────────────────── */
+  *, *::before, *::after {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+    /* Prevent fi/fl Unicode ligature substitution in headless Chromium PDFs */
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "clig" 0, "dlig" 0;
+  }
+
+  html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Body / Page ────────────────────────────────────────────── */
+  body {
+    font-family: "Calibri", "Carlito", "Gill Sans MT", Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    line-height: var(--line-height);
+    color: var(--text-primary);
+    background: #ffffff;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 277mm;          /* slightly less than 297mm — leaves room for PDF margin */
+    max-height: 297mm;
+    margin: 0 auto;
+    padding: 8mm 12mm 8mm 12mm;
+    background: #fff;
+    overflow: hidden;           /* hard clip — content must fit */
+  }
+
+  a { color: var(--text-primary); text-decoration: none; }
+
+  /* ── Header ─────────────────────────────────────────────────── */
+  .resume-name {
+    font-size: 20pt;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: var(--text-primary);
+  }
+
+  /* One thin teal rule — generates zero text nodes for ATS */
+  hr.name-rule {
+    border: none;
+    border-top: 1.8px solid var(--accent);
+    margin: 3pt 0 4pt 0;
+  }
+
+  /* Contact row: plain inline text, NOT flex.
+     ATS reads span children left→right as a clean string. */
+  .contact-line {
+    font-size: 9pt;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .contact-line .sep { color: #bbb; margin: 0 3pt; }
+
+  /* ── Section wrapper ────────────────────────────────────────── */
+  .section { margin-top: var(--section-gap); }
+
+  .section-title {
+    font-size: 8.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--accent);
+    border-bottom: 1px solid var(--rule-color);
+    padding-bottom: 1.5pt;
+    margin-bottom: var(--title-gap);
+  }
+
+  /* ── Summary ────────────────────────────────────────────────── */
+  .summary {
+    font-size: 10pt;
+    color: var(--text-primary);
+    line-height: 1.45;
+  }
+
+  /* ── Competencies ───────────────────────────────────────────── */
+  /* Plain text with bullet separators — every keyword is a parseable
+     text node. ATS cannot reliably parse text in flex children. */
+  .competencies {
+    font-size: 9.5pt;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  /* ── Experience / Project entries ───────────────────────────── */
+  .job, .project {
+    margin-bottom: var(--entry-gap);
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Float-based two-column row: ATS reads left→right correctly.
+     NEVER use flex here — flex reordering can scramble parse order. */
+  .entry-header {
+    overflow: hidden; /* clearfix */
+    margin-bottom: var(--entry-inner);
+  }
+  .entry-date {
+    float: right;
+    font-size: 9pt;
+    color: var(--text-muted);
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+  .entry-company {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .entry-role {
+    font-size: 10pt;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 2pt;
+  }
+  .entry-location {
+    font-size: 9pt;
+    color: var(--text-muted);
+  }
+
+  .job ul, .project ul {
+    padding-left: 14pt;
+    margin-top: 2pt;
+  }
+  .job li, .project li {
+    font-size: 9.5pt;
+    line-height: 1.42;
+    color: var(--text-secondary);
+    margin-bottom: 1.5pt;
+  }
+
+  /* ── Education ──────────────────────────────────────────────── */
+  .edu-item {
+    margin-bottom: 5pt;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .edu-header { overflow: hidden; margin-bottom: 1pt; }
+  .edu-year {
+    float: right;
+    font-size: 9pt;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .edu-institution {
+    font-size: 10pt;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .edu-degree {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .edu-desc {
+    font-size: 9pt;
+    color: var(--text-muted);
+    margin-top: 1pt;
+  }
+
+  /* ── Certifications ─────────────────────────────────────────── */
+  .cert-item {
+    font-size: 9.5pt;
+    color: var(--text-secondary);
+    margin-bottom: 3pt;
+    break-inside: avoid;
+  }
+  .cert-name { font-weight: 700; color: var(--text-primary); }
+  .cert-meta { color: var(--text-muted); }
+
+  /* ── Skills ─────────────────────────────────────────────────── */
+  /* Format: "Category: item1, item2, item3" — one per line.
+     Maximum ATS-parseable format. No flex grid. No pill badges. */
+  .skills-section { font-size: 9.5pt; line-height: 1.65; }
+  .skill-row { margin-bottom: 1pt; }
+  .skill-cat { font-weight: 700; color: var(--text-primary); }
+  .skill-val { color: var(--text-secondary); }
+
+  /* ── Print ──────────────────────────────────────────────────── */
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { padding: 6mm 10mm; }
+  }
+
+  /* ── RTL (Arabic) support ───────────────────────────────────── */
+  html[lang="ar"] body {
+    direction: rtl; text-align: right;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  }
+  html[lang="ar"] .entry-date,
+  html[lang="ar"] .edu-year { float: left; }
+  html[lang="ar"] .job ul,
+  html[lang="ar"] .project ul { padding-right: 14pt; padding-left: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ HEADER (always present) ══════════════════════════════ -->
+  <div class="resume-header">
+    <div class="resume-name">{{NAME}}</div>
+    <hr class="name-rule">
+    <div class="contact-line">
+      {{PHONE}}<span class="sep">|</span>{{EMAIL}}<span class="sep">|</span><a href="{{LINKEDIN_URL}}">{{LINKEDIN_DISPLAY}}</a><span class="sep">|</span><a href="{{PORTFOLIO_URL}}">{{PORTFOLIO_DISPLAY}}</a><span class="sep">|</span>{{LOCATION}}
+    </div>
+  </div>
+
+  <!-- ══ DYNAMIC SECTION BLOCKS ════════════════════════════════
+       Each {{*_BLOCK}} is a complete <div class="section">…</div>
+       or an empty string. If the formatter outputs "" the section
+       and its title are completely absent — no blank whitespace. -->
+  {{SUMMARY_BLOCK}}
+  {{COMPETENCIES_BLOCK}}
+  {{EXPERIENCE_BLOCK}}
+  {{PROJECTS_BLOCK}}
+  {{EDUCATION_BLOCK}}
+  {{CERTIFICATIONS_BLOCK}}
+  {{SKILLS_BLOCK}}
+
+</div>
+</body>
+</html>

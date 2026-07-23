@@ -1,0 +1,9 @@
+Backend Engineer - TechCorp
+
+We are looking for an experienced backend engineer to join our core architecture team. You will be responsible for modernizing our legacy infrastructure and building highly scalable microservices.
+
+Requirements:
+- Strong experience with Python and microservices architecture.
+- Experience migrating relational databases (e.g., MySQL to PostgreSQL).
+- Focus on performance, especially reducing API latency.
+- Knowledge of LLMs and basic AI integration is a plus.

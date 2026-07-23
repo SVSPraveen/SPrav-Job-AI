@@ -1,0 +1,23 @@
+{
+  "threshold": 4.0,
+  "filter_prompt": "You are a logical filter. Read the Job Requirements and User Context.\nRule: If Job YoE > User YoE, output strictly False. If User skills mismatch core requirements, output False. If {threshold}% match, output True.\nUse <think> tags to reason, then output a final JSON: {\"match\": true} or {\"match\": false}",
+  "resume_prompt": "Write a highly dense, ATS-optimized 1-page resume tailored for the job. Do not invent any experience.",
+  "providers": {
+    "extraction": {
+      "provider": "groq",
+      "model": "llama-3.1-70b-versatile"
+    },
+    "hard_filter": {
+      "provider": "openrouter",
+      "model": "anthropic/claude-3.5-sonnet"
+    },
+    "resume_tailoring": {
+      "provider": "openrouter",
+      "model": "anthropic/claude-3.5-sonnet"
+    },
+    "toxic_forensics": {
+      "provider": "ollama",
+      "model": "magnum-v4:9b"
+    }
+  }
+}

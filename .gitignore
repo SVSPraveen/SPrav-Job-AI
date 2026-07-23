@@ -1,0 +1,38 @@
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Environment Variables & Secrets
+.env
+
+# Database & Memory
+jobs.db
+jobs.db-journal
+sprav_memory/chroma.sqlite3
+sprav_memory/*
+!sprav_memory/README.md
+
+# Generated PDFs & Artifacts
+output/*.pdf
+output/*.docx
+
+# Temporary Directories
+temp_repos/*
+!temp_repos/README.md
+scratch/*
+!scratch/README.md
+
+# Node/Frontend
+frontend/node_modules/
+frontend/dist/
+
+# OS Files
+.DS_Store
+Thumbs.db

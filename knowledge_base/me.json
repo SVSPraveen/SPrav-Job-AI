@@ -1,0 +1,116 @@
+{
+  "personal": {
+    "name": "YOUR FULL NAME",
+    "email": "your.email@gmail.com",
+    "phone": "+91-XXXXXXXXXX",
+    "linkedin": "https://linkedin.com/in/your-profile",
+    "github": "https://github.com/your-username",
+    "portfolio": "",
+    "location": "City, Country",
+    "summary": "Write a 2-3 sentence professional summary here. Focus on your strongest value proposition."
+  },
+  "work_history": [
+    {
+      "id": "work_job1",
+      "company": "Company Name",
+      "role": "Your Job Title",
+      "employment_type": "full-time",
+      "start_date": "2022-01-01",
+      "end_date": "Present",
+      "in_progress": true,
+      "last_reviewed": "2025-01-01",
+      "bullets": [
+        {
+          "id": "bullet_job1_1",
+          "text": "Describe your biggest achievement here with a metric. E.g. Reduced deployment time by 60% by migrating CI/CD pipeline to GitHub Actions.",
+          "metric_verified": "verified",
+          "ats_keywords": ["CI/CD", "GitHub Actions", "DevOps"],
+          "themes": ["Automation", "Efficiency"]
+        },
+        {
+          "id": "bullet_job1_2",
+          "text": "Second achievement. E.g. Built REST API serving 50k daily requests with 99.9% uptime.",
+          "metric_verified": "verified",
+          "ats_keywords": ["REST API", "Python", "FastAPI"],
+          "themes": ["Backend", "Scalability"]
+        },
+        {
+          "id": "bullet_job1_3",
+          "text": "Third achievement here.",
+          "metric_verified": "self_reported",
+          "ats_keywords": ["keyword1", "keyword2"],
+          "themes": ["theme1"]
+        }
+      ]
+    },
+    {
+      "id": "work_job2",
+      "company": "Previous Company Name",
+      "role": "Previous Job Title",
+      "employment_type": "full-time",
+      "start_date": "2020-01-01",
+      "end_date": "2021-12-31",
+      "in_progress": false,
+      "last_reviewed": "2025-01-01",
+      "bullets": [
+        {
+          "id": "bullet_job2_1",
+          "text": "Achievement from your previous job.",
+          "metric_verified": "self_reported",
+          "ats_keywords": ["keyword1", "keyword2"],
+          "themes": ["theme1"]
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj_1",
+      "name": "Project Name",
+      "tagline": "One-line description of what the project does",
+      "tech_stack": ["Python", "React", "PostgreSQL"],
+      "start_date": "2023-01-01",
+      "end_date": "2023-06-01",
+      "in_progress": false,
+      "last_reviewed": "2025-01-01",
+      "bullets": [
+        {
+          "id": "bullet_proj1_1",
+          "text": "Describe the technical achievement or impact of this project.",
+          "metric_verified": "self_reported",
+          "ats_keywords": ["Python", "React"],
+          "themes": ["Full Stack", "Open Source"]
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "edu_1",
+      "institution": "University Name",
+      "degree": "Bachelor of Technology in Computer Science",
+      "year": "2020",
+      "cgpa": "8.5/10"
+    }
+  ],
+  "certifications": [
+    {
+      "id": "cert_1",
+      "name": "Certification Name (e.g. AWS Certified Solutions Architect)",
+      "issuer": "Issuing Body",
+      "date_earned": "2023-01-01",
+      "expires": "2026-01-01",
+      "last_reviewed": "2025-01-01"
+    }
+  ],
+  "skills": {
+    "languages": ["Python", "JavaScript", "SQL"],
+    "frameworks": ["FastAPI", "React", "Django"],
+    "tools": ["Docker", "Git", "AWS", "PostgreSQL"],
+    "soft_skills": ["Problem Solving", "Communication", "System Design"]
+  },
+  "github_projects": [],
+  "portfolio_projects": [],
+  "needs_detail": [],
+  "pending_conflicts": []
+}

@@ -1,0 +1,14 @@
+{
+  "_comment": "Application Scope — controls what the AI is allowed to apply to. Enforced before Phase 2 (Fit Evaluation). Edit via the Application Scope UI or directly here.",
+  "locations": [],
+  "work_mode": "any",
+  "roles": [],
+  "job_types": {
+    "full_time": "include",
+    "part_time": "include",
+    "internship": "include",
+    "contract": "include",
+    "freelance": "include"
+  },
+  "experience_level": "any"
+}

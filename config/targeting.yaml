@@ -1,0 +1,18 @@
+# Targeting rules used for filtering job discovery (Phase 3+)
+target_locations:
+  - "Remote"
+  - "United States"
+  - "New York, NY"
+
+target_roles:
+  - "Software Engineer"
+  - "Backend Engineer"
+  - "Full Stack Developer"
+
+excluded_keywords:
+  - "crypto"
+  - "web3"
+  - "unpaid"
+  - "internship"
+
+min_salary_usd: 80000
