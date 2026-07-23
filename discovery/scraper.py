@@ -3,6 +3,7 @@ import os
 import uuid
 import json
 import subprocess
+from engine.jd_extractor import fetch_jd_text
 
 def load_targeting() -> dict:
     return {"target_locations": ["Remote", "Worldwide"]}
@@ -215,12 +216,23 @@ def scrape_company_watchlist() -> list:
 
     scraped_jobs = []
     for item in data:
+        job_url = item.get("url", "")
+        company = item.get("company", "")
+        title = item.get("title", "Unknown Role")
+
+        # Fetch the actual JD so the pipeline can score/tailor properly
+        print(f"  [Watcher] Fetching JD for '{title}' @ {company}...")
+        description = fetch_jd_text(job_url) or (
+            f"{title} at {company}. This is a newly posted role detected on "
+            f"the official career page. Apply promptly as stealth listings often close within hours."
+        )
+
         job = {
             "id": f"watcher_{uuid.uuid4().hex[:10]}",
-            "title": item.get("title", "Unknown Role"),
-            "company": item.get("company", ""),
-            "url": item.get("url", ""),
-            "description": f"[STEALTH LISTING] Detected directly on {item.get('company', 'company')} career page. Run JD extraction.",
+            "title": title,
+            "company": company,
+            "url": job_url,
+            "description": description,
             "location": item.get("location", "India"),
             "source": "company_watcher",
             "fit_score": 0,
@@ -248,6 +260,12 @@ def run_all_scrapers() -> list:
 
     print("Scraping Naukri.com...")
     jobs.extend(scrape_naukri())
+
+    print("Scraping Indeed India...")
+    jobs.extend(scrape_portal("indeed", "indeed_scraper.js"))
+
+    print("Scraping Internshala Jobs...")
+    jobs.extend(scrape_portal("internshala", "internshala_scraper.js"))
 
     print(f"Total jobs discovered: {len(jobs)}")
     return jobs
@@ -305,4 +323,63 @@ def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
             print(f"  Naukri scraper failed for '{keyword}': {e}")
 
     print(f"  Naukri: {len(all_jobs)} total new jobs found.")
+    return all_jobs
+
+
+DEFAULT_KEYWORDS = [
+    "software developer",
+    "backend developer",
+    "full stack developer",
+    "python developer",
+    "react developer",
+]
+
+
+def scrape_portal(source_name: str, js_file: str, keywords: list = None, limit_per_keyword: int = 20) -> list:
+    """
+    Generic runner for Node.js portal scrapers (Indeed, Internshala, etc.).
+    Calls the JS scraper per keyword, collects results, returns normalized jobs.
+    """
+    if keywords is None:
+        keywords = DEFAULT_KEYWORDS
+
+    js_script = os.path.join(os.path.dirname(__file__), "..", "scraper_service", js_file)
+    if not os.path.exists(js_script):
+        print(f"  {js_file} not found — skipping {source_name}.")
+        return []
+
+    all_jobs = []
+    for keyword in keywords:
+        print(f"  {source_name}: '{keyword}'...")
+        try:
+            result = subprocess.run(
+                ["node", js_script, keyword, str(limit_per_keyword)],
+                capture_output=True,
+                text=True,
+                timeout=120,
+                env={**__import__('os').environ}
+            )
+            output = result.stdout.strip()
+            if not output:
+                continue
+            data = json.loads(output)
+            for item in data:
+                all_jobs.append({
+                    "id": f"{source_name}_{uuid.uuid4().hex[:10]}",
+                    "title": item.get("title", ""),
+                    "company": item.get("company", ""),
+                    "url": item.get("url", ""),
+                    "description": item.get("description", ""),
+                    "location": item.get("location", "India"),
+                    "source": source_name.capitalize(),
+                    "fit_score": 0,
+                    "scam_flags": "",
+                    "status": "new"
+                })
+        except json.JSONDecodeError as e:
+            print(f"  {source_name} JSON parse error for '{keyword}': {e}")
+        except Exception as e:
+            print(f"  {source_name} scraper failed for '{keyword}': {e}")
+
+    print(f"  {source_name}: {len(all_jobs)} new jobs found.")
     return all_jobs
