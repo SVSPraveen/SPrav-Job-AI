@@ -110,9 +110,7 @@ def setup_check():
 
 @app.post("/api/signup")
 def signup(data: SignupData):
-    """Creates the first (and only) user account on this machine."""
-    if has_any_account():
-        raise HTTPException(status_code=400, detail="An account already exists. Please log in.")
+    """Creates a user account on this machine."""
     user = create_user(data.name, data.email, data.password)
     token = create_access_token(user)
     return {"access_token": token, "token_type": "bearer", "name": user["name"]}
