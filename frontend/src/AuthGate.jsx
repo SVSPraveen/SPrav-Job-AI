@@ -51,21 +51,21 @@ function AuthGate({ setToken }) {
 
     if (mode === 'loading') {
         return (
-            <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f1115' }}>
+            <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-base)' }}>
                 <div className="loading-spinner"></div>
             </div>
         );
     }
 
     return (
-        <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f1115', color: '#fff' }}>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', padding: '2.5rem', backgroundColor: '#1a1d24', borderRadius: '12px', minWidth: '340px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+        <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}>
+            <form onSubmit={handleSubmit} className="premium-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', padding: '2.5rem', minWidth: '360px' }}>
                 
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                    <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#fff' }}>
+                    <h2 style={{ margin: 0, fontSize: '1.75rem', color: 'var(--text-primary)', letterSpacing: '-0.025em' }}>
                         {mode === 'signup' ? 'Welcome to SPrav' : 'Welcome Back'}
                     </h2>
-                    <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                    <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>
                         {mode === 'signup' 
                             ? 'Create your local secure account to begin.' 
                             : 'Log in to your local account.'}
@@ -73,49 +73,70 @@ function AuthGate({ setToken }) {
                 </div>
 
                 {error && (
-                    <div style={{ padding: '0.8rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderLeft: '3px solid var(--error)', color: 'var(--error)', fontSize: '0.9rem', borderRadius: '4px' }}>
+                    <div style={{ padding: '0.875rem', backgroundColor: 'var(--danger-subtle)', borderLeft: '3px solid var(--danger)', color: '#f87171', fontSize: '0.875rem', borderRadius: '4px' }}>
                         {error}
                     </div>
                 )}
 
                 {mode === 'signup' && (
-                    <input 
-                        type="text" 
-                        placeholder="Full Name" 
-                        value={name} 
-                        onChange={e => setName(e.target.value)} 
-                        className="input"
-                        required 
-                    />
+                    <div>
+                        <label className="input-label">Full Name</label>
+                        <input 
+                            type="text" 
+                            placeholder="John Doe" 
+                            value={name} 
+                            onChange={e => setName(e.target.value)} 
+                            className="input-field"
+                            required 
+                        />
+                    </div>
                 )}
                 
-                <input 
-                    type="email" 
-                    placeholder="Email Address" 
-                    value={email} 
-                    onChange={e => setEmail(e.target.value)} 
-                    className="input"
-                    required 
-                />
+                <div>
+                    <label className="input-label">Email Address</label>
+                    <input 
+                        type="email" 
+                        placeholder="you@example.com" 
+                        value={email} 
+                        onChange={e => setEmail(e.target.value)} 
+                        className="input-field"
+                        required 
+                    />
+                </div>
                 
-                <input 
-                    type="password" 
-                    placeholder="Password" 
-                    value={password} 
-                    onChange={e => setPassword(e.target.value)} 
-                    className="input"
-                    required 
-                    minLength={6}
-                />
+                <div>
+                    <label className="input-label">Password</label>
+                    <input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        value={password} 
+                        onChange={e => setPassword(e.target.value)} 
+                        className="input-field"
+                        required 
+                        minLength={6}
+                    />
+                </div>
                 
                 <button 
                     type="submit" 
                     className="btn"
-                    style={{ marginTop: '0.5rem', padding: '0.9rem', fontSize: '1rem' }}
+                    style={{ marginTop: '0.5rem', padding: '0.75rem', fontSize: '1rem' }}
                     disabled={loading}
                 >
                     {loading ? 'Processing...' : (mode === 'signup' ? 'Create Account' : 'Log In')}
                 </button>
+
+                <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+                    <button 
+                        type="button" 
+                        onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: '500' }}
+                        onMouseOver={(e) => e.target.style.color = 'var(--text-primary)'}
+                        onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}
+                    >
+                        {mode === 'login' ? "Don't have an account? Sign up" : "Already have an account? Log in"}
+                    </button>
+                </div>
             </form>
         </div>
     );
