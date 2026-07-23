@@ -1,17 +1,12 @@
-# Analytics & Tracking Subsystem (`/tracking`)
+# 📊 Analytics & Tracking (`/tracking`)
 
-The Tracking module provides post-application telemetry and observability, closing the feedback loop between the automated dispatch system and external email communications.
+The Tracking module handles the downstream lifecycle of a job application once it has been successfully dispatched by the Execution module.
 
-## 🏗️ Architectural Overview
+## 📈 Telemetry Dashboard
+The frontend React dashboard heavily relies on this module to populate the user UI. It tracks:
+* **Total Applications Sent**
+* **Application Success Rate** (Did Playwright successfully submit the form?)
+* **Conversion Metrics** (Responses vs Rejections)
 
-This subsystem acts as a read-only integration layer with the user's primary communication channels (e.g., Gmail). It uses deterministic matching to correlate incoming email replies with jobs tracked in the local SQLite database.
-
-## 🧩 Core Components
-
-- **`gmail_tracker.py`**: Interacts with the Gmail API via robust, read-only OAuth scopes or App Passwords. 
-- **`signal_detector.py`**: Analyzes the contents of incoming emails using NLP techniques to classify the sentiment and intent (e.g., "Interview Request", "Rejection", "Assessment Test").
-- **`pipeline_updater.py`**: Executes atomic database updates based on detected signals, ensuring the analytics dashboard always reflects the real-time conversion rates of the application funnel.
-
-## 🔒 Security Posture
-
-The tracking module only reads emails explicitly matching recruiter domains or ATS system addresses associated with active applications. All processing is done locally, and no email data is ever transmitted to a third party or LLM cloud provider.
+## 🗃️ Local Storage
+All telemetry is stored in `jobs.db`. No analytics are streamed back to a centralized server. The Tracking module provides read-only API endpoints for the dashboard to render D3.js and Recharts graphs.

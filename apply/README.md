@@ -1,17 +1,16 @@
-# Application Subsystem (`/apply`)
+# 🤖 Execution & Apply Module (`/apply`)
 
-The Application module is responsible for the execution phase of the pipeline, providing headless browser automation to interface directly with Applicant Tracking Systems (ATS).
+The final mile of the SPrav pipeline. This module physically executes the application on behalf of the user.
 
-## 🏗️ Architectural Overview
+## 🛑 Why not use APIs?
+Third-party APIs for job boards are notoriously expensive, rate-limited, and often fail to support complex form logic. By using headless Playwright instances, SPrav mimics human interaction, bypassing API restrictions and ensuring 100% form completion.
 
-Rather than relying on third-party integration APIs that often strip formatting or fail to deliver critical metadata, this module utilizes Playwright to automate native browser interactions. It ensures that applications are submitted exactly as a human would enter them on platforms like Greenhouse and Lever.
+## ⚙️ How it works
+1. **Intake**: Receives the tailored PDF resume and job URL from the Engine.
+2. **Navigation**: Playwright opens the URL and detects the ATS provider (e.g., Greenhouse, Lever, Workday).
+3. **Injection**: Injects canonical user data (Name, Email, Phone, LinkedIn URL).
+4. **Upload**: Attaches the tailored PDF.
+5. **Submission**: Clicks submit and returns the confirmation URL to the Tracking module.
 
-## 🧩 Core Components
-
-- **`ats_automation.py`**: The primary Playwright controller. Handles browser instantiation, context management, and DOM interaction.
-- **`form_filler.py`**: Intelligent form-mapping logic that pairs the user's canonical `me.json` data with complex, deeply nested web forms.
-- **`captcha_handler.py`**: Implements strategies for managing bot-mitigation techniques gracefully, pausing execution for human-in-the-loop intervention when necessary.
-
-## 🛡️ Security & Privacy
-
-This module operates entirely locally. Auth tokens, session cookies, and personal data are never transmitted outside of the direct connection to the target ATS. The headless browser instances are configured for maximum privacy, disabling telemetry and external trackers.
+## ⚠️ Circuit Breakers
+To protect your professional reputation, this module is strictly rate-limited. If it detects abnormal form behaviors (e.g., unexpected required fields), it immediately aborts the run and flags the job for manual Human Review.

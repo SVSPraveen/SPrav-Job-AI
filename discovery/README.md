@@ -1,25 +1,16 @@
-# Discovery Subsystem (`/discovery`)
+# 🕵️‍♂️ Discovery Module (`/discovery`)
 
-The Discovery module operates at the top of the funnel, responsible for continuous job aggregation, parsing, and persistent state management across the application lifecycle.
+The Discovery layer is responsible for aggressively hunting down job listings before they hit the mainstream aggregators.
 
-## 🏗️ Architectural Overview
+## 🛡️ Anti-Bot Evasion
+Modern job boards utilize sophisticated fingerprinting to block automated scraping. Our Discovery module utilizes stealth configurations in `puppeteer-core` to mask WebDriver flags, randomize viewport metrics, and bypass Cloudflare challenges.
 
-This module isolates the complexities of web scraping, API polling, and database persistence, ensuring a clean stream of structured job data is fed into the downstream `engine` subsystem.
+## 🌐 Supported Targets
+* LinkedIn
+* Naukri
+* Indeed
+* Wellfound
+* YC Work at a Startup
 
-## 🧩 Core Components
-
-### Database Management (`db.py`)
-Provides the central data access layer via SQLite, managing pipeline state and providing tamper-evident auditing.
-- **Lifecycle Tracking**: Monitors jobs transitioning through states (`new`, `evaluating`, `auto_applied`, `human_review`).
-- **Audit Logging**: Maintains cryptographic-style logs of all automated submissions, recording exact payloads transmitted to native Applicant Tracking Systems.
-- **Circuit Breakers**: Persists daemon state metrics, allowing the system to pause execution if upstream API changes or network errors cross failure thresholds.
-
-### Aggregation Services
-- **`scraper.py`**: Implements robust, rate-limited polling mechanisms targeting specific job boards and webhook ingest endpoints.
-- **`classifier.py`**: A pre-filtering middleware that executes heuristic-based pruning to immediately discard spam, heavily miscategorized postings, or low-quality data before it triggers heavy LLM inference.
-
-## ⚙️ Execution Flow
-
-1. Aggregation services poll configured endpoints and job boards.
-2. Raw data is sanitized and committed to the local database with an initial `new` state.
-3. The upstream LangGraph daemon consumes the `new` events, triggering the intelligence pipeline.
+## 📥 Output
+The scrapers output raw, unstructured HTML payloads directly to the local SQLite database, where they await parsing by the `Qwen` extraction model in the Engine layer.
