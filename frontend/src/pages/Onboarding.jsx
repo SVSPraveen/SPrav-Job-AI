@@ -173,7 +173,7 @@ export default function Onboarding() {
         ))}
       </div>
 
-      <div className="glass-card" style={{ position: 'relative', minHeight: '320px' }}>
+      <div className="premium-card" style={{ position: 'relative', minHeight: '320px' }}>
         {loading && <div className="loader-overlay"><span>Processing…</span></div>}
 
         {/* ── Step 1: Resume ── */}

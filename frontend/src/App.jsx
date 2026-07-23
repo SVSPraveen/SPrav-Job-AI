@@ -140,25 +140,25 @@ function App() {
             <p className="subtitle">Real-time telemetry of your autonomous application pipeline.</p>
             
             <div className="metrics-grid">
-              <div className="glass-card">
+              <div className="premium-card">
                 <div className="metric-label">Jobs Discovered</div>
                 <div className="metric-value">{metrics?.total || 0}</div>
               </div>
-              <div className="glass-card">
+              <div className="premium-card">
                 <div className="metric-label">New Leads</div>
                 <div className="metric-value">{metrics?.new || 0}</div>
               </div>
-              <div className="glass-card">
+              <div className="premium-card">
                 <div className="metric-label">Auto-Applied</div>
                 <div className="metric-value">{metrics?.applied || 0}</div>
               </div>
-              <div className="glass-card">
+              <div className="premium-card">
                 <div className="metric-label">Interviews</div>
                 <div className="metric-value">{metrics?.interviews || 0}</div>
               </div>
             </div>
 
-            <div className="glass-card">
+            <div className="premium-card">
               <h3 style={{marginBottom: '1rem'}}>Pipeline Controls</h3>
               <p style={{color: 'var(--text-secondary)'}}>Manually trigger the background Python engines from the UI.</p>
               <div className="action-grid">
@@ -189,7 +189,7 @@ function App() {
             <h2>Master Job Portal</h2>
             <p className="subtitle">Unified view of all discovered jobs and application statuses.</p>
             
-            <div className="glass-card" style={{padding: 0}}>
+            <div className="premium-card" style={{padding: 0}}>
               <table className="data-table">
                 <thead>
                   <tr>
@@ -263,7 +263,7 @@ function App() {
             <h2>Pipeline Analytics</h2>
             <p className="subtitle">Company friction rates and salary gap analysis from your application history.</p>
 
-            <div className="glass-card" style={{marginBottom: '2rem'}}>
+            <div className="premium-card" style={{marginBottom: '2rem'}}>
               <h3 style={{marginBottom: '1rem'}}>🚨 Company Friction Rate (Ghost / Rejection Rate)</h3>
               <p style={{color: 'var(--text-secondary)', marginBottom: '1rem'}}>Companies sorted by how often they reject or ghost applicants. 1.0 = always rejects/ghosts.</p>
               {frictionData.length === 0 ? (
@@ -289,7 +289,7 @@ function App() {
               )}
             </div>
 
-            <div className="glass-card">
+            <div className="premium-card">
               <h3 style={{marginBottom: '1rem'}}>💰 Salary Gap Analysis</h3>
               {!salaryData ? (
                 <p style={{color: 'var(--text-secondary)'}}>No salary data yet. Set a target salary in System Config and process some jobs.</p>
@@ -298,9 +298,9 @@ function App() {
               ) : (
                 <div>
                   <div className="metrics-grid" style={{marginBottom: '1rem'}}>
-                    <div className="glass-card"><div className="metric-label">Your Target</div><div className="metric-value" style={{fontSize: '1.5rem'}}>${salaryData.target_salary?.toLocaleString()}</div></div>
-                    <div className="glass-card"><div className="metric-label">Market Average</div><div className="metric-value" style={{fontSize: '1.5rem'}}>${salaryData.market_average?.toLocaleString()}</div></div>
-                    <div className="glass-card"><div className="metric-label">Macro Gap</div><div className="metric-value" style={{fontSize: '1.5rem', color: salaryData.macro_gap_percentage < 0 ? '#f87171' : '#4ade80'}}>{salaryData.macro_gap_percentage > 0 ? '+' : ''}{salaryData.macro_gap_percentage}%</div></div>
+                    <div className="premium-card"><div className="metric-label">Your Target</div><div className="metric-value" style={{fontSize: '1.5rem'}}>${salaryData.target_salary?.toLocaleString()}</div></div>
+                    <div className="premium-card"><div className="metric-label">Market Average</div><div className="metric-value" style={{fontSize: '1.5rem'}}>${salaryData.market_average?.toLocaleString()}</div></div>
+                    <div className="premium-card"><div className="metric-label">Macro Gap</div><div className="metric-value" style={{fontSize: '1.5rem', color: salaryData.macro_gap_percentage < 0 ? '#f87171' : '#4ade80'}}>{salaryData.macro_gap_percentage > 0 ? '+' : ''}{salaryData.macro_gap_percentage}%</div></div>
                   </div>
                 </div>
               )}
@@ -313,7 +313,7 @@ function App() {
             <h2>System Configuration</h2>
             <p className="subtitle">Tune the core SPrav MoE thresholds and System Prompts.</p>
             
-            <div className="glass-card">
+            <div className="premium-card">
               <h3 style={{marginBottom: '1rem'}}>AI Decision Threshold</h3>
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem'}}>
                 <div>

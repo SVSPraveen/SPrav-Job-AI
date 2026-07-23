@@ -131,7 +131,7 @@ export default function ApplicationScope() {
       <div className="scope-grid">
 
         {/* ── Work Mode ─────────────────────────────────────────────────── */}
-        <div className="glass-card scope-card">
+        <div className="premium-card scope-card">
           <h3><Wifi size={18} /> Work Mode</h3>
           <p className="card-hint">Controls remote vs on-site filtering across all jobs.</p>
           <div className="seg-control">
@@ -148,7 +148,7 @@ export default function ApplicationScope() {
         </div>
 
         {/* ── Experience Level ──────────────────────────────────────────── */}
-        <div className="glass-card scope-card">
+        <div className="premium-card scope-card">
           <h3><Award size={18} /> Experience Level</h3>
           <p className="card-hint">Filters by seniority signals found in the job title and description.</p>
           <div className="seg-control">
@@ -165,7 +165,7 @@ export default function ApplicationScope() {
         </div>
 
         {/* ── Locations ──────────────────────────────────────────────────── */}
-        <div className="glass-card scope-card full-width">
+        <div className="premium-card scope-card full-width">
           <h3><MapPin size={18} /> Locations</h3>
           <p className="card-hint">
             Add cities, countries, or "Remote". Tag each as <em>Apply</em> (prefer),
@@ -208,7 +208,7 @@ export default function ApplicationScope() {
         </div>
 
         {/* ── Roles / Titles ─────────────────────────────────────────────── */}
-        <div className="glass-card scope-card full-width">
+        <div className="premium-card scope-card full-width">
           <h3><Briefcase size={18} /> Job Roles / Titles</h3>
           <p className="card-hint">
             Keywords are matched against the extracted job title using fuzzy matching
@@ -250,7 +250,7 @@ export default function ApplicationScope() {
         </div>
 
         {/* ── Job Type ───────────────────────────────────────────────────── */}
-        <div className="glass-card scope-card full-width">
+        <div className="premium-card scope-card full-width">
           <h3><Clock size={18} /> Job Type</h3>
           <p className="card-hint">
             Toggle each type. "Included" types pass through; "Excluded" types are hard-blocked

@@ -161,7 +161,7 @@ const KnowledgeBaseEditor = () => {
         ))}
       </div>
 
-      <div className="kb-content glass-card" style={{ minHeight: '600px' }}>
+      <div className="kb-content premium-card" style={{ minHeight: '600px' }}>
         {activeTab === 'personal' && (
           <div className="fade-in">
             <h3 style={{ marginBottom: '1.5rem', color: 'var(--accent)' }}>Personal Information</h3>

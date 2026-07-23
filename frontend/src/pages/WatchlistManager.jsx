@@ -114,7 +114,7 @@ function WatchlistManager({ token }) {
             </div>
 
             {/* Add Company Form */}
-            <div className="glass-card" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
+            <div className="premium-card" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
                 <h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem', color: 'var(--text-secondary)' }}>
                     ADD A COMPANY TO WATCH
                 </h3>
@@ -166,7 +166,7 @@ function WatchlistManager({ token }) {
                     {companies.map((company, idx) => (
                         <div
                             key={idx}
-                            className="glass-card"
+                            className="premium-card"
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem' }}
                         >
                             <div>
@@ -211,7 +211,7 @@ function WatchlistManager({ token }) {
             )}
 
             {/* Info note */}
-            <div className="glass-card" style={{ marginTop: '2rem', padding: '1rem 1.25rem', borderLeft: '3px solid var(--accent)', background: 'rgba(99,102,241,0.07)' }}>
+            <div className="premium-card" style={{ marginTop: '2rem', padding: '1rem 1.25rem', borderLeft: '3px solid var(--accent)', background: 'rgba(99,102,241,0.07)' }}>
                 <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                     <strong style={{ color: 'var(--text)' }}>How it works: </strong>
                     On first run, the watcher saves a snapshot of each career page and does not inject any jobs
@@ -232,7 +232,7 @@ function WatchlistManager({ token }) {
             </div>
 
             {/* LinkedIn outreach log */}
-            <div className="glass-card" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
+            <div className="premium-card" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
                 <h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem', color: 'var(--text-secondary)' }}>RECENT OUTREACH FROM LINKEDIN POSTS</h3>
                 {linkedinPosts.length === 0 ? (
                     <p style={{ color: 'var(--text-secondary)', margin: 0 }}>No LinkedIn post applications yet. The scanner runs every ~30 minutes.</p>
@@ -261,7 +261,7 @@ function WatchlistManager({ token }) {
             </div>
 
             {/* LinkedIn profile targets */}
-            <div className="glass-card" style={{ padding: '1.5rem' }}>
+            <div className="premium-card" style={{ padding: '1.5rem' }}>
                 <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: 'var(--text-secondary)' }}>SPECIFIC HR / CEO PROFILES TO MONITOR</h3>
                 <p style={{ margin: '0 0 1rem 0', fontSize: '0.87rem', color: 'var(--text-secondary)' }}>
                     Paste a LinkedIn profile URL of an HR or CEO you want to monitor directly.
