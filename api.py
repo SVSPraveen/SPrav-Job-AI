@@ -48,6 +48,7 @@ app.add_middleware(
 DB_PATH = "jobs.db"
 KB_PATH = "knowledge_base/me.json"
 CONFIG_PATH = "config.json"
+BLACKLIST_PATH = "blacklist.txt"
 
 class KBUpdate(BaseModel):
     kb_data: dict
