@@ -9,11 +9,11 @@
 <h4 align="center">The autonomous, offline-first AI agent for hyper-personalized job applications.</h4>
 
 <p align="center">
-  <a href="#-core-features">Features</a> •
+  <a href="#-what-it-does">What</a> •
+  <a href="#-how-it-works">How</a> •
+  <a href="#-why-we-built-this">Why</a> •
   <a href="#-architecture">Architecture</a> •
-  <a href="#-installation">Install</a> •
-  <a href="#-privacy--data">Privacy</a> •
-  <a href="ARCHITECTURE.md">Docs</a>
+  <a href="#-installation">Install</a>
 </p>
 
 <p align="center">
@@ -29,25 +29,35 @@
 
 > *Companies use AI to filter candidates. SPrav gives candidates AI to filter and apply to companies.*
 
-**SPrav** is an enterprise-grade, local-first AI pipeline designed to flip the power dynamic of the modern job hunt. It discovers job listings across 9+ platforms, evaluates your exact fit using deep reasoning models, tailors your resume flawlessly, and dispatches applications autonomously.
+---
 
-It runs **100% locally on your GPU**. Your personal data never leaves your machine. Zero cloud API costs, zero data leakage.
+## 🎯 What it does
+
+Job hunting is a full-time job. **SPrav completely automates the most exhausting parts of the process.** 
+
+Instead of mindlessly scrolling through job boards, SPrav acts as your personal, highly-coordinated AI workforce. It monitors the internet for new job postings, reads the requirements, decides if you are actually a good fit based on your background, custom-rewrites your resume for that specific job to bypass keyword filters, and then physically applies to the job for you.
+
+## ⚙️ How it works
+
+When you turn on the engine, this is the exact flow that happens on your machine:
+
+1. **Discovery:** Headless bots silently wake up and scan platforms like LinkedIn and Naukri, identifying new job links and aggressively filtering out obvious spam, Ed-Tech courses disguised as jobs, and fake listings.
+2. **Extraction:** The AI extracts the unstructured text of the job description and converts it into clean, structured data.
+3. **Reasoning:** A deep-thinking logic model reads the job, cross-references your profile, and calculates a strict mathematical "Fit Score".
+4. **Tailoring:** If the score is high enough, a generative model drafts a custom resume, perfectly highlighting why you are the best fit for that exact role.
+5. **Execution:** A Playwright automation bot opens a hidden browser window, navigates to the ATS application page (like Greenhouse or Lever), fills in your details, uploads the custom resume, and submits it.
+
+## 🛑 Why we built this
+
+* **Absolute Privacy:** Because this runs 100% locally on your computer's GPU, your email, phone number, and employment history are never sent to OpenAI or Anthropic. Your data cannot be leaked.
+* **Zero Cost:** No cloud API keys or subscription fees. Ever.
+* **Beating the ATS:** Modern companies use AI Applicant Tracking Systems to automatically reject resumes that don't have the right keywords. We are fighting fire with fire—using AI to perfectly align your resume to their keyword filters before a human ever sees it.
 
 ---
 
-## ⚡ Core Features
+## 🧠 Architecture (The "Brains")
 
-* **Absolute Privacy (Offline Inference):** Powered entirely by local Ollama models. Your phone number, email, and employment history never touch OpenAI or Anthropic servers.
-* **Mixture-of-Experts (MoE) Routing:** Automatically routes specialized tasks to domain-specific models (e.g., *Qwen* for JSON extraction, *DeepSeek-R1* for logical fit scoring, *Llama 3.1* for prose generation).
-* **Zero-Tolerance Hallucination Check:** Employs an adversarial fact-checking layer. Any generated resume metric not explicitly supported by your canonical data triggers a forced regeneration.
-* **Native ATS Bypassing:** Skips noisy aggregators by scraping and applying directly to native Applicant Tracking Systems (Greenhouse, Lever) using headless Playwright browsers.
-* **Intelligent Auto-Apply Circuit Breakers:** Configurable daily limits and dynamic thresholds prevent you from spamming employers and protect your professional reputation.
-
----
-
-## 🧠 Architecture
-
-SPrav avoids monolithic LLM patterns. Instead, it utilizes a highly targeted MoE methodology orchestrated by `LangGraph`.
+Instead of using one massive model like ChatGPT, SPrav uses a targeted **Mixture-of-Experts (MoE)** approach orchestrated by `LangGraph`. 
 
 ```mermaid
 graph TD;
@@ -61,13 +71,15 @@ graph TD;
     G --> H[(Local SQLite DB)];
 ```
 
-| Subsystem | Primary Model | Purpose |
+We load different specialized, local open-source models via Ollama to handle distinct tasks:
+
+| Subsystem | Model | Purpose |
 |-----------|-------|---------|
-| **Data Extraction** | `qwen2.5:7b-instruct` | High-fidelity structured JSON extraction from messy HR text. |
-| **Logic & Evaluation** | `deepseek-r1:7b` | Chain-of-thought `<think>` reasoning for holistic candidate-to-job fit scoring. |
-| **Culture Forensics** | `magnum-v4:9b` | Uncensored parsing of corporate vernacular to detect red flags and toxic patterns. |
-| **Generative Prose** | `llama3.1:8b` | Professional, AI-slop-free resume drafting and XYZ bullet engineering. |
-| **Vector Memory** | `nomic-embed-text` | High-efficiency 8192-token context window for localized RAG against your history. |
+| **Data Extraction** | `qwen2.5:7b-instruct` | **The Data Entry Clerk.** Reads messy HR text and extracts structured JSON. |
+| **Logic & Evaluation** | `deepseek-r1:7b` | **The Recruiter.** Uses chain-of-thought `<think>` reasoning for holistic candidate-to-job fit scoring. |
+| **Culture Forensics** | `magnum-v4:9b` | **The Fact Checker.** Parses corporate vernacular to detect toxic organizational patterns and prevents resume hallucination. |
+| **Generative Prose** | `llama3.1:8b` | **The Copywriter.** Professional, AI-slop-free resume drafting and XYZ bullet engineering. |
+| **Vector Memory** | `nomic-embed-text` | **The Librarian.** High-efficiency RAG retrieval against your local knowledge base. |
 
 ---
 
@@ -128,17 +140,6 @@ Alternatively, you can launch the native desktop application window:
 ```bash
 python desktop_app.py
 ```
-
----
-
-## 📖 Module Documentation
-
-For deep dives into specific subsystems, refer to the module-level documentation:
-
-- [Engine Orchestration (`/engine`)](engine/README.md)
-- [Job Discovery (`/discovery`)](discovery/README.md)
-- [ATS Automation (`/apply`)](apply/README.md)
-- [System Architecture (`ARCHITECTURE.md`)](ARCHITECTURE.md)
 
 ---
 
