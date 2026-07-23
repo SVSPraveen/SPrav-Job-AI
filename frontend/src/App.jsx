@@ -6,8 +6,10 @@ import KnowledgeBaseEditor from './pages/KnowledgeBaseEditor'
 import Onboarding from './pages/Onboarding'
 import ApplicationScope from './pages/ApplicationScope'
 import WatchlistManager from './pages/WatchlistManager'
-import Login from './Login'
+import Settings from './pages/Settings'
+import AuthGate from './AuthGate'
 import HumanApply from './HumanApply'
+import Copilot from './Copilot'
 import './index.css'
 
 const API_BASE = 'http://localhost:8000/api'
@@ -35,7 +37,7 @@ function App() {
   }, [token])
 
   if (!token) {
-    return <Login setToken={setToken} />
+    return <AuthGate setToken={setToken} />
   }
 
   const fetchAnalytics = async () => {
@@ -121,8 +123,11 @@ function App() {
           <div className={`nav-item ${activeTab === 'watchlist' ? 'active' : ''}`} onClick={() => setActiveTab('watchlist')}>
             <Eye size={20} /> Company Watchlist
           </div>
-          <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+          <div className={`nav-item ${activeTab === 'config' ? 'active' : ''}`} onClick={() => setActiveTab('config')}>
             <Settings size={20} /> System Config
+          </div>
+          <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+            <Settings size={20} /> Settings & Auth
           </div>
         </div>
       </div>
@@ -303,7 +308,7 @@ function App() {
           </div>
         )}
 
-        {activeTab === 'settings' && (
+        {activeTab === 'config' && (
           <div className="fade-in">
             <h2>System Configuration</h2>
             <p className="subtitle">Tune the core SPrav MoE thresholds and System Prompts.</p>
@@ -343,10 +348,16 @@ function App() {
           </div>
         )}
 
+        {activeTab === 'settings' && (
+          <Settings token={token} />
+        )}
+
         {activeTab === 'watchlist' && (
           <WatchlistManager token={token} />
         )}
       </div>
+
+      <Copilot token={token} currentTab={activeTab} />
     </div>
   )
 }

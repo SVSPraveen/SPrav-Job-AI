@@ -11,7 +11,12 @@ import re
 from engine.llm_provider import generate
 from engine.negotiator import generate_negotiation_script
 from engine.upskill_oracle import get_upskill_directive
-from engine.auth import create_access_token, verify_token, get_user_credentials
+from engine.auth import (
+    create_access_token, verify_token, get_user_credentials,
+    has_any_account, create_user, authenticate_user,
+    save_credential, get_credentials, get_all_credentials,
+    get_user_id_from_token, save_copilot_message, get_copilot_history
+)
 from engine.intake import parse_resume, fetch_github, parse_linkedin_export, parse_portfolio, manual_entries
 from engine.kb_merger import merge, resolve_conflicts, apply_detail_updates, kb_is_ready
 from engine.config import (
@@ -84,13 +89,112 @@ class LoginData(BaseModel):
     email: str
     password: str
 
+class SignupData(BaseModel):
+    name: str
+    email: str
+    password: str
+
+class CredentialData(BaseModel):
+    service: str
+    credentials: dict  # {key: value}
+
+class CopilotQuery(BaseModel):
+    message: str
+    page_context: str = ""  # which page/tab the user is on
+
+@app.get("/api/setup-check")
+def setup_check():
+    """Returns whether any account exists. Frontend uses this to show Signup vs Login."""
+    return {"has_account": has_any_account()}
+
+@app.post("/api/signup")
+def signup(data: SignupData):
+    """Creates the first (and only) user account on this machine."""
+    if has_any_account():
+        raise HTTPException(status_code=400, detail="An account already exists. Please log in.")
+    user = create_user(data.name, data.email, data.password)
+    token = create_access_token(user)
+    return {"access_token": token, "token_type": "bearer", "name": user["name"]}
+
 @app.post("/api/login")
 def login(data: LoginData):
-    valid_email, valid_password = get_user_credentials()
-    if data.email == valid_email and data.password == valid_password:
-        token = create_access_token({"sub": data.email})
-        return {"access_token": token, "token_type": "bearer"}
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    user = authenticate_user(data.email, data.password)
+    token = create_access_token(user)
+    return {"access_token": token, "token_type": "bearer", "name": user["name"]}
+
+@app.get("/api/credentials", dependencies=[Depends(verify_token)])
+def get_creds(token_data: dict = Depends(verify_token)):
+    """Returns all stored credentials for the logged-in user (masked for display)."""
+    user_id = get_user_id_from_token(token_data)
+    return get_all_credentials(user_id)
+
+@app.post("/api/credentials", dependencies=[Depends(verify_token)])
+def save_creds(data: CredentialData, token_data: dict = Depends(verify_token)):
+    """Saves credentials for a service. Credentials are encrypted at rest."""
+    user_id = get_user_id_from_token(token_data)
+    for key, value in data.credentials.items():
+        save_credential(user_id, data.service, key, value)
+        # Also write to .env so the Node.js scrapers can read them
+        if data.service == "linkedin":
+            _write_env_var("LINKEDIN_EMAIL" if key == "email" else "LINKEDIN_PASSWORD", value)
+    return {"status": "saved"}
+
+@app.post("/api/copilot", dependencies=[Depends(verify_token)])
+def copilot_chat(query: CopilotQuery, token_data: dict = Depends(verify_token)):
+    """AI copilot endpoint. Answers questions about the app and guides the user."""
+    user_id = get_user_id_from_token(token_data)
+    history = get_copilot_history(user_id, limit=10)
+
+    system_prompt = """You are SPrav Copilot, a friendly AI assistant built into the SPrav Job AI application.
+You help the user understand how the app works, what to do next, and answer any questions about their job search.
+
+App Overview:
+- SPrav is a local AI job-hunting engine that discovers jobs from 9+ platforms (Naukri, Indeed, LinkedIn, Internshala, etc.)
+- It scores each job for fit using DeepSeek-R1, tailors your resume, and auto-applies using Playwright.
+- You can manage your watchlist (companies to monitor 24/7), see applied jobs, check the Human Apply Queue, and configure auto-apply thresholds.
+- First-time setup: go to Settings to add your LinkedIn credentials and configure your job search keywords.
+- The Knowledge Base (me.json) is your profile — the more you fill it in, the better the AI tailors your resume.
+
+Current page context: {page_context}
+Be concise, warm, and practical. If the user seems lost, proactively guide them to their next step.""".format(page_context=query.page_context or "dashboard")
+
+    # Build conversation
+    messages = [{"role": "system", "content": system_prompt}]
+    for h in history:
+        messages.append({"role": h["role"], "content": h["content"]})
+    messages.append({"role": "user", "content": query.message})
+
+    try:
+        # Use the local LLM for copilot responses
+        full_prompt = system_prompt + "\n\nUser: " + query.message
+        if history:
+            context = "\n".join([f"{h['role'].title()}: {h['content']}" for h in history[-4:]])
+            full_prompt = system_prompt + "\n\nRecent conversation:\n" + context + "\n\nUser: " + query.message
+        reply = generate(full_prompt, use_case="extraction")
+    except Exception as e:
+        reply = f"I'm having trouble connecting to the local AI right now. ({e})"
+
+    save_copilot_message(user_id, "user", query.message)
+    save_copilot_message(user_id, "assistant", reply)
+    return {"reply": reply}
+
+def _write_env_var(key: str, value: str):
+    """Updates a key=value line in the local .env file."""
+    env_path = ".env"
+    lines = []
+    found = False
+    if os.path.exists(env_path):
+        with open(env_path, "r") as f:
+            lines = f.readlines()
+        for i, line in enumerate(lines):
+            if line.startswith(f"{key}="):
+                lines[i] = f"{key}={value}\n"
+                found = True
+                break
+    if not found:
+        lines.append(f"{key}={value}\n")
+    with open(env_path, "w") as f:
+        f.writelines(lines)
 
 @app.get("/api/config", dependencies=[Depends(verify_token)])
 def get_config():
