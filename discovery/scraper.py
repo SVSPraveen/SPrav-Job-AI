@@ -175,6 +175,62 @@ def scrape_freshershunt() -> list:
         
     return scraped_jobs
 
+def scrape_company_watchlist() -> list:
+    """
+    Runs career_watcher.js to detect NEW jobs on watched company career pages.
+    Only returns jobs that are new since the last run (diff against stored snapshot).
+    On first run for a company it saves the baseline and returns nothing, so the
+    pipeline is never flooded on initial setup.
+    """
+    print("Running Company Career Page Watcher...")
+    js_script = os.path.join(os.path.dirname(__file__), "..", "scraper_service", "career_watcher.js")
+
+    if not os.path.exists(js_script):
+        print("career_watcher.js not found — skipping.")
+        return []
+
+    try:
+        result = subprocess.run(
+            ["node", js_script],
+            capture_output=True,
+            text=True,
+            timeout=300  # 5 min max — 20 companies × ~15s each
+        )
+
+        # career_watcher.js outputs one JSON array as the LAST line on stdout
+        # All other output is diagnostic (goes to stderr)
+        output = result.stdout.strip()
+        if not output:
+            print("Career watcher returned no output.")
+            return []
+
+        data = json.loads(output)
+        print(f"Career watcher found {len(data)} new job(s) across watched companies.")
+    except json.JSONDecodeError as e:
+        print(f"Career watcher JSON parse error: {e}")
+        return []
+    except Exception as e:
+        print(f"Career watcher execution failed: {e}")
+        return []
+
+    scraped_jobs = []
+    for item in data:
+        job = {
+            "id": f"watcher_{uuid.uuid4().hex[:10]}",
+            "title": item.get("title", "Unknown Role"),
+            "company": item.get("company", ""),
+            "url": item.get("url", ""),
+            "description": f"[STEALTH LISTING] Detected directly on {item.get('company', 'company')} career page. Run JD extraction.",
+            "location": item.get("location", "India"),
+            "source": "company_watcher",
+            "fit_score": 0,
+            "scam_flags": "",
+            "status": "new"
+        }
+        scraped_jobs.append(job)
+
+    return scraped_jobs
+
 def run_all_scrapers() -> list:
     """Runs all configured scrapers and returns a combined list of jobs."""
     print("Scraping Arbeitnow...")
@@ -186,6 +242,9 @@ def run_all_scrapers() -> list:
     
     print("Scraping Freshershunt...")
     jobs.extend(scrape_freshershunt())
+
+    print("Checking Company Career Page Watchlist...")
+    jobs.extend(scrape_company_watchlist())
     
     print(f"Total jobs discovered: {len(jobs)}")
     return jobs

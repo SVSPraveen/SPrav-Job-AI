@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Briefcase, LayoutDashboard, Database, Activity, Search, Send, Mail, CheckCircle, Settings, BarChart2, Target } from 'lucide-react'
+import { Briefcase, LayoutDashboard, Database, Activity, Search, Send, Mail, CheckCircle, Settings, BarChart2, Target, Eye } from 'lucide-react'
 import ManualReview from './pages/ManualReview'
 import KnowledgeBaseEditor from './pages/KnowledgeBaseEditor'
 import Onboarding from './pages/Onboarding'
 import ApplicationScope from './pages/ApplicationScope'
+import WatchlistManager from './pages/WatchlistManager'
 import Login from './Login'
 import HumanApply from './HumanApply'
 import './index.css'
@@ -116,6 +117,9 @@ function App() {
           </div>
           <div className={`nav-item ${activeTab === 'scope' ? 'active' : ''}`} onClick={() => setActiveTab('scope')}>
             <Target size={20} /> Application Scope
+          </div>
+          <div className={`nav-item ${activeTab === 'watchlist' ? 'active' : ''}`} onClick={() => setActiveTab('watchlist')}>
+            <Eye size={20} /> Company Watchlist
           </div>
           <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
             <Settings size={20} /> System Config
@@ -337,6 +341,10 @@ function App() {
               <button className="btn" onClick={saveConfig} style={{background: 'var(--success)', marginTop: '1rem'}}>💾 Save Configuration</button>
             </div>
           </div>
+        )}
+
+        {activeTab === 'watchlist' && (
+          <WatchlistManager token={token} />
         )}
       </div>
     </div>

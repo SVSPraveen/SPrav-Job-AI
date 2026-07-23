@@ -211,7 +211,60 @@ def mark_job_applied(job_id: str):
     conn.close()
     return {"status": "success"}
 
-BLACKLIST_PATH = "blacklist.txt"
+# ─── Watchlist Endpoints ──────────────────────────────────────────────────────
+
+WATCHLIST_PATH = "watchlist.json"
+SNAPSHOTS_DIR = os.path.join("scraper_service", "snapshots")
+
+def _load_watchlist() -> dict:
+    if not os.path.exists(WATCHLIST_PATH):
+        return {"companies": []}
+    with open(WATCHLIST_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def _save_watchlist(data: dict):
+    with open(WATCHLIST_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+@app.get("/api/watchlist", dependencies=[Depends(verify_token)])
+def get_watchlist():
+    wl = _load_watchlist()
+    # Augment with snapshot metadata for the UI
+    companies = wl.get("companies", [])
+    for company in companies:
+        slug = company["name"].lower().replace(" ", "_").replace(r"[^a-z0-9_]", "")
+        snap_path = os.path.join(SNAPSHOTS_DIR, f"{slug}.json")
+        if os.path.exists(snap_path):
+            with open(snap_path, "r", encoding="utf-8") as sf:
+                snap = json.load(sf)
+            company["last_checked"] = snap.get("updated_at", "Never")
+            company["job_count"] = len(snap.get("jobs", []))
+        else:
+            company["last_checked"] = "Never"
+            company["job_count"] = 0
+    return companies
+
+@app.post("/api/watchlist", dependencies=[Depends(verify_token)])
+def update_watchlist(payload: dict = Body(...)):
+    """Replace the entire companies list or add/remove a single entry."""
+    action = payload.get("action", "replace")
+    wl = _load_watchlist()
+
+    if action == "replace":
+        wl["companies"] = payload.get("companies", [])
+    elif action == "add":
+        entry = payload.get("company")
+        if entry and not any(c["name"] == entry["name"] for c in wl["companies"]):
+            wl["companies"].append(entry)
+    elif action == "remove":
+        name = payload.get("name", "")
+        wl["companies"] = [c for c in wl["companies"] if c["name"] != name]
+    else:
+        raise HTTPException(status_code=400, detail="Invalid action. Use 'replace', 'add', or 'remove'.")
+
+    _save_watchlist(wl)
+    return {"status": "ok", "count": len(wl["companies"])}
+
 
 def is_blacklisted(company: str) -> bool:
     if not os.path.exists(BLACKLIST_PATH):
