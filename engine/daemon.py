@@ -31,6 +31,7 @@ from engine.archetype_classifier import classify_archetype, get_rubric_for_arche
 from scraper_service.ats_direct import run_ats_discovery
 from apply.greenhouse import apply_to_greenhouse
 from apply.lever import apply_to_lever
+from apply.naukri import apply_to_naukri
 from tracking.notifier import send_email_notification
 from discovery.linkedin_scanner import run_linkedin_scanner
 from engine.config import (
@@ -526,17 +527,26 @@ def compile_dispatch_node(state: JobState) -> JobState:
             update_job_status(job['id'], 'already_applied')
             state['status'] = 'dispatched'
             return state
-
-        # ── Actually invoke Playwright ───────────────────────────────────────
+        # ── Actually invoke Playwright ─────────────────────────────────────────
         print(f"[Dispatcher] All gates passed. Checking if URL is a supported ATS for Auto-Apply...")
-        
+
         apply_fn = None
+        naukri_creds = None
+
         if "greenhouse.io" in url:
             apply_fn = apply_to_greenhouse
         elif "lever.co" in url:
             apply_fn = apply_to_lever
-            
-        if apply_fn is None:
+        elif "naukri.com" in url or job.get('source', '').lower() == 'naukri':
+            # Naukri Quick Apply needs email+password credentials
+            naukri_email    = os.getenv('NAUKRI_EMAIL', '')
+            naukri_password = os.getenv('NAUKRI_PASSWORD', '')
+            if naukri_email and naukri_password:
+                naukri_creds = (naukri_email, naukri_password)
+            else:
+                print("[Dispatcher] Naukri credentials not set — routing to Human Apply Queue.")
+
+        if apply_fn is None and naukri_creds is None:
             # It's an unsupported ATS (e.g. Workday, custom portal extracted from Freshershunt)
             print(f"[Dispatcher] {url} is not a supported Auto-Apply ATS. Routing to Human Apply Queue.")
             generate_strategy_report(job['id'], company, title,
@@ -547,7 +557,13 @@ def compile_dispatch_node(state: JobState) -> JobState:
             return state
 
         print(f"[Dispatcher] Invoking Playwright for {url}...")
-        apply_success = apply_fn(job["url"], personal_info, pdf_path)
+
+        # Handle Naukri specially (needs email/password, not resume upload)
+        if naukri_creds:
+            naukri_email, naukri_password = naukri_creds
+            apply_success = apply_to_naukri(url, naukri_email, naukri_password)
+        else:
+            apply_success = apply_fn(job["url"], personal_info, pdf_path)
 
         if apply_success:
             _reset_circuit_breaker()

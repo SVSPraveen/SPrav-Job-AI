@@ -267,6 +267,14 @@ def run_all_scrapers() -> list:
     print("Scraping Internshala Jobs...")
     jobs.extend(scrape_portal("internshala", "internshala_scraper.js"))
 
+    print("Scraping Hirist.tech (IT-Only)...")
+    jobs.extend(scrape_portal("hirist", "hirist_scraper.js"))
+
+    print("Scraping Wellfound (Startup Ecosystem)...")
+    jobs.extend(scrape_portal("wellfound", "wellfound_scraper.js",
+                              keywords=["software engineer", "backend engineer",
+                                        "frontend engineer", "full stack engineer"]))
+
     print(f"Total jobs discovered: {len(jobs)}")
     return jobs
 
