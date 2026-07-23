@@ -31,7 +31,7 @@ from engine.archetype_classifier import classify_archetype, get_rubric_for_arche
 from scraper_service.ats_direct import run_ats_discovery
 from apply.greenhouse import apply_to_greenhouse
 from apply.lever import apply_to_lever
-from apply.naukri import apply_to_naukri
+from apply.naukri import extract_real_apply_url, touch_naukri_profile
 from tracking.notifier import send_email_notification
 from discovery.linkedin_scanner import run_linkedin_scanner
 from engine.config import (
@@ -538,15 +538,25 @@ def compile_dispatch_node(state: JobState) -> JobState:
         elif "lever.co" in url:
             apply_fn = apply_to_lever
         elif "naukri.com" in url or job.get('source', '').lower() == 'naukri':
-            # Naukri Quick Apply needs email+password credentials
+            # Strategy: extract the REAL company career page URL from the Naukri listing.
+            # Quick Apply is avoided — it puts you in a pile with 10,000 others.
             naukri_email    = os.getenv('NAUKRI_EMAIL', '')
             naukri_password = os.getenv('NAUKRI_PASSWORD', '')
-            if naukri_email and naukri_password:
-                naukri_creds = (naukri_email, naukri_password)
+            real_url = extract_real_apply_url(url)
+            if real_url:
+                print(f"[Dispatcher] Naukri: Found real ATS URL → {real_url}")
+                url = real_url  # redirect to the actual company portal
+                job['url'] = real_url
+                if 'greenhouse.io' in real_url:
+                    apply_fn = apply_to_greenhouse
+                elif 'lever.co' in real_url:
+                    apply_fn = apply_to_lever
+                # else: unsupported ATS — falls through to Human Apply Queue below
             else:
-                print("[Dispatcher] Naukri credentials not set — routing to Human Apply Queue.")
+                print("[Dispatcher] Naukri: No real ATS URL found — routing to Human Apply Queue with direct link.")
+                # apply_fn stays None → will generate strategy report below
 
-        if apply_fn is None and naukri_creds is None:
+        if apply_fn is None:
             # It's an unsupported ATS (e.g. Workday, custom portal extracted from Freshershunt)
             print(f"[Dispatcher] {url} is not a supported Auto-Apply ATS. Routing to Human Apply Queue.")
             generate_strategy_report(job['id'], company, title,
@@ -557,13 +567,7 @@ def compile_dispatch_node(state: JobState) -> JobState:
             return state
 
         print(f"[Dispatcher] Invoking Playwright for {url}...")
-
-        # Handle Naukri specially (needs email/password, not resume upload)
-        if naukri_creds:
-            naukri_email, naukri_password = naukri_creds
-            apply_success = apply_to_naukri(url, naukri_email, naukri_password)
-        else:
-            apply_success = apply_fn(job["url"], personal_info, pdf_path)
+        apply_success = apply_fn(job["url"], personal_info, pdf_path)
 
         if apply_success:
             _reset_circuit_breaker()
@@ -750,14 +754,32 @@ def run_daemon():
         print("[Daemon] WARNING: me.json is empty or missing required fields.")
         print("[Daemon] Open the dashboard -> Knowledge Base -> Rebuild from Sources to complete onboarding.")
     
+    # Track which days the profile touch has run to avoid running it more than twice a day
+    _profile_touch_dates = set()
+    
     cycle = 1
     while True:
-        if datetime.now().hour == 3:
+        now = datetime.now()
+
+        if now.hour == 3:
             try:
                 run_compaction()
             except Exception as e:
                 print(f"[Daemon Error] Compaction failed: {e}")
                 
+        # Run Naukri profile touch at 9 AM and 6 PM (pushes profile to top of recruiter searches)
+        touch_key = f"{now.date()}_{now.hour}"
+        if now.hour in (9, 18) and touch_key not in _profile_touch_dates:
+            naukri_email    = os.getenv('NAUKRI_EMAIL', '')
+            naukri_password = os.getenv('NAUKRI_PASSWORD', '')
+            if naukri_email and naukri_password:
+                print("\n--- [Profile Boost] Running Naukri profile freshness touch ---")
+                try:
+                    touch_naukri_profile(naukri_email, naukri_password)
+                    _profile_touch_dates.add(touch_key)
+                except Exception as e:
+                    print(f"[Profile Touch Error] {e}")
+
         print(f"\n--- [Cycle {cycle}] Starting Job Discovery ---")
         try:
             print("\n--- Triggering Node.js Stealth Scraper ---")
