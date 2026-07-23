@@ -83,7 +83,7 @@ function AuthGate({ setToken }) {
                         <label className="input-label">Full Name</label>
                         <input 
                             type="text" 
-                            placeholder="John Doe" 
+                            placeholder="Enter your full name here..." 
                             value={name} 
                             onChange={e => setName(e.target.value)} 
                             className="input-field"
@@ -96,7 +96,7 @@ function AuthGate({ setToken }) {
                     <label className="input-label">Email Address</label>
                     <input 
                         type="email" 
-                        placeholder="you@example.com" 
+                        placeholder="Enter your email address..." 
                         value={email} 
                         onChange={e => setEmail(e.target.value)} 
                         className="input-field"
@@ -108,7 +108,7 @@ function AuthGate({ setToken }) {
                     <label className="input-label">Password</label>
                     <input 
                         type="password" 
-                        placeholder="••••••••" 
+                        placeholder="Enter a secure password..." 
                         value={password} 
                         onChange={e => setPassword(e.target.value)} 
                         className="input-field"
