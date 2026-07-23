@@ -93,6 +93,24 @@ function AuthGate({ setToken }) {
         }
     };
 
+    const handleSendOtp = async () => {
+        if (!email) {
+            setError('Please enter your email address first.');
+            return;
+        }
+        setLoading(true);
+        setError('');
+        setSuccessMsg('');
+        try {
+            const res = await axios.post(`${API_BASE}/send-otp`, { email });
+            setSuccessMsg(res.data.message);
+        } catch (err) {
+            setError(err.response?.data?.detail || 'Failed to send OTP.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (mode === 'loading') {
         return (
             <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-base)' }}>
@@ -142,7 +160,7 @@ function AuthGate({ setToken }) {
                     <p style={{ margin: '0.5rem 0 0 0', color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>
                         {mode === 'signup' 
                             ? 'Create your local secure account to begin.' 
-                            : mode === 'recovery' ? 'Enter your Master Recovery Key.' 
+                            : mode === 'recovery' ? 'Enter your Master Recovery Key OR Email OTP.' 
                             : 'Log in to your local account.'}
                     </p>
                 </div>
@@ -187,10 +205,22 @@ function AuthGate({ setToken }) {
                 
                 {mode === 'recovery' && (
                     <div>
-                        <label className="input-label">Master Recovery Key</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                            <label className="input-label" style={{ margin: 0 }}>Recovery Key OR 6-Digit OTP</label>
+                            <button 
+                                type="button" 
+                                onClick={handleSendOtp}
+                                style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '0.8125rem', fontWeight: '500' }}
+                                onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+                                onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+                                disabled={loading}
+                            >
+                                Email me an OTP
+                            </button>
+                        </div>
                         <input 
                             type="text" 
-                            placeholder="SPRAV-XXXX-XXXX" 
+                            placeholder="SPRAV-XXXX-XXXX or 123456" 
                             value={recoveryKey} 
                             onChange={e => setRecoveryKey(e.target.value.toUpperCase())} 
                             className="input-field"

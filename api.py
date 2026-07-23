@@ -13,7 +13,7 @@ from engine.negotiator import generate_negotiation_script
 from engine.upskill_oracle import get_upskill_directive
 from engine.auth import (
     create_access_token, verify_token, get_user_credentials,
-    has_any_account, create_user, authenticate_user, reset_password,
+    has_any_account, create_user, authenticate_user, reset_password, send_otp,
     save_credential, get_credentials, get_all_credentials,
     get_user_id_from_token, save_copilot_message, get_copilot_history
 )
@@ -100,6 +100,9 @@ class ResetPasswordData(BaseModel):
     recovery_key: str
     new_password: str
 
+class EmailRequestData(BaseModel):
+    email: str
+
 class CredentialData(BaseModel):
     service: str
     credentials: dict  # {key: value}
@@ -127,6 +130,13 @@ def reset_password_endpoint(data: ResetPasswordData):
     try:
         reset_password(data.email, data.recovery_key, data.new_password)
         return {"message": "Password reset successfully. You can now log in."}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/send-otp")
+def send_otp_endpoint(data: EmailRequestData):
+    try:
+        return send_otp(data.email)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

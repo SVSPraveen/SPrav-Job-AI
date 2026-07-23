@@ -14,6 +14,9 @@ import hashlib
 import os
 import json
 import base64
+import random
+import smtplib
+from email.message import EmailMessage
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -139,24 +142,93 @@ def create_user(name: str, email: str, password: str) -> dict:
     finally:
         conn.close()
 
+otp_store = {}
+
+def send_otp(email: str):
+    email = email.strip().lower()
+    
+    conn = sqlite3.connect(USERS_DB)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    if not row:
+        raise HTTPException(status_code=404, detail="Email not found in local database.")
+        
+    sender_email = os.getenv("EMAIL_SENDER")
+    sender_password = os.getenv("EMAIL_PASSWORD")
+    
+    if not sender_email or not sender_password:
+        raise HTTPException(status_code=400, detail="Email OTP requires EMAIL_SENDER and EMAIL_PASSWORD in .env")
+        
+    otp_code = str(random.randint(100000, 999999))
+    otp_store[email] = {"code": otp_code, "time": datetime.now()}
+    
+    msg = EmailMessage()
+    msg.set_content(f"Your SPrav Job AI password reset OTP is: {otp_code}")
+    msg['Subject'] = 'SPrav Job AI - Password Reset OTP'
+    msg['From'] = sender_email
+    msg['To'] = email
+    
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+        
+    return {"message": "OTP sent successfully to your email."}
+
 def reset_password(email: str, recovery_key: str, new_password: str):
-    """Resets the password using the Master Recovery Key."""
+    """Resets the password using the Master Recovery Key OR an Email OTP."""
+    email = email.strip().lower()
+    
+    is_otp = recovery_key.strip().isdigit() and len(recovery_key.strip()) == 6
+    
     conn = sqlite3.connect(USERS_DB)
     cursor = conn.cursor()
     
-    cursor.execute("SELECT id, recovery_key_hash FROM users WHERE email = ?", (email.strip().lower(),))
-    row = cursor.fetchone()
-    
-    if not row or not row[1] or not _verify_password(recovery_key.strip(), row[1]):
-        conn.close()
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Email or Master Recovery Key."
-        )
+    if is_otp:
+        if email not in otp_store:
+            conn.close()
+            raise HTTPException(status_code=401, detail="No OTP requested for this email.")
+            
+        stored = otp_store[email]
+        if stored["code"] != recovery_key.strip():
+            conn.close()
+            raise HTTPException(status_code=401, detail="Invalid OTP code.")
+            
+        if (datetime.now() - stored["time"]).total_seconds() > 600:
+            del otp_store[email]
+            conn.close()
+            raise HTTPException(status_code=401, detail="OTP expired. Please request a new one.")
+            
+        del otp_store[email]
+        
+        cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+        row = cursor.fetchone()
+        if not row:
+            conn.close()
+            raise HTTPException(status_code=404, detail="User not found.")
+        user_id = row[0]
+    else:
+        cursor.execute("SELECT id, recovery_key_hash FROM users WHERE email = ?", (email,))
+        row = cursor.fetchone()
+        
+        if not row or not row[1] or not _verify_password(recovery_key.strip(), row[1]):
+            conn.close()
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid Email or Master Recovery Key."
+            )
+        user_id = row[0]
         
     cursor.execute(
         "UPDATE users SET password_hash = ? WHERE id = ?",
-        (_hash_password(new_password), row[0])
+        (_hash_password(new_password), user_id)
     )
     conn.commit()
     conn.close()
