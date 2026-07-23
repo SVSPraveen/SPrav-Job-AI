@@ -59,7 +59,7 @@ class SPravBrain:
         Retrieves ONLY the relevant text from the Vector DB and builds a targeted prompt 
         for the overarching state machine to answer the user's request.
         """
-        print(f"[SPrav] Searching memory for relevant context...")
+        print("[SPrav] Searching memory for relevant context...")
         results = self.collection.query(
             query_texts=[user_prompt],
             n_results=n_results
@@ -69,7 +69,7 @@ class SPravBrain:
         context = "\n\n---\n\n".join(retrieved_chunks)
         
         # Build the targeted prompt
-        targeted_prompt = f"""You are the SPrav AI Brain. You have been provided with specific fragments of retrieved memory to answer the user's question.
+        targeted_prompt = """You are the SPrav AI Brain. You have been provided with specific fragments of retrieved memory to answer the user's question.
 
 <retrieved_memory>
 {context}
@@ -79,7 +79,7 @@ User Question: {user_prompt}
 
 Please answer the question based solely on the retrieved memory context above.
 """
-        print(f"[SPrav] Synthesizing answer using LLM generation...")
+        print("[SPrav] Synthesizing answer using LLM generation...")
         # The generation model (llama3.1:8b) runs in VRAM
         response = generate(targeted_prompt, use_case="brain_retrieval")
         return response

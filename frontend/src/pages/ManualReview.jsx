@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ExternalLink, CheckCircle, FileText, AlertCircle, BookOpen, X } from 'lucide-react';
+import { ExternalLink, CheckCircle, FileText, BookOpen, X } from 'lucide-react';
 
 export default function ManualReview() {
   const [jobs, setJobs] = useState([]);

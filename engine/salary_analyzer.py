@@ -39,9 +39,6 @@ def get_salary_gaps() -> dict:
             comp = rubric.get("compensation", {})
             stable_cash = comp.get("expected_stable_cash", "")
             
-            # Simple heuristic to extract numbers from a string like "$130k - $150k" or "$140,000"
-            numbers = [int(n) for n in ''.join(c if c.isdigit() or c == 'k' else ' ' for c in stable_cash.lower()).split() if n.isdigit() or (n.endswith('k') and n[:-1].isdigit())]
-            
             # Convert 'k' to 000
             clean_numbers = []
             for n in stable_cash.lower().split():

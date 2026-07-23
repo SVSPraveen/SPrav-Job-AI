@@ -1,20 +1,17 @@
-# Tracking & Notifications (`tracking/`)
+# Analytics & Tracking Subsystem (`/tracking`)
 
-The `tracking` directory contains post-application utilities. Once the `apply` module successfully submits a resume, these scripts take over to monitor the outcome of that application.
+The Tracking module provides post-application telemetry and observability, closing the feedback loop between the automated dispatch system and external email communications.
 
----
+## 🏗️ Architectural Overview
 
-## 📬 Inbox Monitoring (`gmail_tracker.py`)
+This subsystem acts as a read-only integration layer with the user's primary communication channels (e.g., Gmail). It uses deterministic matching to correlate incoming email replies with jobs tracked in the local SQLite database.
 
-This script uses the Gmail API (or IMAP) to monitor your inbox for responses from companies you applied to.
-- **Interview Detection**: Scans incoming emails from known ATS domains or company domains for intent signals (e.g., "schedule a time", "next steps", "availability"). 
-- **Rejection Detection**: Scans for standard rejection boilerplate (e.g., "moved forward with other candidates", "not a fit at this time").
-- **Database Syncing**: When a signal is detected, it queries the local `jobs.db` for the corresponding company and updates the job's status to `interview` or `rejected`, allowing the Analytics dashboard to correctly track pipeline conversion rates.
+## 🧩 Core Components
 
-## 🔔 System Alerts (`notifier.py`)
+- **`gmail_tracker.py`**: Interacts with the Gmail API via robust, read-only OAuth scopes or App Passwords. 
+- **`signal_detector.py`**: Analyzes the contents of incoming emails using NLP techniques to classify the sentiment and intent (e.g., "Interview Request", "Rejection", "Assessment Test").
+- **`pipeline_updater.py`**: Executes atomic database updates based on detected signals, ensuring the analytics dashboard always reflects the real-time conversion rates of the application funnel.
 
-Handles pushing alerts to the user so you don't have to constantly monitor the dashboard.
-- Dispatches notifications (via desktop toasts, Slack, or email) when:
-  - An interview is secured.
-  - The Auto-Apply Circuit Breaker is triggered (e.g., due to an IP block).
-  - A high-value job lands in the "Human Apply" queue and requires manual intervention.
+## 🔒 Security Posture
+
+The tracking module only reads emails explicitly matching recruiter domains or ATS system addresses associated with active applications. All processing is done locally, and no email data is ever transmitted to a third party or LLM cloud provider.

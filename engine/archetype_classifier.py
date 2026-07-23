@@ -6,7 +6,7 @@ def classify_archetype(job_title: str, requirements: str) -> str:
     Classifies a job into a strict Archetype to determine its scoring rubric.
     Uses a fast, low-temp extraction call.
     """
-    prompt = f"""Analyze the Job Title and Requirements and classify the role into EXACTLY ONE of these archetypes:
+    prompt = """Analyze the Job Title and Requirements and classify the role into EXACTLY ONE of these archetypes:
 - Backend
 - Frontend
 - DevOps
@@ -44,12 +44,12 @@ def get_rubric_for_archetype(archetype: str, threshold: float, scoring_caps: lis
         scoring_caps = []
         
     rubrics = {
-        "DevOps": f"ARCHETYPE: DevOps/Infrastructure.\nSPECIAL FOCUS: Penalize lack of Kubernetes, Docker, CI/CD pipelines, or cloud (AWS/GCP) experience.",
-        "Frontend": f"ARCHETYPE: Frontend/UI.\nSPECIAL FOCUS: Penalize lack of React, Vue, CSS architecture, or State Management.",
-        "Data/ML": f"ARCHETYPE: Data/Machine Learning.\nSPECIAL FOCUS: Penalize lack of Python, PyTorch/TensorFlow, SQL, or data pipelines.",
-        "Backend": f"ARCHETYPE: Backend Systems.\nSPECIAL FOCUS: Penalize lack of API design, DB scaling, Postgres/SQL, or caching (Redis).",
-        "Product": f"ARCHETYPE: Product Management.\nSPECIAL FOCUS: Penalize lack of Agile, Stakeholder Management, PRDs, or cross-functional leadership.",
-        "General": f"ARCHETYPE: General Software Engineering.\nSPECIAL FOCUS: Evaluate general software lifecycle and problem-solving skills."
+        "DevOps": "ARCHETYPE: DevOps/Infrastructure.\nSPECIAL FOCUS: Penalize lack of Kubernetes, Docker, CI/CD pipelines, or cloud (AWS/GCP) experience.",
+        "Frontend": "ARCHETYPE: Frontend/UI.\nSPECIAL FOCUS: Penalize lack of React, Vue, CSS architecture, or State Management.",
+        "Data/ML": "ARCHETYPE: Data/Machine Learning.\nSPECIAL FOCUS: Penalize lack of Python, PyTorch/TensorFlow, SQL, or data pipelines.",
+        "Backend": "ARCHETYPE: Backend Systems.\nSPECIAL FOCUS: Penalize lack of API design, DB scaling, Postgres/SQL, or caching (Redis).",
+        "Product": "ARCHETYPE: Product Management.\nSPECIAL FOCUS: Penalize lack of Agile, Stakeholder Management, PRDs, or cross-functional leadership.",
+        "General": "ARCHETYPE: General Software Engineering.\nSPECIAL FOCUS: Evaluate general software lifecycle and problem-solving skills."
     }
     
     base_prompt = """You are an elite Tech Recruiter evaluating a candidate against a job description.
@@ -80,7 +80,7 @@ Additionally, you must output a Block D for Compensation Intelligence:
             caps_prompt += f"- If {cap.get('condition', '')}, then cap the final holistic score at {cap.get('cap', 5.0)}/5.0 max.\n"
 
     rubric = rubrics.get(archetype, rubrics["General"])
-    end_prompt = f"""
+    end_prompt = """
 {caps_prompt}
 Calculate the final holistic score as a float from 1.0 to 5.0 (average of the 5 grades).
 If the final score is >= {threshold}, set "match" to true, else false.

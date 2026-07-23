@@ -19,7 +19,7 @@ def compile_latex_to_pdf(tex_content: str, output_path: str) -> bool:
     with open(tex_path, "w", encoding="utf-8") as f:
         f.write(tex_content)
         
-    print(f"[TeX Compiler] Compiling PDF via pdflatex...")
+    print("[TeX Compiler] Compiling PDF via pdflatex...")
     
     try:
         # Run pdflatex. -interaction=nonstopmode prevents it from halting on minor errors

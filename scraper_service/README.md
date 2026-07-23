@@ -1,20 +1,17 @@
-# Scraper Service (`scraper_service/`)
+# Scraper Service (`/scraper_service`)
 
-The `scraper_service` directory contains specialized, direct-to-ATS scraping tools. 
+The Scraper Service is a specialized, headless automation suite designed to navigate complex Applicant Tracking Systems (ATS) and job board frontends that lack public APIs.
 
-While generic job boards (like LinkedIn or Indeed) are extremely noisy, heavily scraped by bots, and often feature stale "ghost" jobs, this service bypasses aggregators entirely by crawling the ATS pages of companies directly.
+## 🏗️ Architectural Overview
 
----
+Built on Node.js and Puppeteer Extra, this microservice handles the high-friction aspects of job discovery, including bypassing bot-mitigation platforms (e.g., Cloudflare, DataDome) through stealth plugins and behavioral emulation.
 
-## 🎯 Direct-to-ATS Strategy
+## 🧩 Core Capabilities
 
-By maintaining a curated list of target companies, this module programmatically iterates through their known ATS endpoints (Greenhouse, Lever, Workday) to find postings the exact minute they go live. This strategy grants a significant "first-mover" advantage in highly competitive application pools.
+- **Stealth Browsing**: Utilizes `puppeteer-extra-plugin-stealth` to mask automated signatures, ensuring high-reliability scraping without triggering IP bans.
+- **Dynamic DOM Parsing**: Extracts structured JSON data (job titles, requirements, salary bands) directly from deeply nested, dynamically rendered React/Vue DOM trees.
+- **IPC Communication**: Runs as a localized microservice, communicating with the primary Python orchestration daemon via lightweight inter-process communication (IPC) sockets.
 
-## 📂 Key Files
+## ⚙️ Configuration
 
-- **`ats_direct.py`**: The core direct scraping logic. It parses the DOM of Greenhouse/Lever company boards, looking for `<script>` JSON blobs or standard HTML job listings to extract raw Job Descriptions and posting URLs.
-- **`company_list.txt`**: A plain-text, newline-separated list of company names or target URLs. This acts as the seed list for the `ats_direct.py` crawler.
-
-## 🔄 Integration with Discovery
-
-When `ats_direct.py` successfully finds a new job link, it passes the URL and raw HTML description over to the `discovery/db.py` logic, which inserts it into the `jobs.db` database as a `new` job. From there, the `engine`'s daemon picks it up for processing.
+The service can be scaled or adjusted via the local configuration files to manage concurrency limits and rate-limit backoffs, protecting the user's IP integrity.

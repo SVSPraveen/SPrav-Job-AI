@@ -70,9 +70,13 @@ function spawnFastAPI() {
         console.log(`[FastAPI] ${data.toString()}`);
     });
 
-    // Cleanup API on exit
+    // Cleanup processes on exit
     app.on('will-quit', () => {
         if (apiProcess) apiProcess.kill();
+        if (pythonDaemonProcess) pythonDaemonProcess.kill();
+        
+        // Hard fallback for Windows orphaned processes
+        spawn('taskkill', ['/F', '/IM', 'python.exe']);
     });
 }
 

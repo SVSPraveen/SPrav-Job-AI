@@ -170,9 +170,9 @@ def check_scope(job: dict, scope: dict | None = None) -> tuple[bool, str]:
     if work_mode != "any":
         detected_mode = _detect_work_mode(job)
         if work_mode == "remote_only" and detected_mode == "onsite":
-            return False, f"Work mode excluded: job is On-site, scope requires Remote only"
+            return False, "Work mode excluded: job is On-site, scope requires Remote only"
         if work_mode == "onsite_only" and detected_mode == "remote":
-            return False, f"Work mode excluded: job is Remote, scope requires On-site only"
+            return False, "Work mode excluded: job is Remote, scope requires On-site only"
 
     # ── Gate 2: Per-location rules ────────────────────────────────────────────
     for loc_rule in scope.get("locations", []):

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Save, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
+import { Save, Plus, Trash2, X } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8000/api';
 

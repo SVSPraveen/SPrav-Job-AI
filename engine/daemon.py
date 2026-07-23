@@ -96,7 +96,7 @@ class JobState(TypedDict):
 
 def verify_job_node(state: JobState) -> JobState:
     job = state['job']
-    print(f"\n==============================================")
+    print("\n==============================================")
     print(f"[Thread] Processing Job: {job['url']}")
     
     print("\n[Phase 0.25] Pinging ATS to verify job is still alive...")
@@ -133,7 +133,7 @@ def verify_job_node(state: JobState) -> JobState:
         c_check.execute("SELECT id FROM jobs WHERE jd_hash = ? AND id != ?", (jd_hash, job['id']))
         repost_match = c_check.fetchone()
         if repost_match:
-            print(f"[Phase 0.75] REPOST DETECTED! Skipping to save compute.")
+            print("[Phase 0.75] REPOST DETECTED! Skipping to save compute.")
             conn_check.close()
             update_job_status(job['id'], 'repost')
             state['status'] = 'repost'
@@ -185,7 +185,7 @@ def scope_gate_node(state: JobState) -> JobState:
 def extraction_node(state: JobState) -> JobState:
     job = state['job']
     print("\n[Phase 1] Extracting structured data from raw HR post...")
-    extraction_prompt = f"""Extract Job Title, Requirements, and Years of Experience (YoE) from this unstructured text. 
+    extraction_prompt = """Extract Job Title, Requirements, and Years of Experience (YoE) from this unstructured text. 
 Strict JSON output only. If no YoE is stated, put 0.
 Text: {job['description']}"""
     
@@ -296,7 +296,7 @@ def tailor_node(state: JobState) -> JobState:
     tailor_context = f"Job Reqs: {extracted_json}\nRaw JD: {job['description']}"
     if retry_count > 0 and state.get('invented_claims'):
         tailor_context += (
-            f"\n\nCRITICAL WARNING: In your previous attempt, you hallucinated the "
+            "\n\nCRITICAL WARNING: In your previous attempt, you hallucinated the "
             f"following claims: {state['invented_claims']}. "
             "YOU MUST ONLY USE FACTS FROM THE KNOWLEDGE BASE."
         )
@@ -337,7 +337,7 @@ def tailor_node(state: JobState) -> JobState:
         if ats_passes and fit_passes:
             state['auto_apply_eligible'] = True
             state['disagreement_reason'] = ""
-            print(f"[Phase 3.5] GATE PASS — eligible for auto-apply "
+            print("[Phase 3.5] GATE PASS — eligible for auto-apply "
                   f"(ATS {ats_score_pct:.1f}%, Fit {fit_score:.1f}/5).")
 
         elif ats_passes and not fit_passes:
@@ -636,8 +636,8 @@ def build_job_graph():
             return 'dispatch'
 
         # Human-review retry path
-        if state.get('retry_count', 0) >= 2:
-            print("[Graph] Fact check failed 2 times on human-review path. Aborting.")
+        if state.get('retry_count', 0) >= 2 or not auto_eligible:
+            print("[Graph] Fact check failed. Aborting retry (max retries reached or not auto-eligible).")
             update_job_status(state['job']['id'], 'failed_fact_check')
             return END
 

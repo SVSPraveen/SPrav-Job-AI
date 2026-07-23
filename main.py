@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 from engine.tailor import tailor_resume
+from engine.formatter import generate_docx, generate_pdf
 
 def load_config():
     config_path = "config.json"
@@ -71,7 +72,7 @@ def main():
         from dotenv import load_dotenv
         load_dotenv()
 
-        from engine.tailor import tailor_resume, load_kb
+        from engine.tailor import load_kb
 
         tailored_resume = tailor_resume(jd_text)
         kb = load_kb()

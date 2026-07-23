@@ -1,26 +1,25 @@
-# Discovery Module (`discovery/`)
+# Discovery Subsystem (`/discovery`)
 
-The `discovery` directory is responsible for the top of the funnel: finding jobs across the internet and persisting the application pipeline state locally. 
+The Discovery module operates at the top of the funnel, responsible for continuous job aggregation, parsing, and persistent state management across the application lifecycle.
 
-This module feeds raw Job Descriptions (JDs) into the `engine` for evaluation.
+## 🏗️ Architectural Overview
 
----
+This module isolates the complexities of web scraping, API polling, and database persistence, ensuring a clean stream of structured job data is fed into the downstream `engine` subsystem.
 
-## 📂 Contents
+## 🧩 Core Components
 
-### 1. Database & State Management (`db.py`)
-This file manages the local SQLite database (`jobs.db`) which acts as the central nervous system for the pipeline. It stores:
-- **`jobs` Table**: Tracks every discovered job through its lifecycle (`active`, `rejected`, `in_scope`, `auto_applied`, `human_review`, etc.).
-- **`auto_apply_audit` Table**: A tamper-evident log of every automated submission. Records the exact payload sent to the ATS, ensuring transparency and accountability.
-- **`daemon_state` Table**: A key-value store used to persist system state across restarts, such as the Circuit Breaker failure count (which pauses auto-apply if too many consecutive failures occur).
+### Database Management (`db.py`)
+Provides the central data access layer via SQLite, managing pipeline state and providing tamper-evident auditing.
+- **Lifecycle Tracking**: Monitors jobs transitioning through states (`new`, `evaluating`, `auto_applied`, `human_review`).
+- **Audit Logging**: Maintains cryptographic-style logs of all automated submissions, recording exact payloads transmitted to native Applicant Tracking Systems.
+- **Circuit Breakers**: Persists daemon state metrics, allowing the system to pause execution if upstream API changes or network errors cross failure thresholds.
 
-### 2. Job Scrapers
-- **`scraper.py`**: The generic job board scraper logic. Designed to periodically poll target keywords and locations to pull down raw JD text and URLs.
-- **`classifier.py`**: A fast, pre-filtering classifier that drops obvious spam or heavily miscategorized jobs before they are added to the database.
+### Aggregation Services
+- **`scraper.py`**: Implements robust, rate-limited polling mechanisms targeting specific job boards and webhook ingest endpoints.
+- **`classifier.py`**: A pre-filtering middleware that executes heuristic-based pruning to immediately discard spam, heavily miscategorized postings, or low-quality data before it triggers heavy LLM inference.
 
----
+## ⚙️ Execution Flow
 
-## ⚙️ How it works
-1. Scrapers poll job boards or ingest webhooks.
-2. New jobs are sanitized and inserted into the SQLite database with a status of `new`.
-3. The `engine/daemon.py` constantly monitors the database, picking up `new` jobs and initiating Phase 0 (Verification).
+1. Aggregation services poll configured endpoints and job boards.
+2. Raw data is sanitized and committed to the local database with an initial `new` state.
+3. The upstream LangGraph daemon consumes the `new` events, triggering the intelligence pipeline.

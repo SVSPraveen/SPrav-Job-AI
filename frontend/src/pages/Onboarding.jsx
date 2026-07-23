@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { UploadCloud, Github, Linkedin, Globe, Edit, CheckCircle, ArrowRight, Plus, Trash2 } from 'lucide-react';
+import { UploadCloud, Link, Globe, Edit, CheckCircle, ArrowRight, Plus, Trash2 } from 'lucide-react';
 import './Onboarding.css';
 
 const API_BASE = 'http://localhost:8000/api/intake';
@@ -197,7 +197,7 @@ export default function Onboarding() {
         {/* ── Step 2: GitHub ── */}
         {step === 2 && (
           <div className="step-content">
-            <h3><Github size={20} /> Sync GitHub Projects</h3>
+            <h3><Link size={20} /> Sync GitHub Projects</h3>
             <p>Enter your GitHub username to import all your public repos, or paste comma-separated repo URLs for specific projects only.</p>
             <div className="form-group">
               <label>GitHub Username <em>or</em> repo URLs (comma-separated)</label>
@@ -224,7 +224,7 @@ export default function Onboarding() {
         {/* ── Step 3: LinkedIn ── */}
         {step === 3 && (
           <div className="step-content">
-            <h3><Linkedin size={20} /> LinkedIn Data Export</h3>
+            <h3><Globe size={20} /> LinkedIn Data Export</h3>
             <p>
               We never scrape LinkedIn directly — that would violate ToS and risk your account.
               Instead, export your data from <strong>LinkedIn Settings → Data Privacy → Get a copy of your data → All data</strong>,

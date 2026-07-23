@@ -4,14 +4,11 @@ tests/test_intake.py — Unit tests for Phase 0 Intake + Merger
 Run with:
     pytest tests/test_intake.py -v
 """
-import csv
-import io
 import json
 import os
 import sys
 import zipfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -27,13 +24,11 @@ from engine.intake import (
 from engine.kb_merger import (
     _dates_overlap,
     _detect_needs_detail,
-    _has_metric,
     _merge_skills,
     _merge_work_history,
     apply_detail_updates,
     kb_is_ready,
     merge,
-    resolve_conflicts,
 )
 
 
@@ -406,7 +401,6 @@ class TestKbIsReady:
 class TestFullMerge:
     def test_merge_writes_json_and_creates_backup(self, tmp_path):
         kb_path = os.path.join(str(tmp_path), "me.json")
-        history_dir = os.path.join(str(tmp_path), "knowledge_base", "history")
 
         # Write initial KB
         with open(kb_path, "w") as f:

@@ -1,31 +1,17 @@
-# Apply Module (`apply/`)
+# Application Subsystem (`/apply`)
 
-The `apply` directory contains the "Last Mile" automation layer of the SPrav pipeline. Once a job has passed the strict Fact Checker and is approved for automated submission, these modules take over.
+The Application module is responsible for the execution phase of the pipeline, providing headless browser automation to interface directly with Applicant Tracking Systems (ATS).
 
-They are responsible for packaging your tailored PDF resume, filling out the ATS (Applicant Tracking System) specific form fields, and successfully submitting the application without triggering bot detection.
+## 🏗️ Architectural Overview
 
----
+Rather than relying on third-party integration APIs that often strip formatting or fail to deliver critical metadata, this module utilizes Playwright to automate native browser interactions. It ensures that applications are submitted exactly as a human would enter them on platforms like Greenhouse and Lever.
 
-## 🧩 Supported ATS Adapters
+## 🧩 Core Components
 
-- **`greenhouse.py`**: Adapter for Greenhouse boards (typically `boards.greenhouse.io`). Parses the dynamic multipart form boundary requirements and handles mandatory custom questions.
-- **`lever.py`**: Adapter for Lever boards (typically `jobs.lever.co`). Handles Lever's specific JSON/Form payload structure.
+- **`ats_automation.py`**: The primary Playwright controller. Handles browser instantiation, context management, and DOM interaction.
+- **`form_filler.py`**: Intelligent form-mapping logic that pairs the user's canonical `me.json` data with complex, deeply nested web forms.
+- **`captcha_handler.py`**: Implements strategies for managing bot-mitigation techniques gracefully, pausing execution for human-in-the-loop intervention when necessary.
 
-*(More adapters can be added by implementing the standard `submit_application(job_url, user_data, pdf_path)` interface).*
+## 🛡️ Security & Privacy
 
----
-
-## 🛡️ Anti-Bot Mechanics (Jitter)
-
-Automated tracking systems frequently deploy bot-mitigation tools (like Cloudflare or DataDome) that flag applications submitted instantly.
-
-To circumvent this, adapters in this directory utilize **Jitter**:
-- **Delays**: Simulates human reading speed by waiting random intervals (e.g. 15-45 seconds) before fetching the form, and another interval before submitting the payload.
-- **Header Masking**: Spoofs standard modern browser headers (User-Agent, Accept-Language, Sec-Fetch-Dest) to blend in with legitimate web traffic.
-- **Form Parsing**: Dynamically parses hidden CSRF tokens or session IDs required by the ATS rather than hardcoding static requests.
-
----
-
-## 🛑 Circuit Breaker Integration
-
-If an adapter encounters consecutive failures (e.g., an ATS changes its form structure or blocks the IP), it reports the failure back to the database. The `api.py` monitors these failures and will **pause the entire auto-apply pipeline** (engaging the Circuit Breaker) if the failure threshold is exceeded, preventing silent, repeated failures while you sleep.
+This module operates entirely locally. Auth tokens, session cookies, and personal data are never transmitted outside of the direct connection to the target ATS. The headless browser instances are configured for maximum privacy, disabling telemetry and external trackers.

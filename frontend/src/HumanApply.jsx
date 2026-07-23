@@ -8,6 +8,7 @@ function HumanApply({ token }) {
 
     useEffect(() => {
         if (token) fetchJobs();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
 
     const fetchJobs = async () => {

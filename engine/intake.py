@@ -24,7 +24,6 @@ No XYZ rewriting happens here — that is the tailoring engine's job.
 import csv
 import io
 import json
-import os
 import re
 import uuid
 import zipfile
@@ -407,7 +406,6 @@ def parse_linkedin_export(zip_path: str) -> dict:
 
     try:
         with zipfile.ZipFile(zip_path, "r") as zf:
-            names = {n.lower(): n for n in zf.namelist()}
 
             def read_csv(key: str) -> list[dict]:
                 """Case-insensitive CSV reader from the ZIP."""

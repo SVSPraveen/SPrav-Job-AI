@@ -22,19 +22,19 @@ def generate_strategy_report(job_id: int, company: str, title: str, job_requirem
         positioning = evaluation_rubric.get("positioning", {})
         compensation = evaluation_rubric.get("compensation", {})
         if positioning:
-            precomputed_insights += f"""
+            precomputed_insights += """
 \n## Pre-Computed Positioning Intelligence (from evaluator):
 - Level Delta: {positioning.get('level_delta', 'Unknown')}
 - Positioning Strategy: {positioning.get('positioning_strategy', '')}
 - Downlevel Response: {positioning.get('downlevel_response', '')}"""
         if compensation:
-            precomputed_insights += f"""
+            precomputed_insights += """
 \n## Pre-Computed Compensation Intelligence (from evaluator):
 - Company Type: {compensation.get('company_type', 'Unknown')}
 - Comp Reliability: {compensation.get('comp_reliability', 'Unknown')}
 - Expected Stable Cash: {compensation.get('expected_stable_cash', 'Unknown')}"""
     
-    deep_research_prompt = f"""You are a Silicon Valley Business Analyst (Career-Ops Deep Mode).
+    deep_research_prompt = """You are a Silicon Valley Business Analyst (Career-Ops Deep Mode).
 Analyze the following Job Description for {company} and generate a concise 6-Axis Deep Profile:
 1. Business Strategy & Market Position
 2. Engineering Culture & Tech Stack
@@ -46,11 +46,11 @@ Analyze the following Job Description for {company} and generate a concise 6-Axi
 Job Requirements: {job_requirements}
 """
     deep_profile = generate(deep_research_prompt, use_case="hard_filter")
-    print(f"[Strategy Generator] Deep Profile generated.")
+    print("[Strategy Generator] Deep Profile generated.")
     
-    print(f"[Strategy Generator] Step 2: Drafting Cover Letter...")
+    print("[Strategy Generator] Step 2: Drafting Cover Letter...")
     
-    prompt = f"""You are an elite SPrav AI Agent.
+    prompt = """You are an elite SPrav AI Agent.
 The user is manually applying to the following job.
 Company: {company}
 Title: {title}
@@ -98,7 +98,7 @@ def generate_application_email(job_id: int, company: str, title: str, extracted_
     """
     print(f"\n[Strategy Generator] Drafting Direct Application Email for {company}...")
     
-    prompt = f"""You are an elite SPrav AI Agent.
+    prompt = """You are an elite SPrav AI Agent.
 Draft a highly professional Application Email for the user to send directly to the founder/recruiter at {company} for the {title} role.
 
 User Data: {master_identity}

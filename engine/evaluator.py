@@ -158,5 +158,7 @@ Pre-Calculated Verified Experience: {yoe} years (Use this exact number for YoE r
         except Exception as e:
             print(f"[Knowledge Distiller Error] Failed to parse DeepSeek JSON: {e}")
             parsed_data = {"score": 0.0, "match": False, "rubric": {}}
+            is_match = False
             
+        parsed_data["match"] = is_match
         return parsed_data
