@@ -13,6 +13,11 @@ function AuthGate({ setToken }) {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }, []);
+
+    useEffect(() => {
         const checkSetup = async () => {
             try {
                 const res = await axios.get(`${API_BASE}/setup-check`);

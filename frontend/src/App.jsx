@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Briefcase, LayoutDashboard, Database, Activity, Search, Send, Mail, CheckCircle, Settings as SettingsIcon, BarChart2, Target, Eye } from 'lucide-react'
+import { Briefcase, LayoutDashboard, Database, Activity, Search, Send, Mail, CheckCircle, Settings as SettingsIcon, BarChart2, Target, Eye, Sun, Moon } from 'lucide-react'
 import ManualReview from './pages/ManualReview'
 import KnowledgeBaseEditor from './pages/KnowledgeBaseEditor'
 import Onboarding from './pages/Onboarding'
@@ -16,12 +16,18 @@ const API_BASE = 'http://localhost:8000/api'
 
 function App() {
   const [activeTab, setActiveTab] = useState('home')
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark')
   const [metrics, setMetrics] = useState(null)
   const [jobs, setJobs] = useState([])
   const [sysConfig, setSysConfig] = useState({threshold: 4.0, filter_prompt: "", resume_prompt: "", max_applications_per_day: 30, target_salary: ""})
   const [frictionData, setFrictionData] = useState([])
   const [salaryData, setSalaryData] = useState(null)
   const [token, setToken] = useState(localStorage.getItem('sprav_token') || null)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   useEffect(() => {
     if (token) {
@@ -128,6 +134,13 @@ function App() {
           </div>
           <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
             <SettingsIcon size={20} /> Settings &amp; Auth
+          </div>
+          
+          <div style={{ marginTop: 'auto', paddingTop: '1rem' }}>
+            <div className="nav-item" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </div>
           </div>
         </div>
       </div>
