@@ -1,7 +1,7 @@
 import shutil
 from PIL import Image
 
-src_png = r"C:\Users\svspr\.gemini\antigravity-ide\brain\e4f7e4d9-c056-431d-9b68-b5b6b04951b0\sprav_logo_premium_1784833679859.png"
+src_png = r"C:\Users\svspr\.gemini\antigravity-ide\brain\e4f7e4d9-c056-431d-9b68-b5b6b04951b0\sprav_logo_v2_1784834355892.png"
 dst_favicon = r"C:\My Job APPLYING App\frontend\public\favicon.png"
 dst_ico = r"C:\My Job APPLYING App\app_icon.ico"
 
