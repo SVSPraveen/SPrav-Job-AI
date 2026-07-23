@@ -8,6 +8,8 @@ function AuthGate({ setToken }) {
     const [mode, setMode] = useState('loading'); // 'loading' | 'login' | 'signup'
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [name, setName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -36,6 +38,12 @@ function AuthGate({ setToken }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (mode === 'signup' && password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
+
         setLoading(true);
 
         const url = mode === 'signup' ? `${API_BASE}/signup` : `${API_BASE}/login`;
@@ -110,16 +118,44 @@ function AuthGate({ setToken }) {
                 
                 <div>
                     <label className="input-label">Password</label>
-                    <input 
-                        type="password" 
-                        placeholder="Enter a secure password..." 
-                        value={password} 
-                        onChange={e => setPassword(e.target.value)} 
-                        className="input-field"
-                        required 
-                        minLength={6}
-                    />
+                    <div style={{ position: 'relative' }}>
+                        <input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="Enter a secure password..." 
+                            value={password} 
+                            onChange={e => setPassword(e.target.value)} 
+                            className="input-field"
+                            required 
+                            minLength={6}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: 'var(--text-secondary)', padding: 0 }}
+                            title={showPassword ? "Hide Password" : "Show Password"}
+                        >
+                            {showPassword ? '👁️' : '👁️‍🗨️'}
+                        </button>
+                    </div>
                 </div>
+
+                {mode === 'signup' && (
+                    <div>
+                        <label className="input-label">Confirm Password</label>
+                        <div style={{ position: 'relative' }}>
+                            <input 
+                                type={showPassword ? "text" : "password"} 
+                                placeholder="Retype your password..." 
+                                value={confirmPassword} 
+                                onChange={e => setConfirmPassword(e.target.value)}
+                                onPaste={e => e.preventDefault()} 
+                                className="input-field"
+                                required={mode === 'signup'} 
+                                minLength={6}
+                            />
+                        </div>
+                    </div>
+                )}
                 
                 <button 
                     type="submit" 
