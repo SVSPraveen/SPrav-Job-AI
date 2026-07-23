@@ -1,7 +1,7 @@
 import shutil
 from PIL import Image
 
-src_png = r"C:\My Job APPLYING App\sprav_logo_moe.png"
+src_png = r"C:\My Job APPLYING App\SPrav logo.png"
 dst_favicon = r"C:\My Job APPLYING App\frontend\public\favicon.png"
 dst_ico = r"C:\My Job APPLYING App\app_icon.ico"
 
