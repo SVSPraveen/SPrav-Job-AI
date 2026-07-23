@@ -38,6 +38,7 @@ def init_users_db():
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
+            recovery_key_hash TEXT,
             created_at TEXT DEFAULT (datetime('now')),
             last_login TEXT
         );
@@ -61,6 +62,13 @@ def init_users_db():
             created_at TEXT DEFAULT (datetime('now'))
         );
     """)
+    
+    # Simple migration for existing databases
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN recovery_key_hash TEXT")
+    except sqlite3.OperationalError:
+        pass # Column already exists
+
     conn.commit()
     conn.close()
 
@@ -115,13 +123,14 @@ def create_user(name: str, email: str, password: str) -> dict:
     conn = sqlite3.connect(USERS_DB)
     cursor = conn.cursor()
     try:
+        recovery_key = f"SPRAV-{os.urandom(4).hex().upper()}"
         cursor.execute(
-            "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
-            (name.strip(), email.strip().lower(), _hash_password(password))
+            "INSERT INTO users (name, email, password_hash, recovery_key_hash) VALUES (?, ?, ?, ?)",
+            (name.strip(), email.strip().lower(), _hash_password(password), _hash_password(recovery_key))
         )
         conn.commit()
         user_id = cursor.lastrowid
-        return {"id": user_id, "name": name, "email": email}
+        return {"id": user_id, "name": name, "email": email, "recovery_key": recovery_key}
     except sqlite3.IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -129,6 +138,29 @@ def create_user(name: str, email: str, password: str) -> dict:
         )
     finally:
         conn.close()
+
+def reset_password(email: str, recovery_key: str, new_password: str):
+    """Resets the password using the Master Recovery Key."""
+    conn = sqlite3.connect(USERS_DB)
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT id, recovery_key_hash FROM users WHERE email = ?", (email.strip().lower(),))
+    row = cursor.fetchone()
+    
+    if not row or not row[1] or not _verify_password(recovery_key.strip(), row[1]):
+        conn.close()
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Email or Master Recovery Key."
+        )
+        
+    cursor.execute(
+        "UPDATE users SET password_hash = ? WHERE id = ?",
+        (_hash_password(new_password), row[0])
+    )
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
 
 
 def authenticate_user(email: str, password: str) -> dict:

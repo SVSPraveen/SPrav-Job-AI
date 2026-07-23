@@ -13,7 +13,7 @@ from engine.negotiator import generate_negotiation_script
 from engine.upskill_oracle import get_upskill_directive
 from engine.auth import (
     create_access_token, verify_token, get_user_credentials,
-    has_any_account, create_user, authenticate_user,
+    has_any_account, create_user, authenticate_user, reset_password,
     save_credential, get_credentials, get_all_credentials,
     get_user_id_from_token, save_copilot_message, get_copilot_history
 )
@@ -95,6 +95,11 @@ class SignupData(BaseModel):
     email: str
     password: str
 
+class ResetPasswordData(BaseModel):
+    email: str
+    recovery_key: str
+    new_password: str
+
 class CredentialData(BaseModel):
     service: str
     credentials: dict  # {key: value}
@@ -110,10 +115,20 @@ def setup_check():
 
 @app.post("/api/signup")
 def signup(data: SignupData):
-    """Creates a user account on this machine."""
-    user = create_user(data.name, data.email, data.password)
-    token = create_access_token(user)
-    return {"access_token": token, "token_type": "bearer", "name": user["name"]}
+    try:
+        user = create_user(data.name, data.email, data.password)
+        token = create_access_token(user)
+        return {"access_token": token, "token_type": "bearer", "recovery_key": user.get("recovery_key")}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/reset-password")
+def reset_password_endpoint(data: ResetPasswordData):
+    try:
+        reset_password(data.email, data.recovery_key, data.new_password)
+        return {"message": "Password reset successfully. You can now log in."}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/api/login")
 def login(data: LoginData):
