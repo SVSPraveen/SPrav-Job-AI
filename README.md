@@ -8,6 +8,23 @@ SPrav is a self-hosted, offline AI pipeline that discovers job listings, filters
 
 ---
 
+## ⚡ Pros & Cons
+
+### ✅ Pros
+- **100% Free Inference**: Runs entirely on your local GPU via Ollama. Zero API costs.
+- **Total Privacy**: Your email, phone number, and resume data never touch OpenAI or Anthropic servers.
+- **First-Mover Advantage**: Direct-to-ATS scraping catches jobs the minute they are posted, bypassing noisy aggregators.
+- **Adversarial Fact-Checking**: Prevents AI hallucinations. If the AI invents a metric (e.g. 50% revenue growth instead of 20%), the Fact Checker catches it and forces a rewrite.
+- **Cloud Accelerators (Optional)**: Can route to Groq for insanely fast JSON extraction or OpenRouter (Claude 3.5 Sonnet) for elite-tier resume prose if you want to speed up the local pipeline.
+
+### ❌ Cons
+- **Strict Hardware Floor**: Requires a dedicated GPU with at least **8GB VRAM**.
+- **Not a "Spray and Pray" bot**: SPrav applies to 10-20 highly relevant jobs a day, perfectly tailored. It does not spam 1,000 jobs a day with a generic PDF.
+- **Setup Complexity**: Requires installing Playwright, Ollama, Node, and pulling multiple models before first run.
+- **No GUI for Configuration**: Core pipeline logic (like changing models) requires editing `config.json` or Python files.
+
+---
+
 ## AI Model Architecture (Mixture-of-Experts, Local Only)
 
 The system uses a **Mixture-of-Experts (MoE)** routing pattern. Instead of one giant model for everything, each specialist task is routed to the best-in-class model for that exact job. All models run locally via **Ollama** on your GPU.
@@ -37,9 +54,10 @@ The system uses a **Mixture-of-Experts (MoE)** routing pattern. Instead of one g
 
 ## Known Limitations
 
-### Hardware Limits
+### Hardware Limits: 8GB VRAM is a HARD REQUIREMENT
+- **8 GB VRAM Floor:** To run this pipeline in 100% local mode, you **MUST** have a GPU with at least 8GB of VRAM (e.g., RTX 3060, 4060, or Mac M-series equivalent). The 7B and 8B models (quantized at Q4) require ~5.5GB of VRAM to load, leaving headroom for the context window. **If you have less than 8GB VRAM, the local pipeline will crash with an Out-of-Memory (OOM) error.**
+  - *Workaround:* If you lack the hardware, you must add a Groq or OpenRouter API key to `.env` to offload the LLM inference to the cloud.
 - **One model at a time.** The GPU mutex serialises all generation calls. The 2-worker parallel daemon provides CPU-level concurrency, but GPU inference is strictly sequential. Running 2 jobs in parallel gives zero GPU speedup.
-- **8 GB VRAM ceiling.** Any model above ~8B parameters (Q4) will OOM. If you upgrade to 16 GB VRAM, you can switch `llama3.1:8b` to `llama3.1:70b` in the System Config tab for dramatically better prose.
 - **Slow on cold start.** The first job of each daemon cycle takes ~15–30 seconds longer because Ollama loads the model from SSD into VRAM. Subsequent jobs on the same model are fast.
 
 ### AI / Output Limits
