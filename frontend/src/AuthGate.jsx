@@ -21,14 +21,13 @@ function AuthGate({ setToken }) {
         const checkSetup = async () => {
             try {
                 const res = await axios.get(`${API_BASE}/setup-check`);
-                if (res.data.has_account) {
-                    setMode('login');
-                } else {
-                    setMode('signup');
-                }
+                setMode(prev => {
+                    if (prev !== 'loading') return prev;
+                    return res.data.has_account ? 'login' : 'signup';
+                });
             } catch (err) {
                 console.error("Setup check failed", err);
-                setMode('login'); // fallback
+                setMode(prev => prev === 'loading' ? 'login' : prev); // fallback
             }
         };
         checkSetup();
