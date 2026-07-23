@@ -32,6 +32,7 @@ from scraper_service.ats_direct import run_ats_discovery
 from apply.greenhouse import apply_to_greenhouse
 from apply.lever import apply_to_lever
 from tracking.notifier import send_email_notification
+from discovery.linkedin_scanner import run_linkedin_scanner
 from engine.config import (
     ATS_AUTO_APPLY_THRESHOLD,
     FIT_AUTO_APPLY_THRESHOLD,
@@ -758,6 +759,14 @@ def run_daemon():
         except Exception as e:
             print(f"[Daemon Error] Pipeline failed this cycle: {e}")
             
+        # Run LinkedIn post scanner every other cycle (~30 min cadence)
+        if cycle % 2 == 0:
+            print("\n--- Triggering LinkedIn HR/CEO Post Scanner ---")
+            try:
+                run_linkedin_scanner()
+            except Exception as e:
+                print(f"LinkedIn Scanner error: {e}")
+
         sleep_minutes = random.randint(5, 15)
         print(f"\n[Daemon] Cycle {cycle} complete. Sleeping for {sleep_minutes} minutes...")
         time.sleep(sleep_minutes * 60)

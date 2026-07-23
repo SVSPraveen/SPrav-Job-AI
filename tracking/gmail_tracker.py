@@ -1,5 +1,10 @@
 import os.path
+import os
 import sqlite3
+import email as email_lib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -8,7 +13,13 @@ import base64
 import json
 from engine.llm_provider import generate
 
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+# NOTE: Scope now includes gmail.send for LinkedIn post auto-outreach.
+# If you are upgrading from an older version, delete token.json and
+# re-authorize once to grant the new scope.
+SCOPES = [
+    'https://www.googleapis.com/auth/gmail.readonly',
+    'https://www.googleapis.com/auth/gmail.send',
+]
 DB_PATH = "jobs.db"
 
 def authenticate_gmail():
@@ -88,6 +99,44 @@ def update_job_status_from_email(company, status):
         conn.commit()
         print(f"  -> Updated job {job_id} ({company}) to {db_status}")
     conn.close()
+
+def send_email(to: str, subject: str, body_text: str, attachment_path: str = None) -> bool:
+    """
+    Sends an email via the Gmail API.
+    Optionally attaches a file (e.g. a tailored resume PDF).
+    Returns True on success, False on failure.
+    """
+    creds = authenticate_gmail()
+    if not creds:
+        print("[Gmail] Cannot send — not authenticated.")
+        return False
+
+    try:
+        service = build('gmail', 'v1', credentials=creds)
+
+        msg = MIMEMultipart()
+        msg['To'] = to
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body_text, 'plain'))
+
+        if attachment_path and os.path.exists(attachment_path):
+            with open(attachment_path, 'rb') as f:
+                part = MIMEApplication(f.read(), Name=os.path.basename(attachment_path))
+            part['Content-Disposition'] = f'attachment; filename="{os.path.basename(attachment_path)}"'
+            msg.attach(part)
+
+        raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+        service.users().messages().send(
+            userId='me',
+            body={'raw': raw}
+        ).execute()
+
+        print(f"[Gmail] Email sent successfully to {to}")
+        return True
+
+    except Exception as e:
+        print(f"[Gmail] Failed to send email: {e}")
+        return False
 
 def scan_inbox():
     creds = authenticate_gmail()
