@@ -245,6 +245,64 @@ def run_all_scrapers() -> list:
 
     print("Checking Company Career Page Watchlist...")
     jobs.extend(scrape_company_watchlist())
-    
+
+    print("Scraping Naukri.com...")
+    jobs.extend(scrape_naukri())
+
     print(f"Total jobs discovered: {len(jobs)}")
     return jobs
+
+def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
+    """
+    Runs naukri_scraper.js for each target keyword and returns new job listings.
+    Keywords default to common SDE/tech roles if not specified.
+    """
+    if keywords is None:
+        keywords = [
+            "software developer",
+            "backend developer",
+            "frontend developer",
+            "full stack developer",
+            "python developer",
+            "react developer",
+        ]
+
+    js_script = os.path.join(os.path.dirname(__file__), "..", "scraper_service", "naukri_scraper.js")
+    if not os.path.exists(js_script):
+        print("naukri_scraper.js not found — skipping.")
+        return []
+
+    all_jobs = []
+    for keyword in keywords:
+        print(f"  Naukri: '{keyword}'...")
+        try:
+            result = subprocess.run(
+                ["node", js_script, keyword, str(limit_per_keyword)],
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            output = result.stdout.strip()
+            if not output:
+                continue
+            data = json.loads(output)
+            for item in data:
+                all_jobs.append({
+                    "id": f"naukri_{uuid.uuid4().hex[:10]}",
+                    "title": item.get("title", ""),
+                    "company": item.get("company", ""),
+                    "url": item.get("url", ""),
+                    "description": item.get("description", ""),
+                    "location": item.get("location", "India"),
+                    "source": "Naukri",
+                    "fit_score": 0,
+                    "scam_flags": "",
+                    "status": "new"
+                })
+        except json.JSONDecodeError as e:
+            print(f"  Naukri JSON parse error for '{keyword}': {e}")
+        except Exception as e:
+            print(f"  Naukri scraper failed for '{keyword}': {e}")
+
+    print(f"  Naukri: {len(all_jobs)} total new jobs found.")
+    return all_jobs
