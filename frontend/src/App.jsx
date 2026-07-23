@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Briefcase, LayoutDashboard, Database, Activity, Search, Send, Mail, CheckCircle, Settings, BarChart2, Target, Eye } from 'lucide-react'
+import { Briefcase, LayoutDashboard, Database, Activity, Search, Send, Mail, CheckCircle, Settings as SettingsIcon, BarChart2, Target, Eye } from 'lucide-react'
 import ManualReview from './pages/ManualReview'
 import KnowledgeBaseEditor from './pages/KnowledgeBaseEditor'
 import Onboarding from './pages/Onboarding'
 import ApplicationScope from './pages/ApplicationScope'
 import WatchlistManager from './pages/WatchlistManager'
-import Settings from './pages/Settings'
+import SettingsPage from './pages/Settings'
 import AuthGate from './AuthGate'
 import HumanApply from './HumanApply'
 import Copilot from './Copilot'
@@ -124,10 +124,10 @@ function App() {
             <Eye size={20} /> Company Watchlist
           </div>
           <div className={`nav-item ${activeTab === 'config' ? 'active' : ''}`} onClick={() => setActiveTab('config')}>
-            <Settings size={20} /> System Config
+            <SettingsIcon size={20} /> System Config
           </div>
           <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-            <Settings size={20} /> Settings & Auth
+            <SettingsIcon size={20} /> Settings &amp; Auth
           </div>
         </div>
       </div>
@@ -349,7 +349,7 @@ function App() {
         )}
 
         {activeTab === 'settings' && (
-          <Settings token={token} />
+          <SettingsPage token={token} />
         )}
 
         {activeTab === 'watchlist' && (
