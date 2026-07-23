@@ -1,5 +1,6 @@
 from fastapi import FastAPI, BackgroundTasks, UploadFile, File, Body, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import sqlite3
 import os
@@ -25,6 +26,10 @@ import tempfile
 import shutil
 
 app = FastAPI()
+
+if not os.path.exists("resumes"):
+    os.makedirs("resumes")
+app.mount("/resumes", StaticFiles(directory="resumes"), name="resumes")
 
 # Allow frontend to communicate with backend
 app.add_middleware(

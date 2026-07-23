@@ -108,7 +108,12 @@ def verify_job_node(state: JobState) -> JobState:
         return state
         
     print("\n[Phase 0.5] Executing Block G Posting-Legitimacy Check...")
-    is_ghost, scam_reason = detect_ghost_job(job['description'], job.get('location', ''))
+    is_ghost, scam_reason = detect_ghost_job(
+        job['description'],
+        job.get('location', ''),
+        company=job.get('company', ''),
+        title=job.get('title', '')
+    )
     if is_ghost:
         print(f"[Phase 0.5] WARNING: Job rejected! Reason: {scam_reason}")
         with db_mutex:
@@ -522,12 +527,25 @@ def compile_dispatch_node(state: JobState) -> JobState:
             return state
 
         # ── Actually invoke Playwright ───────────────────────────────────────
-        print(f"[Dispatcher] All gates passed. Invoking Playwright for {url}...")
+        print(f"[Dispatcher] All gates passed. Checking if URL is a supported ATS for Auto-Apply...")
+        
+        apply_fn = None
         if "greenhouse.io" in url:
             apply_fn = apply_to_greenhouse
-        else:
+        elif "lever.co" in url:
             apply_fn = apply_to_lever
+            
+        if apply_fn is None:
+            # It's an unsupported ATS (e.g. Workday, custom portal extracted from Freshershunt)
+            print(f"[Dispatcher] {url} is not a supported Auto-Apply ATS. Routing to Human Apply Queue.")
+            generate_strategy_report(job['id'], company, title,
+                                     state['extracted_json'], state['master_identity'],
+                                     state.get('evaluation_rubric'))
+            update_job_status(job['id'], 'pending_cover_letter')
+            state['status'] = 'pending_cover_letter'
+            return state
 
+        print(f"[Dispatcher] Invoking Playwright for {url}...")
         apply_success = apply_fn(job["url"], personal_info, pdf_path)
 
         if apply_success:

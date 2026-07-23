@@ -1,6 +1,8 @@
 import requests
 import os
 import uuid
+import json
+import subprocess
 
 def load_targeting() -> dict:
     return {"target_locations": ["Remote", "Worldwide"]}
@@ -128,6 +130,51 @@ def scrape_remoteok() -> list:
         
     return scraped_jobs
 
+def scrape_freshershunt() -> list:
+    """Uses Playwright/Puppeteer-extra to bypass ads and extract official links from Freshershunt."""
+    print("Scraping Freshershunt via headless Node.js ad-bypasser...")
+    js_script = os.path.join(os.path.dirname(__file__), "..", "scraper_service", "freshershunt_bypass.js")
+    
+    if not os.path.exists(js_script):
+        print("Freshershunt JS scraper not found.")
+        return []
+        
+    try:
+        # We pass 10 as the limit
+        result = subprocess.run(["node", js_script, "10"], capture_output=True, text=True, timeout=120)
+        
+        # The JS script outputs JSON on the very last line
+        output = result.stdout.strip()
+        # Find the last line that looks like an array
+        json_str = "[]"
+        for line in reversed(output.split('\n')):
+            if line.startswith("[") and line.endswith("]"):
+                json_str = line
+                break
+                
+        data = json.loads(json_str)
+    except Exception as e:
+        print(f"Failed to execute Freshershunt scraper: {e}")
+        return []
+
+    scraped_jobs = []
+    for item in data:
+        job = {
+            "id": f"freshershunt_{uuid.uuid4().hex[:8]}",
+            "title": item.get("title", ""),
+            "company": "Freshershunt Extracted", # Usually need deeper extraction for company name
+            "url": item.get("url", ""),
+            "description": f"Extracted from {item.get('original_post')}",
+            "location": "India / Remote",
+            "source": "Freshershunt",
+            "fit_score": 0,
+            "scam_flags": "",
+            "status": "new"
+        }
+        scraped_jobs.append(job)
+        
+    return scraped_jobs
+
 def run_all_scrapers() -> list:
     """Runs all configured scrapers and returns a combined list of jobs."""
     print("Scraping Arbeitnow...")
@@ -136,4 +183,9 @@ def run_all_scrapers() -> list:
     jobs.extend(scrape_remotive())
     print("Scraping RemoteOK...")
     jobs.extend(scrape_remoteok())
+    
+    print("Scraping Freshershunt...")
+    jobs.extend(scrape_freshershunt())
+    
+    print(f"Total jobs discovered: {len(jobs)}")
     return jobs

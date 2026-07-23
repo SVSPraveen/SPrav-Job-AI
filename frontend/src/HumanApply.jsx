@@ -46,18 +46,34 @@ function HumanApply({ token }) {
                     {jobs.map(job => (
                         <div key={job.id} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
-                                <h3 style={{ margin: '0 0 0.5rem 0' }}>{job.title} at {job.company}</h3>
+                                <h3 style={{ margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    {job.title} at {job.company}
+                                    {job.url && job.url.includes('freshershunt') && (
+                                        <span className="badge" style={{ background: 'linear-gradient(45deg, #FF6B6B, #FF8E53)', color: '#fff' }}>Freshershunt Bypassed</span>
+                                    )}
+                                </h3>
                                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0 }}>
-                                    Match: {job.fit_score} | <a href={job.url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>Go to Job Posting</a>
+                                    Match: {job.fit_score} | <a href={job.url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>Open Company Portal</a>
                                 </p>
                             </div>
-                            <button 
-                                className="btn" 
-                                style={{ background: 'var(--success)' }} 
-                                onClick={() => markApplied(job.id)}
-                            >
-                                I Applied
-                            </button>
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                <a 
+                                    href={`http://localhost:8000/resumes/${encodeURIComponent(job.company)}_Tailored.pdf`}
+                                    download 
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="btn btn-secondary"
+                                >
+                                    📥 Download Tailored Resume
+                                </a>
+                                <button 
+                                    className="btn" 
+                                    style={{ background: 'var(--success)' }} 
+                                    onClick={() => markApplied(job.id)}
+                                >
+                                    I Applied
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

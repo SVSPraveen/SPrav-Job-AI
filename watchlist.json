@@ -1,0 +1,24 @@
+{
+  "companies": [
+    { "name": "Google India", "careers_url": "https://careers.google.com/jobs/results/?location=India" },
+    { "name": "Microsoft India", "careers_url": "https://jobs.careers.microsoft.com/global/en/search?q=&lc=India&l=en_us" },
+    { "name": "Amazon India", "careers_url": "https://www.amazon.jobs/en/search?country%5B%5D=IND" },
+    { "name": "Flipkart", "careers_url": "https://www.flipkartcareers.com/#!/joblist" },
+    { "name": "Zepto", "careers_url": "https://jobs.lever.co/zepto" },
+    { "name": "Razorpay", "careers_url": "https://razorpay.com/jobs/" },
+    { "name": "CRED", "careers_url": "https://careers.cred.club/" },
+    { "name": "Meesho", "careers_url": "https://meesho.io/jobs" },
+    { "name": "PhonePe", "careers_url": "https://www.phonepe.com/careers/#openings" },
+    { "name": "Swiggy", "careers_url": "https://careers.swiggy.com/#careers" },
+    { "name": "Ola", "careers_url": "https://ola.skillate.com/" },
+    { "name": "Zomato", "careers_url": "https://www.zomato.com/careers" },
+    { "name": "Groww", "careers_url": "https://groww.in/careers" },
+    { "name": "Cleartax", "careers_url": "https://cleartax.in/careers" },
+    { "name": "Freshworks", "careers_url": "https://careers.freshworks.com/jobs" },
+    { "name": "Zoho", "careers_url": "https://careers.zohocorp.com/jobs/Careers" },
+    { "name": "Infosys", "careers_url": "https://career.infosys.com/joblist" },
+    { "name": "Wipro", "careers_url": "https://careers.wipro.com/careers-home/jobs" },
+    { "name": "TCS", "careers_url": "https://ibegin.tcs.com/iBegin/jobs/search" },
+    { "name": "Postman", "careers_url": "https://www.postman.com/company/careers/open-positions/" }
+  ]
+}

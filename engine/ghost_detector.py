@@ -1,9 +1,80 @@
 import re
 import json
+import os
 from engine.llm_provider import generate
 
+# ─── Known Ed-Tech & Fake Recruitment Company Blacklist ───────────────────────
+# These companies are well-documented to post fake "We're Hiring!" social posts
+# that are either lead-gen for their own courses or mass-resume harvesting.
 
-def detect_ghost_job(description: str, location: str) -> tuple[bool, str]:
+EDTECH_SCAM_COMPANIES = {
+    "upgrad", "unacademy", "byju", "byjus", "great learning", "simplilearn",
+    "skillsoft", "coursera business", "udemy for business", "intellipaat",
+    "edureka", "jigsaw academy", "imarticus", "henrys academy", "masai school",
+    "coding ninjas", "newton school", "scalar", "scaler", "lambdatest academy",
+    "almabetter", "learnbay", "upgrade", "prepinsta",
+}
+
+# Phrases that appear in LinkedIn posts from fake HR/CEO "social recruiting" scams
+FAKE_SOCIAL_RECRUITING_SIGNALS = [
+    "comment yes if interested",
+    "comment 'interested'",
+    "drop your resume in comments",
+    "dm me your cv",
+    "dm me your resume",
+    "dm me if interested",
+    "limited seats",
+    "batch starting",
+    "next batch",
+    "enroll now",
+    "join our free webinar",
+    "guaranteed placement",
+    "100% placement",
+    "placement guarantee",
+    "course fee",
+    "training fee",
+    "pay after placement",
+    "pay after job",
+    "income share agreement",
+    "isa model",
+    "upskill to get hired",
+    "get certified",
+    "apply through our portal after completing",
+    "whatsapp your resume",
+    "share this post to apply",
+    "repost to apply",
+    "like and comment to apply",
+]
+
+# Suspicious title patterns that are almost never real SDE/tech roles
+FAKE_TITLE_PATTERNS = [
+    r"business development (executive|associate|intern)",
+    r"sales (executive|associate|intern|officer)",
+    r"telecaller",
+    r"insurance (advisor|agent|associate)",
+    r"financial advisor",
+    r"mlm",
+    r"multi.level marketing",
+    r"network marketing",
+    r"direct selling",
+    r"field sales",
+]
+
+
+def _load_company_blacklist() -> set:
+    """Loads user-managed blacklist.txt of banned company names."""
+    blacklist_path = "blacklist.txt"
+    result = set()
+    if os.path.exists(blacklist_path):
+        with open(blacklist_path, "r", encoding="utf-8") as f:
+            for line in f:
+                stripped = line.strip().lower()
+                if stripped and not stripped.startswith("#"):
+                    result.add(stripped)
+    return result
+
+
+def detect_ghost_job(description: str, location: str, company: str = "", title: str = "") -> tuple[bool, str]:
     """
     Ghost Job and Scam Detector (Block G Legitimacy Check).
     Combines fast zero-token regex checks with a deep semantic forensics pass
@@ -12,7 +83,43 @@ def detect_ghost_job(description: str, location: str) -> tuple[bool, str]:
     """
     desc_lower = description.lower()
     loc_lower = location.lower()
+    company_lower = company.lower().strip()
+    title_lower = title.lower().strip()
     flags = []
+
+    # ── Gate 0: User-managed company blacklist ───────────────────────────────
+    user_blacklist = _load_company_blacklist()
+    if company_lower and company_lower in user_blacklist:
+        return True, f"Company blacklisted by user: '{company}'"
+
+    # ── Gate 0.25: Known Ed-Tech Scam Companies ──────────────────────────────
+    # Ed-tech companies post fake "We're Hiring!" posts to harvest resumes and
+    # funnel applicants into paid courses. Never auto-apply to them.
+    for edtech in EDTECH_SCAM_COMPANIES:
+        if edtech in company_lower:
+            return True, (
+                f"Ed-Tech Company Blocked: '{company}' is a known ed-tech that posts "
+                "fake job listings to harvest resumes and sell courses"
+            )
+
+    # ── Gate 0.5: Fake Social Recruiting Signals ─────────────────────────────
+    # Catches LinkedIn "HR/CEO" posts that are actually course funnels or scams.
+    for signal in FAKE_SOCIAL_RECRUITING_SIGNALS:
+        if signal in desc_lower:
+            return True, (
+                f"Fake Social Recruiting Detected: '{signal}' — this looks like a "
+                "LinkedIn lead-gen post, not a real job opening"
+            )
+
+    # ── Gate 0.75: Fake Job Title Patterns ───────────────────────────────────
+    # Filters out sales/BD/MLM roles disguised as tech jobs, often posted by
+    # insurance agencies and ed-tech companies targeting fresh graduates.
+    for pattern in FAKE_TITLE_PATTERNS:
+        if re.search(pattern, title_lower):
+            return True, (
+                f"Suspicious Title Pattern: '{title}' matches a known non-tech "
+                "disguised role (sales, MLM, insurance, or telecalling)"
+            )
 
     # 1. Jurisdiction Mismatch (Copy-paste template error)
     is_non_us = any(k in loc_lower for k in ["canada", "uk ", "united kingdom", "europe"])
