@@ -38,7 +38,11 @@
 
 Job hunting is a full-time job. **SPrav completely automates the most exhausting parts of the process.** 
 
-Instead of mindlessly scrolling through job boards, SPrav acts as your personal, highly-coordinated AI workforce. It monitors the internet for new job postings on platforms like **Indeed**, **Hacker News (Who is Hiring)**, **Y Combinator**, and **Wellfound** using native, credential-free HTTP scrapers. It reads the requirements, explicitly targets your preferred markets (like **India** and **Remote** roles), decides if you are actually a good fit based on your background, custom-rewrites your resume for that specific job to bypass keyword filters, and then drops a completely finished application package and cold-email draft into your Human Review queue.
+Instead of mindlessly scrolling through job boards, SPrav acts as your personal, highly-coordinated AI workforce:
+- 🌐 **Monitors the internet** for new job postings (Indeed, Hacker News, Y Combinator, Wellfound) using native, credential-free HTTP scrapers.
+- 🎯 **Explicitly targets** your preferred markets (e.g., India, Remote) and mathematically calculates if you are a good fit based on your background.
+- ✍️ **Custom-rewrites** your resume for that specific job to effortlessly bypass ATS keyword filters.
+- 📨 **Drops a completely finished application** package and cold-email draft directly into your Human Review queue.
 
 *(Note: LinkedIn automation has been explicitly removed from this project to ensure your personal accounts remain 100% safe from bot detection and ID verification).*
 
@@ -83,15 +87,47 @@ This concatenated "word chain" `(1) + (2) + (3) + (4)` is fed directly back into
 > **8GB VRAM Constraint & Zero-Downtime Failsafe:** The SPrav MOE Model dynamically routes tasks between the Groq API (Primary) and local Ollama models (Fallback). If a network failure occurs, the system fails over to your local machine. To ensure this runs flawlessly on consumer hardware with an **8GB VRAM bottleneck**, we implemented a strict `gpu_mutex` thread lock and pass `keep_alive: 0` to Ollama. This forces the GPU to purge memory between steps, guaranteeing that only one expert model occupies VRAM at a time, completely preventing Out-Of-Memory (OOM) crashes.
 
 ```mermaid
-graph TD;
-    A[Job Discovery Scrapers] -->|Raw HTML| B(Qwen 2.5: Extract JSON);
-    B --> C{DeepSeek-R1 / Groq: Fit Scoring};
-    C -->|Score > Threshold| D[Llama 3.3 / Groq: Resume Tailoring];
-    C -->|Score < Threshold| E[Reject / Watchlist];
-    D --> F[Bespoke-Minicheck: Fact Checker];
-    F -->|Pass| G[Action Required / ATS Apply];
-    F -->|Fail| D;
-    G --> H[(Local SQLite DB)];
+flowchart TD
+    %% Subgraphs for logical grouping
+    subgraph Discovery ["🔍 Phase 1: Discovery"]
+        Scrapers["🕸️ Python HTTP Scrapers<br/>(HN, YC, Indeed, Wellfound)"]
+    end
+
+    subgraph Engine ["🧠 Phase 2: AI Engine (MOE)"]
+        Extractor["🗂️ Qwen 2.5<br/>Data Extraction"]
+        Scorer{"⚖️ DeepSeek-R1 / Groq<br/>Fit Scoring"}
+        Tailor["📝 Llama 3.3 / Groq<br/>Resume Tailoring"]
+        Verifier{"🔎 Bespoke-Minicheck<br/>Fact Verifier"}
+    end
+
+    subgraph Execution ["🚀 Phase 3: Execution"]
+        Reject["🛑 Reject / Watchlist"]
+        Apply["✅ Playwright ATS<br/>Auto-Apply / Inbox"]
+        DB[("💾 Local SQLite<br/>(jobs.db)")]
+    end
+
+    %% Edge connections
+    Scrapers -- "Raw HTML" --> Extractor
+    Extractor -- "Structured JSON" --> Scorer
+    Scorer -- "Score ≥ Threshold" --> Tailor
+    Scorer -- "Score < Threshold" --> Reject
+    Tailor -- "Draft Resume & Email" --> Verifier
+    Verifier -- "Pass (100% Factual)" --> Apply
+    Verifier -- "Fail (Hallucination)" --> Tailor
+    Apply --> DB
+    Reject --> DB
+
+    %% Professional styling
+    classDef default fill:#1E1E2E,stroke:#4C4F69,stroke-width:2px,color:#CDD6F4;
+    classDef decision fill:#313244,stroke:#89B4FA,stroke-width:2px,color:#CDD6F4;
+    classDef success fill:#40A02B,stroke:#A6E3A1,stroke-width:2px,color:#11111B;
+    classDef reject fill:#D20F39,stroke:#F38BA8,stroke-width:2px,color:#11111B;
+    classDef database fill:#1E66F5,stroke:#89B4FA,stroke-width:2px,color:#11111B;
+
+    class Scorer,Verifier decision;
+    class Apply success;
+    class Reject reject;
+    class DB database;
 ```
 
 We utilize different specialized models to handle distinct tasks:
@@ -202,7 +238,7 @@ playwright install chromium
 ### 2. Model Initialization
 
 If you plan to use local fallbacks, ensure [Ollama](https://ollama.com/) is installed. 
-*You do not need to manually pull models.* The SPrav `LaunchJobAssistant.bat` bootstrapper will automatically wake up Ollama in the background and pull `qwen2.5:7b-instruct`, `deepseek-r1:7b`, `hermes3:8b`, `bespoke-minicheck`, and `nomic-embed-text` for you on first launch!
+*You do not need to manually pull models.* The SPrav `LaunchJobAssistant.bat` bootstrapper will automatically wake up Ollama in the background and pull `qwen2.5:7b-instruct`, `deepseek-r1:7b`, `bespoke-minicheck`, and `nomic-embed-text` for you on first launch!
 
 ### 3. Dashboard Configuration
 
