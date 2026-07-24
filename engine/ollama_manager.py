@@ -31,7 +31,8 @@ def is_ollama_installed() -> bool:
             [get_ollama_path(), "--version"], 
             capture_output=True, 
             text=True, 
-            startupinfo=startupinfo
+            startupinfo=startupinfo,
+            stdin=subprocess.DEVNULL
         )
         return "ollama version" in result.stdout.lower()
     except Exception:
@@ -44,7 +45,7 @@ def install_ollama_windows():
         urllib.request.urlretrieve("https://ollama.com/download/OllamaSetup.exe", installer_path)
         print("[Ollama Manager] Download complete. Launching installer...")
         # Run installer and wait for it to finish
-        subprocess.run([installer_path], check=True)
+        subprocess.run([installer_path], check=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("[Ollama Manager] Installation completed.")
         
         # Give the background service a moment to start
@@ -63,12 +64,14 @@ def ensure_ollama_running():
             [get_ollama_path(), "list"], 
             capture_output=True, 
             text=True, 
-            startupinfo=startupinfo
+            startupinfo=startupinfo,
+            stdin=subprocess.DEVNULL
         )
         if "could not connect" in result.stderr.lower() or "error" in result.stderr.lower():
             print("[Ollama Manager] Ollama is asleep. Waking it up in the background...")
             subprocess.Popen(
                 [get_ollama_path(), "serve"],
+                stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 startupinfo=startupinfo,
@@ -89,14 +92,19 @@ def check_and_pull_models():
                 [get_ollama_path(), "list"], 
                 capture_output=True, 
                 text=True, 
-                startupinfo=startupinfo
+                startupinfo=startupinfo,
+                stdin=subprocess.DEVNULL
             )
             if model not in result.stdout:
                 print(f"[Ollama Manager] Pulling {model}... This may take a while depending on your internet speed.")
                 
-                # Show a visible console window for the download progress
-                creationflags = subprocess.CREATE_NEW_CONSOLE if sys.platform == "win32" else 0
-                subprocess.run([get_ollama_path(), "pull", model], creationflags=creationflags)
+                if sys.platform == "win32":
+                    # Use 'start' to spawn a completely detached console window with a title and an explanation
+                    # This avoids all handle inheritance issues and ensures the progress bar renders correctly.
+                    cmd_str = f'start "SPrav AI Downloader" cmd /c "echo [SPrav AI Engine] && echo Downloading required model: {model}... && echo This may take a few minutes depending on your internet connection. && echo. && "{get_ollama_path()}" pull {model}"'
+                    subprocess.run(cmd_str, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                else:
+                    subprocess.run([get_ollama_path(), "pull", model], stdin=subprocess.DEVNULL)
             else:
                 print(f"[Ollama Manager] Model {model} is already installed.")
         except Exception as e:
