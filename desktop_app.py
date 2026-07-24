@@ -33,8 +33,8 @@ def start_backend():
         startupinfo=startupinfo,
         creationflags=subprocess.CREATE_NO_WINDOW,
         stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stdout=log_file,
+        stderr=log_file
     )
 
     # Start Daemon
@@ -43,8 +43,8 @@ def start_backend():
         startupinfo=startupinfo,
         creationflags=subprocess.CREATE_NO_WINDOW,
         stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stdout=log_file,
+        stderr=log_file
     )
 
     # Start Frontend (Vite) - REMOVED!

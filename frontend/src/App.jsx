@@ -12,7 +12,7 @@ import HumanApply from './HumanApply'
 import Copilot from './Copilot'
 import './index.css'
 
-const API_BASE = 'http://localhost:8000/api'
+const API_BASE = '/api'
 
 function App() {
   const [activeTab, setActiveTab] = useState('home')
