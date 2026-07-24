@@ -119,13 +119,21 @@ def auto_login():
         random_password = secrets.token_hex(16)
         user_data = create_user("Local Admin", "admin@localhost", random_password)
         # Create a JWT token for the new user
-        token = create_access_token({"sub": "admin@localhost"})
+        token = create_access_token(user_data)
         return {"access_token": token, "recovery_key": user_data["recovery_key"]}
     else:
         # Fetch the first user and generate a token
-        email, _ = get_user_credentials()
-        token = create_access_token({"sub": email})
-        return {"access_token": token}
+        conn = sqlite3.connect("users.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, name, email FROM users LIMIT 1")
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row:
+            token = create_access_token({"id": row[0], "name": row[1], "email": row[2]})
+            return {"access_token": token}
+        else:
+            raise HTTPException(status_code=500, detail="Database corrupted")
 
 @app.get("/api/setup-check")
 def setup_check():
