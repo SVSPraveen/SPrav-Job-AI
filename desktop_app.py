@@ -64,7 +64,7 @@ def main():
     
     # Start the UI loop (passing the icon for the window title bar and taskbar)
     import os
-    icon_path = os.path.join(os.path.dirname(__file__), 'app_icon.ico')
+    icon_path = os.path.join(os.path.dirname(__file__), 'app_icon_v2.ico')
     webview.start(private_mode=False, icon=icon_path)
     
     # Clean up when the window is closed
