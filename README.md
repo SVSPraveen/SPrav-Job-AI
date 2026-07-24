@@ -95,7 +95,7 @@ flowchart TD
 
     subgraph Engine ["🧠 Phase 2: AI Engine (MOE)"]
         Extractor["🗂️ Qwen 2.5<br/>Data Extraction"]
-        Scorer{"⚖️ DeepSeek-R1 / Groq<br/>Fit Scoring"}
+        Scorer{"⚖️ DeepSeek-R1<br/>Fit Scoring"}
         Tailor["📝 Llama 3.3 / Groq<br/>Resume Tailoring"]
         Verifier{"🔎 Bespoke-Minicheck<br/>Fact Verifier"}
     end
