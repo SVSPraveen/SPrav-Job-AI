@@ -86,8 +86,10 @@ def check_and_pull_models():
             )
             if model not in result.stdout:
                 print(f"[Ollama Manager] Pulling {model}... This may take a while depending on your internet speed.")
-                # We use Popen so it prints to the console directly for progress (if visible)
-                subprocess.run(["ollama", "pull", model])
+                
+                # Show a visible console window for the download progress
+                creationflags = subprocess.CREATE_NEW_CONSOLE if sys.platform == "win32" else 0
+                subprocess.run(["ollama", "pull", model], creationflags=creationflags)
             else:
                 print(f"[Ollama Manager] Model {model} is already installed.")
         except Exception as e:
