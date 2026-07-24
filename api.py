@@ -684,3 +684,10 @@ def api_intake_resolve(req: ResolveRequest):
 @app.get("/api/intake/status", dependencies=[Depends(verify_token)])
 def api_intake_status():
     return {"status": "success", "is_ready": kb_is_ready()}
+
+# Serve the pre-compiled Native React Desktop UI directly from the backend
+frontend_dist = os.path.join(os.path.dirname(__file__), "frontend", "dist")
+if os.path.exists(frontend_dist):
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
+else:
+    print("[WARNING] frontend/dist not found. Did you run 'npm run build'?")
