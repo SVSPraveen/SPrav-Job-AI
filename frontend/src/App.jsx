@@ -30,6 +30,25 @@ function App() {
   }, [theme])
 
   useEffect(() => {
+    const initializeAuth = async () => {
+      if (!token) {
+        try {
+          const res = await axios.get(`${API_BASE}/auto-login`);
+          if (res.data.access_token) {
+            setToken(res.data.access_token);
+            if (res.data.recovery_key) {
+              alert(`Master Recovery Key Generated: ${res.data.recovery_key}\nSave this if you ever need to recover your encrypted database on another machine!`);
+            }
+          }
+        } catch (e) {
+          console.error("Auto-login failed", e);
+        }
+      }
+    };
+    initializeAuth();
+  }, []);
+
+  useEffect(() => {
     if (token) {
       localStorage.setItem('sprav_token', token)
       axios.interceptors.request.use(config => {
@@ -43,7 +62,12 @@ function App() {
   }, [token])
 
   if (!token) {
-    return <AuthGate setToken={setToken} />
+    return (
+        <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-base)' }}>
+            <div className="loading-spinner"></div>
+            <p style={{marginLeft: '1rem', color: 'var(--text-secondary)'}}>Initializing Local Desktop Session...</p>
+        </div>
+    );
   }
 
   const fetchAnalytics = async () => {

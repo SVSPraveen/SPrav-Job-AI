@@ -4,8 +4,14 @@ import subprocess
 import sys
 import os
 
+from engine.ollama_manager import verify_ollama
+
 def start_backend():
     print("Starting backend services...")
+    
+    # Verify Ollama is installed and pull necessary models
+    verify_ollama()
+    
     # Hide window for subprocesses on Windows
     startupinfo = subprocess.STARTUPINFO()
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW

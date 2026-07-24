@@ -111,6 +111,22 @@ class CopilotQuery(BaseModel):
     message: str
     page_context: str = ""  # which page/tab the user is on
 
+@app.get("/api/auto-login")
+def auto_login():
+    """Desktop App Auto-Login: Creates an account if none exists, and returns a valid JWT token."""
+    if not has_any_account():
+        import secrets
+        random_password = secrets.token_hex(16)
+        user_data = create_user("Local Admin", "admin@localhost", random_password)
+        # Create a JWT token for the new user
+        token = create_access_token({"sub": "admin@localhost"})
+        return {"access_token": token, "recovery_key": user_data["recovery_key"]}
+    else:
+        # Fetch the first user and generate a token
+        email, _ = get_user_credentials()
+        token = create_access_token({"sub": email})
+        return {"access_token": token}
+
 @app.get("/api/setup-check")
 def setup_check():
     """Returns whether any account exists. Frontend uses this to show Signup vs Login."""
