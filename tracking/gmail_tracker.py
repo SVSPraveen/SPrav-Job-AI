@@ -13,7 +13,7 @@ import base64
 import json
 from engine.llm_provider import generate
 
-# NOTE: Scope now includes gmail.send for LinkedIn post auto-outreach.
+# NOTE: Scope now includes gmail.send for Direct Cold Email outreach to Founders/Recruiters.
 # If you are upgrading from an older version, delete token.json and
 # re-authorize once to grant the new scope.
 SCOPES = [

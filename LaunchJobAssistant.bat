@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 title AI Job Assistant - NextGen UI Launcher
 color 0B
 

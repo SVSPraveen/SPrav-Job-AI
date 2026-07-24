@@ -20,7 +20,7 @@ function Copilot({ token, currentTab }) {
             setTimeout(() => {
                 setIsOpen(true);
                 setMessages([
-                    { role: 'assistant', content: "Hi! I'm your SPrav Copilot. It looks like this is your first time here. \n\nI recommend starting by going to **Settings & Auth** on the left to securely add your LinkedIn credentials so I can start scouting HR posts for you. \n\nWhat would you like help with first?" }
+                    { role: 'assistant', content: "Hi! I'm your SPrav Copilot. It looks like this is your first time here. \n\nI recommend starting by going to **Settings & Auth** on the left to securely add your credentials. \n\nWhat would you like help with first?" }
                 ]);
                 localStorage.setItem('sprav_copilot_opened', 'true');
                 setHasOpenedOnce(true);

@@ -19,8 +19,13 @@ ATS_AUTO_APPLY_THRESHOLD: float = float(os.getenv("ATS_AUTO_APPLY_THRESHOLD", "0
 FIT_AUTO_APPLY_THRESHOLD: float = float(os.getenv("FIT_AUTO_APPLY_THRESHOLD", "4.0"))
 
 # Maximum number of auto-applications to the SAME company in one calendar day.
-# Prevents over-applying to a single employer and tripping their dedup filters.
-COMPANY_DAILY_CAP: int = int(os.getenv("COMPANY_DAILY_CAP", "3"))
+COMPANY_DAILY_CAP: int = int(os.getenv("COMPANY_DAILY_CAP", "5"))
+
+# Maximum number of auto-applications to the SAME portal in one calendar day.
+PORTAL_DAILY_CAP: int = int(os.getenv("PORTAL_DAILY_CAP", "25"))
+
+# Maximum number of auto-applications across ALL portals combined in one calendar day.
+TOTAL_DAILY_CAP: int = int(os.getenv("TOTAL_DAILY_CAP", "150"))
 
 # Number of consecutive Playwright submission failures that trips the circuit breaker.
 # When tripped, the auto-apply loop pauses and a dashboard banner is shown.
@@ -48,6 +53,8 @@ You are exhausted and skimming. You give each resume 8 seconds.
 If the first bullet under each role does not immediately signal value with a clear number or outcome, you flip to the next resume.
 
 Your sole purpose: make this candidate's resume score a 95+ in all three roles simultaneously.
+
+CRITICAL RULE FOR EXPERIENCE: When calculating Years of Experience (YoE) for the user, ONLY count official Internships or Full-Time employment. Strictly ignore Freelancing, Self-Taught, or Personal Projects when evaluating against the Job's required YoE.
 """
 
 # ─────────────────────────────────────────

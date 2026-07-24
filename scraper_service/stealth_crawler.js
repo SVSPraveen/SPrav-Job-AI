@@ -7,9 +7,8 @@ puppeteer.use(StealthPlugin());
 
 // Configurable multi-platform targets
 const TARGETS = [
-    { name: "LinkedIn", url: "https://www.linkedin.com/jobs/search?keywords=Software%20Engineer&location=Remote&f_TPR=r86400" },
-    // You can add logic for Indeed, Naukri, WeWorkRemotely, Wellfound here
-    // { name: "WeWorkRemotely", url: "https://weworkremotely.com/categories/remote-programming-jobs#job-listings" }
+    { name: "Indeed", url: "https://www.indeed.co.in/jobs?q=Software+Engineer&l=Remote" },
+    { name: "Wellfound", url: "https://wellfound.com/role/software-engineer" }
 ];
 
 async function randomDelay(min = 2000, max = 5000) {

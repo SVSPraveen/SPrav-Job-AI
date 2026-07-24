@@ -4,20 +4,20 @@
   "resume_prompt": "Write a highly dense, ATS-optimized 1-page resume tailored for the job. Do not invent any experience.",
   "providers": {
     "extraction": {
-      "provider": "groq",
-      "model": "llama-3.1-70b-versatile"
+      "provider": "ollama",
+      "model": "qwen2.5-coder:7b-instruct"
     },
     "hard_filter": {
-      "provider": "openrouter",
-      "model": "anthropic/claude-3.5-sonnet"
+      "provider": "ollama",
+      "model": "deepseek-r1:7b"
     },
     "resume_tailoring": {
-      "provider": "openrouter",
-      "model": "anthropic/claude-3.5-sonnet"
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile"
     },
     "toxic_forensics": {
       "provider": "ollama",
-      "model": "magnum-v4:9b"
+      "model": "bespoke-minicheck"
     }
   }
 }

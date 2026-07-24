@@ -4,6 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import sqlite3
 import os
+from dotenv import load_dotenv
+load_dotenv()
 import json
 import subprocess
 import PyPDF2
@@ -22,7 +24,6 @@ from engine.kb_merger import merge, resolve_conflicts, apply_detail_updates, kb_
 from engine.config import (
     ATS_AUTO_APPLY_THRESHOLD,
     FIT_AUTO_APPLY_THRESHOLD,
-    COMPANY_DAILY_CAP,
     AUTO_APPLY_CIRCUIT_BREAKER_N,
 )
 from discovery.db import get_daemon_state, set_daemon_state
@@ -57,21 +58,25 @@ class ConfigData(BaseModel):
     threshold: float = 4.0
     filter_prompt: str = ""
     resume_prompt: str = ""
-    max_applications_per_day: int = 30
+    max_applications_per_day_total: int = 150
+    max_applications_per_day_per_portal: int = 25
+    max_applications_per_day_per_company: int = 5
     target_salary: str = ""
     scoring_caps: list = []
     # Auto-apply gating thresholds (editable via System Config UI)
     ats_auto_apply_threshold: float = ATS_AUTO_APPLY_THRESHOLD
     fit_auto_apply_threshold: float = FIT_AUTO_APPLY_THRESHOLD
-    company_daily_cap: int = COMPANY_DAILY_CAP
     auto_apply_circuit_breaker_n: int = AUTO_APPLY_CIRCUIT_BREAKER_N
 
 def get_default_config():
+    from engine.config import TOTAL_DAILY_CAP, PORTAL_DAILY_CAP, COMPANY_DAILY_CAP
     return {
         "threshold": 4.0,
-        "filter_prompt": "You are a logical filter. Read the Job Requirements and User Context.\nRule: If Job YoE > User YoE, output strictly False. If User skills mismatch core requirements, output False. If {threshold}% match, output True.\nUse <think> tags to reason, then output a final JSON: {\"match\": true} or {\"match\": false}",
-        "resume_prompt": "Write a highly dense, ATS-optimized 1-page resume tailored for the job. Do not invent any experience.",
-        "max_applications_per_day": 30,
+        "filter_prompt": "You are a logical filter. Read the Job Requirements and User Context.\nRule: If Job YoE > User YoE, output strictly False. If User skills mismatch core requirements, output False. If {threshold}% match, output True.\nCRITICAL RULE FOR EXPERIENCE: When calculating Years of Experience (YoE) for the user, ONLY count official Internships or Full-Time employment. Strictly ignore Freelancing, Self-Taught, or Personal Projects when evaluating against the Job's required YoE.\nUse <think> tags to reason, then output a final JSON: {\"match\": true} or {\"match\": false}",
+        "resume_prompt": "Write a highly dense, ATS-optimized 1-page resume tailored for the job. Do not invent any experience. When calculating Years of Experience (YoE) for the user, ONLY count official Internships or Full-Time employment. Strictly ignore Freelancing, Self-Taught, or Personal Projects.",
+        "max_applications_per_day_total": TOTAL_DAILY_CAP,
+        "max_applications_per_day_per_portal": PORTAL_DAILY_CAP,
+        "max_applications_per_day_per_company": COMPANY_DAILY_CAP,
         "target_salary": "",
         "scoring_caps": [
             {
@@ -82,7 +87,6 @@ def get_default_config():
         # Auto-apply gating — defaults from config.py / environment
         "ats_auto_apply_threshold": ATS_AUTO_APPLY_THRESHOLD,
         "fit_auto_apply_threshold": FIT_AUTO_APPLY_THRESHOLD,
-        "company_daily_cap": COMPANY_DAILY_CAP,
         "auto_apply_circuit_breaker_n": AUTO_APPLY_CIRCUIT_BREAKER_N,
     }
 
@@ -244,6 +248,24 @@ def _write_env_var(key: str, value: str):
     with open(env_path, "w") as f:
         f.writelines(lines)
 
+@app.post("/api/debug/reset-jobs")
+def reset_jobs():
+    """Wipes the jobs and auto-apply audit tables so the user can start fresh after onboarding."""
+    conn = sqlite3.connect("jobs.db")
+    c = conn.cursor()
+    c.execute("DELETE FROM jobs")
+    c.execute("DELETE FROM auto_apply_audit")
+    c.execute("DELETE FROM daemon_state")
+    # also reset the auto increment counters
+    try:
+        c.execute("DELETE FROM sqlite_sequence WHERE name='jobs'")
+        c.execute("DELETE FROM sqlite_sequence WHERE name='auto_apply_audit'")
+    except Exception:
+        pass
+    conn.commit()
+    conn.close()
+    return {"status": "success", "message": "Database wiped."}
+
 @app.get("/api/config", dependencies=[Depends(verify_token)])
 def get_config():
     defaults = get_default_config()
@@ -340,6 +362,28 @@ def get_jobs():
     conn.close()
     return [dict(ix) for ix in rows]
 
+@app.get("/api/jobs/{job_id}/details", dependencies=[Depends(verify_token)])
+def get_job_details(job_id: str):
+    if not os.path.exists(DB_PATH):
+        raise HTTPException(status_code=404, detail="DB not found")
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM jobs WHERE id = ?", (job_id,))
+    job_row = cursor.fetchone()
+    if not job_row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Job not found")
+    job_data = dict(job_row)
+    
+    # Fetch latest auto-apply audit log for this job
+    cursor.execute("SELECT * FROM auto_apply_audit WHERE job_id = ? ORDER BY id DESC LIMIT 1", (job_id,))
+    audit_row = cursor.fetchone()
+    job_data['audit'] = dict(audit_row) if audit_row else None
+    
+    conn.close()
+    return job_data
+
 @app.get("/api/jobs/manual")
 def get_manual_jobs():
     if not os.path.exists(DB_PATH):
@@ -377,6 +421,49 @@ def _load_watchlist() -> dict:
 def _save_watchlist(data: dict):
     with open(WATCHLIST_PATH, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+@app.get("/api/scope/suggest")
+def suggest_scope():
+    """Uses LLM to suggest locations and job roles based on the Knowledge Base (me.json)."""
+    kb = get_kb()
+    
+    # Compress KB into a string for the LLM
+    personal = kb.get("personal", {})
+    work = kb.get("work_history", [])
+    skills = kb.get("skills", {})
+    
+    summary = f"Location: {personal.get('location', '')}\n"
+    summary += "Work History:\n"
+    for w in work:
+        summary += f"- {w.get('role', '')} at {w.get('company', '')}\n"
+    summary += f"Skills: {json.dumps(skills)}\n"
+    
+    prompt = f"""
+    Based on the following professional profile, suggest the 5 best job titles (roles) and 3 best geographic locations to target for their next job. 
+    If the user has a location, include it as one of the 3 locations, plus 2 other major tech/industry hubs that make sense.
+    CRITICAL: You MUST prioritize "India", specific Indian tech hubs (e.g., "Bangalore", "Hyderabad"), or "Remote India" as the top geographic locations.
+    
+    Profile:
+    {summary}
+    
+    Return EXACTLY a JSON object with this schema and NO other text:
+    {{
+        "roles": ["Role 1", "Role 2", "Role 3", "Role 4", "Role 5"],
+        "locations": ["Location 1", "Location 2", "Location 3"]
+    }}
+    """
+    
+    try:
+        response = generate(prompt, use_case="pdf_extraction").strip()
+        json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", response, re.DOTALL)
+        if json_match:
+            response = json_match.group(1)
+            
+        data = json.loads(response)
+        return {"status": "success", "data": data}
+    except Exception as e:
+        print(f"[Scope Suggestion Error] {e}")
+        return {"status": "error", "message": "Failed to parse AI suggestions."}
 
 @app.get("/api/watchlist", dependencies=[Depends(verify_token)])
 def get_watchlist():

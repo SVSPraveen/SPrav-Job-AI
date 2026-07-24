@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 import sqlite3
 import time
 import random
@@ -14,6 +16,7 @@ from langgraph.graph import StateGraph, END
 
 from engine.db_utils import db_mutex
 from engine.llm_provider import generate
+from engine.kb_merger import merge, apply_detail_updates, kb_is_ready
 from engine.html_compiler import render_html_to_pdf
 from engine.tailor import tailor_resume, load_kb
 from engine.html_formatter import generate_html_context
@@ -33,11 +36,14 @@ from apply.greenhouse import apply_to_greenhouse
 from apply.lever import apply_to_lever
 from apply.naukri import extract_real_apply_url, touch_naukri_profile
 from tracking.notifier import send_email_notification
-from discovery.linkedin_scanner import run_linkedin_scanner
+from discovery.indeed_scanner import run_indeed_scanner
+from discovery.hn_whoishiring import run_hn_scanner
+from discovery.yc_startup_scanner import run_yc_scanner
 from engine.config import (
-    ATS_AUTO_APPLY_THRESHOLD,
     FIT_AUTO_APPLY_THRESHOLD,
     COMPANY_DAILY_CAP,
+    PORTAL_DAILY_CAP,
+    TOTAL_DAILY_CAP,
     AUTO_APPLY_CIRCUIT_BREAKER_N,
 )
 from discovery.db import (
@@ -303,9 +309,11 @@ def tailor_node(state: JobState) -> JobState:
     tailor_context = f"Job Reqs: {extracted_json}\nRaw JD: {job['description']}"
     if retry_count > 0 and state.get('invented_claims'):
         tailor_context += (
-            "\n\nCRITICAL WARNING: In your previous attempt, you hallucinated the "
+            f"\n\nPREVIOUS GENERATED OUTPUT:\n{state.get('resume_json_str', 'None')}"
+            "\n\nVERIFIER FEEDBACK:\n"
+            f"CRITICAL WARNING: In your previous attempt, you hallucinated the "
             f"following claims: {state['invented_claims']}. "
-            "YOU MUST ONLY USE FACTS FROM THE KNOWLEDGE BASE."
+            "YOU MUST ONLY USE FACTS FROM THE KNOWLEDGE BASE. Rewrite the resume fixing these specific errors while preserving the rest of the good content."
         )
 
     try:
@@ -394,32 +402,15 @@ def tailor_node(state: JobState) -> JobState:
 
 def fact_check_node(state: JobState) -> JobState:
     job = state['job']
-    auto_eligible = state.get('auto_apply_eligible', False)
-    intent = "auto_apply" if auto_eligible else "human_review"
-
-    print(f"\n[Phase 4] Verifying CV Facts (intent={intent})...")
-    is_passed, invented_claims = verify_resume_facts(state['resume_json_str'], intent=intent)
+    
+    print(f"\n[Phase 4] Verifying CV Facts...")
+    is_passed, invented_claims = verify_resume_facts(state['resume_json_str'], intent="verification")
 
     if not is_passed:
         state['invented_claims'] = invented_claims
-        if intent == "auto_apply":
-            # Zero-tolerance: immediately downgrade to Human Apply Queue, no retry
-            print("[Phase 4] AUTO-APPLY DOWNGRADE: routing to Human Apply Queue.")
-            with db_mutex:
-                conn_d = sqlite3.connect(DB_PATH)
-                c_d = conn_d.cursor()
-                c_d.execute(
-                    "UPDATE jobs SET status='failed_fact_check_auto_downgrade' WHERE id=?",
-                    (job['id'],)
-                )
-                conn_d.commit()
-                conn_d.close()
-            state['auto_apply_eligible'] = False   # Force human path in dispatch
-            state['status'] = 'failed_fact_check_auto_downgrade'
-        else:
-            # Human-review path: signal for retry (graph router handles max retries)
-            state['retry_count'] = state.get('retry_count', 0) + 1
-            state['status'] = 'hallucinated'
+        state['retry_count'] = state.get('retry_count', 0) + 1
+        state['status'] = 'hallucinated'
+        print(f"[Phase 4] Hallucination detected! Initiating word-chain loop back to tailor (Attempt {state['retry_count']})...")
     else:
         state['status'] = 'verified'
 
@@ -470,20 +461,31 @@ def compile_dispatch_node(state: JobState) -> JobState:
     ats_score = state.get('ats_score_raw', 0.0) * 100   # back to pct for audit log
     fit_score = state.get('fit_score_raw', 0.0)
 
-    # ── Global daily rate limit (unchanged) ──────────────────────────────────
+    # ── Global & Portal daily rate limits ──────────────────────────────────
     with db_mutex:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
+        
+        # Check Total limit
+        cursor.execute(
+            "SELECT COUNT(*) FROM jobs WHERE status = 'applied' "
+            "AND substr(updated_at, 1, 10) = date('now')"
+        )
+        total_apps_today = cursor.fetchone()[0]
+        
+        # Check Portal limit
         cursor.execute(
             "SELECT COUNT(*) FROM jobs WHERE status = 'applied' AND source = ? "
             "AND substr(updated_at, 1, 10) = date('now')",
             (job.get('source', 'Unknown'),)
         )
-        apps_today = cursor.fetchone()[0]
+        portal_apps_today = cursor.fetchone()[0]
         conn.close()
 
-    max_apps = state['sys_config'].get('max_applications_per_day', 30)
-    global_limit_reached = apps_today >= max_apps
+    max_total = state['sys_config'].get('max_applications_per_day_total', TOTAL_DAILY_CAP)
+    max_portal = state['sys_config'].get('max_applications_per_day_per_portal', PORTAL_DAILY_CAP)
+    global_limit_reached = total_apps_today >= max_total
+    portal_limit_reached = portal_apps_today >= max_portal
 
     # ── Playwright auto-apply path (Greenhouse / Lever only) ─────────────────
     is_auto_portal = "greenhouse.io" in url or "lever.co" in url
@@ -503,16 +505,24 @@ def compile_dispatch_node(state: JobState) -> JobState:
 
         # ── Global daily rate limit ──────────────────────────────────────────
         if global_limit_reached:
-            print(f"[Dispatcher] Global rate limit reached ({apps_today}/{max_apps}). Human Apply.")
+            print(f"[Dispatcher] Global rate limit reached ({total_apps_today}/{max_total}). Human Apply.")
+            update_job_status(job['id'], 'manual_review')
+            state['status'] = 'dispatched'
+            return state
+
+        # ── Portal daily rate limit ──────────────────────────────────────────
+        if portal_limit_reached:
+            print(f"[Dispatcher] Portal rate limit reached ({portal_apps_today}/{max_portal}). Human Apply.")
             update_job_status(job['id'], 'manual_review')
             state['status'] = 'dispatched'
             return state
 
         # ── Per-company daily cap ────────────────────────────────────────────
-        company_apps_today = get_company_applies_today(company)
-        if company_apps_today >= COMPANY_DAILY_CAP:
-            reason = f"company_cap_reached: {company_apps_today}/{COMPANY_DAILY_CAP} today"
-            print(f"[Dispatcher] Per-company cap reached for '{company}': {reason}")
+        company_apps_today = get_company_applies_today(job['company'])
+        max_company = state['sys_config'].get('max_applications_per_day_per_company', COMPANY_DAILY_CAP)
+        if company_apps_today >= max_company:
+            reason = f"company_cap_reached: {company_apps_today}/{max_company} today"
+            print(f"[Dispatcher] Rejecting {job['title']} at {job['company']} - {reason}")
             log_auto_apply_attempt(job['id'], company, title, jd_hash, pdf_path,
                                    ats_score, fit_score, 'capped')
             update_job_status(job['id'], 'company_cap_reached')
@@ -664,21 +674,14 @@ def build_job_graph():
 
     def route_fact_check(state: JobState):
         status = state['status']
-        auto_eligible = state.get('auto_apply_eligible', False)
 
         if status == 'verified':
             return 'dispatch'
 
-        if status == 'failed_fact_check_auto_downgrade':
-            # Zero-tolerance auto-apply downgrade — skip retry, go to dispatch
-            # (dispatch will route to Human Apply Queue)
+        if state.get('retry_count', 0) >= 2:
+            print("[Graph] Fact check failed 2 times. Aborting retry to prevent infinite loop. Downgrading to Human Apply.")
+            state['auto_apply_eligible'] = False
             return 'dispatch'
-
-        # Human-review retry path
-        if state.get('retry_count', 0) >= 2 or not auto_eligible:
-            print("[Graph] Fact check failed. Aborting retry (max retries reached or not auto-eligible).")
-            update_job_status(state['job']['id'], 'failed_fact_check')
-            return END
 
         return 'tailor'
 
@@ -734,7 +737,7 @@ def check_ollama_models():
         resp = requests.get("http://localhost:11434/api/tags", timeout=5)
         if resp.status_code == 200:
             models = [m['name'] for m in resp.json().get('models', [])]
-            required = ["qwen2.5:7b-instruct", "deepseek-r1:7b", "magnum-v4:9b", "llama3.1:8b", "nomic-embed-text:latest"]
+            required = ["qwen2.5:7b-instruct", "deepseek-r1:7b", "bespoke-minicheck", "hermes3:8b", "nomic-embed-text:latest"]
             missing = [m for m in required if not any(m in available for available in models)]
             if missing:
                 print(f"[WARNING] Missing recommended local models: {missing}. Fallbacks will be used or execution may fail.")
@@ -744,6 +747,8 @@ def check_ollama_models():
         print("[WARNING] Could not connect to local Ollama instance on port 11434.")
 
 def run_daemon():
+    from discovery.db import init_db
+    init_db()
     print("=========================================")
     print("[Daemon] SPrav Multi-Threaded MoE Initialized (LangGraph Enabled).")
     print("=========================================")
@@ -759,6 +764,13 @@ def run_daemon():
     
     cycle = 1
     while True:
+        if not kb_is_ready():
+            set_daemon_state("WAITING_FOR_ONBOARDING", "Please complete your Knowledge Base Onboarding first.")
+            time.sleep(10)
+            continue
+        else:
+            set_daemon_state("WAITING_FOR_ONBOARDING", "")
+            
         now = datetime.now()
 
         if now.hour == 3:
@@ -797,13 +809,15 @@ def run_daemon():
         except Exception as e:
             print(f"[Daemon Error] Pipeline failed this cycle: {e}")
             
-        # Run LinkedIn post scanner every other cycle (~30 min cadence)
+        # Run external platform scanners every other cycle (~30 min cadence)
         if cycle % 2 == 0:
-            print("\n--- Triggering LinkedIn HR/CEO Post Scanner ---")
+            print("\n--- Triggering Platform Scanners (Indeed, YC, HN) ---")
             try:
-                run_linkedin_scanner()
+                run_indeed_scanner()
+                run_hn_scanner()
+                run_yc_scanner()
             except Exception as e:
-                print(f"LinkedIn Scanner error: {e}")
+                print(f"Platform Scanners error: {e}")
 
         sleep_minutes = random.randint(5, 15)
         print(f"\n[Daemon] Cycle {cycle} complete. Sleeping for {sleep_minutes} minutes...")

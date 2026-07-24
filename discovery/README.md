@@ -6,7 +6,6 @@ The Discovery layer is responsible for aggressively hunting down job listings be
 Modern job boards utilize sophisticated fingerprinting to block automated scraping. Our Discovery module utilizes stealth configurations in `puppeteer-core` to mask WebDriver flags, randomize viewport metrics, and bypass Cloudflare challenges.
 
 ## 🌐 Supported Targets
-* LinkedIn
 * Naukri
 * Indeed
 * Wellfound

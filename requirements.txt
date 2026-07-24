@@ -21,3 +21,6 @@ langchain-text-splitters
 langgraph
 langchain-core
 pyjwt
+pywebview
+ollama
+PyJWT

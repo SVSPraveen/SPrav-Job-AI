@@ -20,8 +20,7 @@ def get_salary_gaps() -> dict:
                 ts = ''.join(c for c in ts if c.isdigit())
             target_salary = int(ts) if ts else 0
 
-    if target_salary == 0:
-        return {"error": "No target_salary defined in config.json"}
+
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -73,14 +72,16 @@ def get_salary_gaps() -> dict:
         except Exception:
             continue
             
-    market_average = round(total_market_estimate / valid_estimates, 2) if valid_estimates > 0 else 0
-    macro_gap = round(((market_average - target_salary) / target_salary) * 100, 2) if target_salary > 0 else 0
+    avg = total_market_estimate / valid_estimates if valid_estimates > 0 else 0
+    gap = avg - target_salary if target_salary > 0 else 0
+    macro_gap_pct = round((gap / target_salary) * 100, 2) if target_salary > 0 else 0
     
     return {
         "target_salary": target_salary,
-        "market_average": market_average,
-        "macro_gap_percentage": macro_gap,
-        "job_gaps": sorted(gaps, key=lambda x: x["gap_percentage"])
+        "market_average": avg,
+        "macro_gap_percentage": macro_gap_pct,
+        "data_points": valid_estimates,
+        "details": sorted(gaps, key=lambda x: x["gap_percentage"])
     }
 
 if __name__ == "__main__":

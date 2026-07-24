@@ -6,7 +6,7 @@
   SPrav Job AI
 </h1>
 
-<h4 align="center">The autonomous, offline-first AI agent for hyper-personalized job applications.</h4>
+<h4 align="center">The autonomous, offline-first AI agent for hyper-personalized job hunting and auto-applying.</h4>
 
 <p align="center">
   <a href="#-what-it-does">What</a> •
@@ -24,8 +24,8 @@
   <a href="https://github.com/SVSPraveen/SPrav-Job-AI/issues"><img src="https://img.shields.io/github/issues/SVSPraveen/SPrav-Job-AI?style=for-the-badge&color=FFD93D" alt="Issues"></a>
   <img src="https://img.shields.io/badge/Python-3.13+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
-  <img src="https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/Local_LLM-Ollama-A020F0?style=for-the-badge&logo=ollama&logoColor=white" alt="Ollama">
+  <img src="https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Groq%20API-A020F0?style=for-the-badge&logo=ollama&logoColor=white" alt="Groq API">
 </p>
 
 <br/>
@@ -38,78 +38,89 @@
 
 Job hunting is a full-time job. **SPrav completely automates the most exhausting parts of the process.** 
 
-Instead of mindlessly scrolling through job boards, SPrav acts as your personal, highly-coordinated AI workforce. It monitors the internet for new job postings, reads the requirements, decides if you are actually a good fit based on your background, custom-rewrites your resume for that specific job to bypass keyword filters, and then physically applies to the job for you.
+Instead of mindlessly scrolling through job boards, SPrav acts as your personal, highly-coordinated AI workforce. It monitors the internet for new job postings on platforms like **Indeed**, **Hacker News (Who is Hiring)**, **Y Combinator**, and **Wellfound** using native, credential-free HTTP scrapers. It reads the requirements, explicitly targets your preferred markets (like **India** and **Remote** roles), decides if you are actually a good fit based on your background, custom-rewrites your resume for that specific job to bypass keyword filters, and then drops a completely finished application package and cold-email draft into your Human Review queue.
+
+*(Note: LinkedIn automation has been explicitly removed from this project to ensure your personal accounts remain 100% safe from bot detection and ID verification).*
 
 ## ⚙️ How it works
 
 When you turn on the engine, this is the exact flow that happens on your machine:
 
-1. **Discovery:** Headless bots silently wake up and scan platforms like LinkedIn and Naukri, identifying new job links and aggressively filtering out obvious spam, Ed-Tech courses disguised as jobs, and fake listings.
-2. **Extraction:** The AI extracts the unstructured text of the job description and converts it into clean, structured data.
+1. **Discovery:** Python-based stealth scrapers silently wake up and scan top platforms (Indeed, YC, HN) without requiring any login credentials, bypassing Cloudflare and captchas to pull raw job postings directly into your pipeline.
+2. **Extraction:** The AI extracts the unstructured text of the job description and converts it into clean, structured JSON data.
 3. **Reasoning:** A deep-thinking logic model reads the job, cross-references your profile, and calculates a strict mathematical "Fit Score".
-4. **Tailoring:** If the score is high enough, a generative model drafts a custom resume, perfectly highlighting why you are the best fit for that exact role.
-5. **Execution:** A Playwright automation bot opens a hidden browser window, navigates to the ATS application page (like Greenhouse or Lever), fills in your details, uploads the custom resume, and submits it.
+4. **Tailoring:** If the score is high enough, the Groq API drafts a custom resume and a personalized cold email, perfectly highlighting why you are the best fit for that exact role.
+5. **Execution:** An automation bot navigates to ATS application pages (like Greenhouse or Lever) to auto-apply. For startup roles (YC/Hacker News), the system pushes a tailored email draft to your Dashboard's "Action Required" inbox for 1-click manual sending.
 
 ## 🔒 Security & Offline Auth
 
 Because SPrav operates independently of any central cloud, traditional password recovery mechanisms (like an external auth server sending you an email) pose a security risk. We built a zero-trust local authentication system:
 
-* **Encrypted Credential Vault:** Your platform credentials (e.g., LinkedIn passwords used for Auto-Apply) are XOR-encrypted in a local SQLite database (`users.db`) using your private `.env` key. They are never stored in plain text.
+* **Encrypted Credential Vault:** Your platform credentials are XOR-encrypted in a local SQLite database (`users.db`) using your private `.env` key. They are never stored in plain text.
 * **Master Recovery Key:** Upon sign-up, the system generates a unique `SPRAV-XXXX-XXXX` Master Recovery Key. If you forget your local password, this physical key is your ultimate fallback to regain access to your encrypted vault.
-* **Bring-Your-Own-SMTP (Optional):** If you prefer a modern Web 2.0 experience, you can hook up your own Gmail App Password to the `.env` file. The backend will natively generate and securely email you a 6-digit OTP for password recovery, completely bypassing the need for a paid, centralized email server like Twilio or SendGrid.
-* **Themed UI:** A sleek, fully responsive React frontend with built-in Light/Dark mode toggles to manage your agents in comfort.
+* **Bring-Your-Own-SMTP (Optional):** If you prefer a modern Web 2.0 experience, you can hook up your own Gmail App Password to the `.env` file. The backend will natively generate and securely email you a 6-digit OTP for password recovery.
+* **SPrav Copilot:** A built-in AI assistant integrated directly into the UI to guide you through your job search, configure settings, and answer questions.
+* **Themed UI:** A sleek, fully responsive React frontend with built-in Light/Dark mode toggles to manage your agents in comfort, served entirely via FastAPI without needing Node.js in production.
 
 ---
 
-## 🧠 Architecture (The "Brains")
+## 🧠 Architecture (The "SPrav MOE Model")
 
-Instead of using one massive model like ChatGPT, SPrav uses a targeted **Mixture-of-Experts (MoE)** approach orchestrated by `LangGraph`. 
+Instead of relying on a monolithic Large Language Model (which is prone to context degradation and hallucinations), SPrav utilizes a custom pipeline called the **SPrav MOE Model** (Mixture of Experts). 
+
+This model is engineered as a strict **"Word Chain Game" State Machine**. It runs efficiently in system RAM, intelligently passing conversational state sequentially across highly specialized expert models (The Extractor → The Evaluator → The Tailor → The Fact Checker). 
+
+### The Word Chain Memory Loop
+The most critical feature of the SPrav MOE Model is its zero-hallucination feedback loop. If the internal Fact Checker (Verifier) detects that the Tailor hallucinated a skill or manipulated a timeline, the system does not simply retry the prompt blindly. Instead, it chains the data sequentially:
+1. It extracts the **Original Query / Context (1)**.
+2. It aggregates the **Flawed Generated Output (2)**.
+3. It captures the intermediate logic state **(3)**.
+4. It appends the **Verifier's Strict Feedback (4)**.
+
+This concatenated "word chain" `(1) + (2) + (3) + (4)` is fed directly back into the generative model. By forcing the model to explicitly read its own flawed output alongside the precise correction, it eliminates hallucinations and prevents infinite generation loops. This guarantees your tailored resumes remain 100% factually accurate.
+
+> [!NOTE]
+> **8GB VRAM Constraint & Zero-Downtime Failsafe:** The SPrav MOE Model dynamically routes tasks between the Groq API (Primary) and local Ollama models (Fallback). If a network failure occurs, the system fails over to your local machine. To ensure this runs flawlessly on consumer hardware with an **8GB VRAM bottleneck**, we implemented a strict `gpu_mutex` thread lock and pass `keep_alive: 0` to Ollama. This forces the GPU to purge memory between steps, guaranteeing that only one expert model occupies VRAM at a time, completely preventing Out-Of-Memory (OOM) crashes.
 
 ```mermaid
 graph TD;
     A[Job Discovery Scrapers] -->|Raw HTML| B(Qwen 2.5: Extract JSON);
-    B --> C{DeepSeek-R1: Fit Scoring};
-    C -->|Score > Threshold| D[Llama 3.1: Resume Tailoring];
+    B --> C{DeepSeek-R1 / Groq: Fit Scoring};
+    C -->|Score > Threshold| D[Llama 3.3 / Groq: Resume Tailoring];
     C -->|Score < Threshold| E[Reject / Watchlist];
-    D --> F[Magnum: Fact Checker];
-    F -->|Pass| G[Playwright ATS Auto-Apply];
+    D --> F[Bespoke-Minicheck: Fact Checker];
+    F -->|Pass| G[Action Required / ATS Apply];
     F -->|Fail| D;
     G --> H[(Local SQLite DB)];
 ```
 
-We load different specialized, local open-source models via Ollama to handle distinct tasks:
+We utilize different specialized models to handle distinct tasks:
 
-| Subsystem | Model | Purpose |
-|-----------|-------|---------|
-| **Data Extraction** | `qwen2.5:7b-instruct` | **The Data Entry Clerk.** Reads messy HR text and extracts structured JSON. |
-| **Logic & Evaluation** | `deepseek-r1:7b` | **The Recruiter.** Uses chain-of-thought `<think>` reasoning for holistic candidate-to-job fit scoring. |
-| **Culture Forensics** | `magnum-v4:9b` | **The Fact Checker.** Parses corporate vernacular to detect toxic organizational patterns and prevents resume hallucination. |
-| **Generative Prose** | `llama3.1:8b` | **The Copywriter.** Professional, AI-slop-free resume drafting and XYZ bullet engineering. |
+| Subsystem | Model / Provider | Purpose |
+|-----------|------------------|---------|
+| **Data Extraction** | `qwen2.5` | **The Data Entry Clerk.** Reads messy HR text and extracts structured JSON. |
+| **Logic & Evaluation** | `deepseek-r1:7b` (Ollama) | **The Recruiter.** Uses local chain-of-thought `<think>` reasoning for holistic candidate-to-job fit scoring. |
+| **Culture Forensics** | `bespoke-minicheck` (Ollama) | **The Fact Checker.** State-of-the-Art grounded factuality and hallucination diagnosis. |
+| **Generative Prose** | `llama-3.3-70b` (Groq) | **The Copywriter.** Professional, completely AI-slop-free resume drafting and cold-email engineering. |
 | **Vector Memory** | `nomic-embed-text` | **The Librarian.** High-efficiency RAG retrieval against your local knowledge base. |
 
 ---
 
 ## 📁 Repository Structure
 
-SPrav is a monolithic repository containing three distinct stacks (Node.js, Python FastAPI, and React) that communicate with each other locally.
+SPrav is a monolithic repository containing a Python FastAPI backend and a React frontend compiled down and served natively. Node.js is completely eliminated from the production runtime for lower memory usage.
 
 ```text
 SPrav-Job-AI/
 ├── engine/              # Python Backend (Core AI Logic)
 │   ├── auth.py          # SQLite auth and credential encryption
-│   ├── daemon.py        # LangGraph loop orchestrating the AI pipeline
-│   ├── evaluator.py     # DeepSeek-R1 job scoring logic
-│   └── resume_tailor.py # Llama 3.1 PDF generation
+│   ├── daemon.py        # Pipeline orchestrating the scrapers and AI logic
+│   └── llm_provider.py  # Advanced routing between Groq API and Local Ollama
 ├── frontend/            # React UI (Dashboard & Auth)
 │   ├── src/             # Vite application source code
-│   └── package.json     # Node dependencies for UI
-├── scraper_service/     # Node.js Microservice
-│   ├── stealth_crawler.js # Playwright scraper bypassing Cloudflare
-│   └── package.json     # Puppeteer/Playwright dependencies
+│   └── dist/            # Compiled static React assets (Served by FastAPI)
 ├── knowledge_base/      # Your local RAG memory bank
-│   └── master_resume.pdf # The ground-truth facts the AI pulls from
-├── discovery/           # Python scripts for querying job boards API
-├── apply/               # Form-filling automation scripts (Greenhouse/Lever)
+├── discovery/           # Python HTTP Scrapers (HN, YC, Indeed, Wellfound)
 ├── api.py               # FastAPI server bridging Frontend, Engine, and Scraper
 ├── desktop_app.py       # PyWebview wrapper for native desktop experience
 ├── users.db             # Local SQLite (Auto-generated on first run)
@@ -132,8 +143,7 @@ JWT_SECRET=super_secret_jwt_key_12345
 # -----------------------------
 # AI API Keys
 # -----------------------------
-# Configure your Groq and OpenRouter keys directly inside the application's Settings UI.
-# They are securely encrypted in users.db and NO LONGER required in the .env file!
+GROQ_API_KEY=your_groq_api_key
 
 # -----------------------------
 # SMTP Email Setup (Optional)
@@ -149,11 +159,17 @@ EMAIL_RECEIVER=your-personal-email@gmail.com
 # Minimum match score required to trigger an Auto-Apply (0.0 to 1.0)
 ATS_AUTO_APPLY_THRESHOLD=0.88
 
-# DeepSeek Fit Score required to consider a job a "Fit" (1.0 to 5.0)
+# DeepSeek/Groq Fit Score required to consider a job a "Fit" (1.0 to 5.0)
 FIT_AUTO_APPLY_THRESHOLD=4.0
 
-# Max applications per company per day to prevent spam flags
-COMPANY_DAILY_CAP=3
+# Max applications per company per day
+COMPANY_DAILY_CAP=5
+
+# Max applications per job portal per day
+PORTAL_DAILY_CAP=25
+
+# Max applications across the entire internet per day
+TOTAL_DAILY_CAP=150
 
 # Pause bot if it gets blocked/fails X times in a row
 AUTO_APPLY_CIRCUIT_BREAKER_N=3
@@ -164,7 +180,7 @@ AUTO_APPLY_CIRCUIT_BREAKER_N=3
 ## 🚀 Installation
 
 > [!IMPORTANT]
-> To guarantee pipeline stability without Out-of-Memory (OOM) failures, a minimum of **8GB VRAM** (RTX 3060, RTX 4060, or Apple Silicon equivalent) and **16GB RAM** is required.
+> If you plan to heavily rely on local Ollama fallbacks instead of the Groq API, a minimum of **8GB VRAM** and **16GB RAM** is required to prevent Out-of-Memory (OOM) failures.
 
 ### 1. Environment Setup
 
@@ -179,20 +195,14 @@ python -m venv .venv
 
 # Install core dependencies and ATS automation browsers
 pip install -r requirements.txt
+pip install uuid_utils
 playwright install chromium
 ```
 
 ### 2. Model Initialization
 
-Ensure [Ollama](https://ollama.com/) is installed and running in the background.
-
-```bash
-ollama pull qwen2.5:7b-instruct
-ollama pull deepseek-r1:7b
-ollama pull magnum-v4:9b
-ollama pull llama3.1:8b
-ollama pull nomic-embed-text
-```
+If you plan to use local fallbacks, ensure [Ollama](https://ollama.com/) is installed. 
+*You do not need to manually pull models.* The SPrav `LaunchJobAssistant.bat` bootstrapper will automatically wake up Ollama in the background and pull `qwen2.5:7b-instruct`, `deepseek-r1:7b`, `hermes3:8b`, `bespoke-minicheck`, and `nomic-embed-text` for you on first launch!
 
 ### 3. Dashboard Configuration
 
@@ -200,22 +210,23 @@ ollama pull nomic-embed-text
 # Install frontend dependencies
 cd frontend
 npm install
+npm run build
 cd ..
 
 # Initialize configuration
 copy .env.example .env
-# Open .env and customize your thresholds and API keys
+# Open .env and add your Groq API key!
 ```
 
 ### 4. Launch
 
-Execute the bootstrapper to spin up the LangGraph daemon, FastAPI backend, Node scrapers, and React UI:
+Execute the 1-click bootstrapper to instantly spin up the FastAPI backend, background daemon, and the pre-compiled desktop UI. This will also automatically install Ollama and pull any missing models if you don't have them!
 
 ```bash
 LaunchJobAssistant.bat
 ```
 
-Alternatively, you can launch the native desktop application window directly:
+Alternatively, you can launch the native desktop application window directly via python:
 ```bash
 python desktop_app.py
 ```
@@ -226,7 +237,7 @@ python desktop_app.py
 
 **SPrav operates on a strict single-source-of-truth paradigm.** Every generated bullet point and claim must trace back to a verifiable entry in your canonical Knowledge Base. The system is explicitly engineered to highlight your actual skill gaps rather than hallucinating false proficiencies. 
 
-Your data never leaves your hard drive. 
+Your data never leaves your hard drive unless you explicitly configure a cloud AI provider like Groq. 
 
 <br/>
 <div align="center">

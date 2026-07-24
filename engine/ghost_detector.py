@@ -78,7 +78,7 @@ def detect_ghost_job(description: str, location: str, company: str = "", title: 
     """
     Ghost Job and Scam Detector (Block G Legitimacy Check).
     Combines fast zero-token regex checks with a deep semantic forensics pass
-    using the Magnum-v4:9b model for disguised toxic culture patterns.
+    using the Bespoke-Minicheck model for disguised toxic culture patterns.
     Returns: (is_ghost_or_scam: bool, reason: str)
     """
     desc_lower = description.lower()
@@ -151,7 +151,7 @@ def detect_ghost_job(description: str, location: str, company: str = "", title: 
             flags.append(f"Staffing Agency/Body-Shop Marker: '{marker}' — role may be underpaid or misrepresented")
             break  # One flag is enough, don't spam
 
-    # 6. Deep Semantic Toxic Culture Forensics (Magnum-v4:9b)
+    # 6. Deep Semantic Toxic Culture Forensics (Bespoke-Minicheck)
     # This catches disguised patterns like "cross-functional autonomy" = understaffed
     forensic_prompt = f"""You are a corporate psychological forensic analyst.
 Analyze this job description for subtle markers of extreme burnout culture, toxic management, or boundary-less work environments.

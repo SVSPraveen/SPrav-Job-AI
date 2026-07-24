@@ -17,6 +17,10 @@ const KnowledgeBaseEditor = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+
   useEffect(() => {
     fetchKb();
   }, []);
@@ -24,8 +28,7 @@ const KnowledgeBaseEditor = () => {
   const fetchKb = async () => {
     try {
       const res = await axios.get(`${API_BASE}/kb`);
-      // Ensure arrays/objects exist if missing
-      const data = res.data;
+      let data = res.data;
       if (!data.work_history) data.work_history = [];
       if (!data.projects) data.projects = [];
       if (!data.education) data.education = [];
@@ -41,13 +44,56 @@ const KnowledgeBaseEditor = () => {
     }
   };
 
+  // Auto-Save Effect
+  useEffect(() => {
+    if (loading || !dirty) return;
+    
+    const timer = setTimeout(async () => {
+      setSaving(true);
+      try {
+        await axios.post(`${API_BASE}/kb`, { kb_data: kbData });
+        setSaved(true);
+        setDirty(false);
+        setTimeout(() => setSaved(false), 3000);
+      } catch (e) {
+        console.error('Error auto-saving KB data', e);
+      } finally {
+        setSaving(false);
+      }
+    }, 1500); // 1.5 seconds debounce
+
+    return () => clearTimeout(timer);
+  }, [kbData, dirty, loading]);
+
   const saveKb = async () => {
+    setSaving(true);
     try {
       await axios.post(`${API_BASE}/kb`, { kb_data: kbData });
-      alert('Knowledge Base saved successfully to me.json!');
+      setSaved(true);
+      setDirty(false);
+      setTimeout(() => setSaved(false), 3000);
     } catch (e) {
       console.error(e);
       alert('Error saving KB data');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const wipeKb = () => {
+    if (window.confirm("WARNING: This will instantly clear ALL your Knowledge Base data on this screen. You must click 'Save All Changes' afterwards to apply it to the database. Proceed?")) {
+      setKbData({
+        personal: {
+          name: '', email: '', phone: '', location: '', linkedin: '', github: '', portfolio: '', summary: ''
+        },
+        work_history: [],
+        projects: [],
+        education: [],
+        certifications: [],
+        resume_bullets: [],
+        skills: { languages: [], frameworks: [], tools: [] }
+      });
+      setDirty(true);
     }
   };
 
@@ -56,6 +102,7 @@ const KnowledgeBaseEditor = () => {
       ...prev,
       personal: { ...prev.personal, [field]: value }
     }));
+    setDirty(true);
   };
 
   const handleArrayChange = (arrayName, index, field, value) => {
@@ -64,21 +111,24 @@ const KnowledgeBaseEditor = () => {
       newArray[index] = { ...newArray[index], [field]: value };
       return { ...prev, [arrayName]: newArray };
     });
+    setDirty(true);
   };
 
-  const addArrayItem = (arrayName, defaultItem) => {
+  const addArrayItem = (arrayName, emptyItem) => {
+    const id = `${arrayName}_${Date.now()}`;
     setKbData(prev => ({
       ...prev,
-      [arrayName]: [...prev[arrayName], { id: `${arrayName}_${Date.now()}`, ...defaultItem }]
+      [arrayName]: [...prev[arrayName], { ...emptyItem, id }]
     }));
+    setDirty(true);
   };
 
   const removeArrayItem = (arrayName, index) => {
-    setKbData(prev => {
-      const newArray = [...prev[arrayName]];
-      newArray.splice(index, 1);
-      return { ...prev, [arrayName]: newArray };
-    });
+    setKbData(prev => ({
+      ...prev,
+      [arrayName]: prev[arrayName].filter((_, i) => i !== index)
+    }));
+    setDirty(true);
   };
 
   // Bullets Logic
@@ -87,13 +137,19 @@ const KnowledgeBaseEditor = () => {
   };
 
   const addBullet = (parentId) => {
+    const newBullet = {
+      id: `bullet_${Date.now()}`,
+      parent_id: parentId,
+      text: '',
+      metric_verified: 'self_reported',
+      ats_keywords: [],
+      themes: []
+    };
     setKbData(prev => ({
       ...prev,
-      resume_bullets: [
-        ...prev.resume_bullets,
-        { id: `bullet_${Date.now()}`, parent_id: parentId, text: '', ats_keywords: [] }
-      ]
+      resume_bullets: [...prev.resume_bullets, newBullet]
     }));
+    setDirty(true);
   };
 
   const updateBullet = (bulletId, text) => {
@@ -101,6 +157,7 @@ const KnowledgeBaseEditor = () => {
       ...prev,
       resume_bullets: prev.resume_bullets.map(b => b.id === bulletId ? { ...b, text } : b)
     }));
+    setDirty(true);
   };
 
   const removeBullet = (bulletId) => {
@@ -108,6 +165,7 @@ const KnowledgeBaseEditor = () => {
       ...prev,
       resume_bullets: prev.resume_bullets.filter(b => b.id !== bulletId)
     }));
+    setDirty(true);
   };
 
   const handleSkillChange = (category, value) => {
@@ -135,9 +193,14 @@ const KnowledgeBaseEditor = () => {
           <h2>Knowledge Base Editor</h2>
           <p className="subtitle" style={{marginBottom: 0}}>The absolute source of truth for your AI Resume Engine.</p>
         </div>
-        <button className="btn" onClick={saveKb} style={{ background: 'var(--success)' }}>
-          <Save size={18} /> Save All Changes
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button className="btn" onClick={wipeKb} style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+            <Trash2 size={18} /> Clear Everything
+          </button>
+          <button className={`btn ${saved ? 'saved' : ''}`} onClick={saveKb} disabled={saving} style={{ background: saved ? 'rgba(74, 222, 128, 0.2)' : 'var(--success)', color: saved ? '#4ade80' : '#fff', border: saved ? '1px solid rgba(74, 222, 128, 0.3)' : 'none', minWidth: '160px' }}>
+            {saving ? 'Saving...' : saved ? '✓ Saved' : dirty ? <><Save size={18} /> Save Changes</> : <><Save size={18} /> Saved</>}
+          </button>
+        </div>
       </div>
 
       <div className="kb-tabs" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '2rem' }}>
@@ -168,27 +231,27 @@ const KnowledgeBaseEditor = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
               <div>
                 <label className="input-label">Full Name</label>
-                <input className="input-field" value={kbData.personal.name || ''} onChange={e => handlePersonalChange('name', e.target.value)} />
+                <input className="input-field" value={kbData.personal.name || ''} onChange={e => handlePersonalChange('name', e.target.value)} placeholder="First Last" />
               </div>
               <div>
                 <label className="input-label">Email Address</label>
-                <input className="input-field" value={kbData.personal.email || ''} onChange={e => handlePersonalChange('email', e.target.value)} />
+                <input className="input-field" value={kbData.personal.email || ''} onChange={e => handlePersonalChange('email', e.target.value)} placeholder="you@domain.com" />
               </div>
               <div>
                 <label className="input-label">Phone Number</label>
-                <input className="input-field" value={kbData.personal.phone || ''} onChange={e => handlePersonalChange('phone', e.target.value)} />
+                <input className="input-field" value={kbData.personal.phone || ''} onChange={e => handlePersonalChange('phone', e.target.value)} placeholder="(555) 123-4567" />
               </div>
               <div>
                 <label className="input-label">Location (City, State)</label>
-                <input className="input-field" value={kbData.personal.location || ''} onChange={e => handlePersonalChange('location', e.target.value)} />
+                <input className="input-field" value={kbData.personal.location || ''} onChange={e => handlePersonalChange('location', e.target.value)} placeholder="New York, NY" />
               </div>
               <div>
                 <label className="input-label">LinkedIn URL</label>
-                <input className="input-field" value={kbData.personal.linkedin || ''} onChange={e => handlePersonalChange('linkedin', e.target.value)} />
+                <input className="input-field" value={kbData.personal.linkedin || ''} onChange={e => handlePersonalChange('linkedin', e.target.value)} placeholder="linkedin.com/in/username" />
               </div>
               <div>
                 <label className="input-label">GitHub / Portfolio URL</label>
-                <input className="input-field" value={kbData.personal.github || kbData.personal.portfolio || ''} onChange={e => handlePersonalChange('github', e.target.value)} />
+                <input className="input-field" value={kbData.personal.github || kbData.personal.portfolio || ''} onChange={e => handlePersonalChange('github', e.target.value)} placeholder="github.com/username" />
               </div>
             </div>
             <div style={{ marginTop: '1.5rem' }}>
@@ -216,19 +279,19 @@ const KnowledgeBaseEditor = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                   <div>
                     <label className="input-label">Company</label>
-                    <input className="input-field" value={job.company} onChange={e => handleArrayChange('work_history', idx, 'company', e.target.value)} />
+                    <input className="input-field" value={job.company} onChange={e => handleArrayChange('work_history', idx, 'company', e.target.value)} placeholder="Tech Corp Inc." />
                   </div>
                   <div>
                     <label className="input-label">Role / Title</label>
-                    <input className="input-field" value={job.role} onChange={e => handleArrayChange('work_history', idx, 'role', e.target.value)} />
+                    <input className="input-field" value={job.role} onChange={e => handleArrayChange('work_history', idx, 'role', e.target.value)} placeholder="Senior Software Engineer" />
                   </div>
                   <div>
                     <label className="input-label">Start Date (MM/YYYY)</label>
-                    <input className="input-field" value={job.start_date} onChange={e => handleArrayChange('work_history', idx, 'start_date', e.target.value)} />
+                    <input className="input-field" value={job.start_date} onChange={e => handleArrayChange('work_history', idx, 'start_date', e.target.value)} placeholder="MM/YYYY" />
                   </div>
                   <div>
                     <label className="input-label">End Date (or 'Present')</label>
-                    <input className="input-field" value={job.end_date} onChange={e => handleArrayChange('work_history', idx, 'end_date', e.target.value)} />
+                    <input className="input-field" value={job.end_date} onChange={e => handleArrayChange('work_history', idx, 'end_date', e.target.value)} placeholder="MM/YYYY or Present" />
                   </div>
                 </div>
 
@@ -273,19 +336,19 @@ const KnowledgeBaseEditor = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                   <div>
                     <label className="input-label">Project Name</label>
-                    <input className="input-field" value={proj.name} onChange={e => handleArrayChange('projects', idx, 'name', e.target.value)} />
+                    <input className="input-field" value={proj.name} onChange={e => handleArrayChange('projects', idx, 'name', e.target.value)} placeholder="Analytics Dashboard" />
                   </div>
                   <div>
                     <label className="input-label">Tagline / Short Desc</label>
-                    <input className="input-field" value={proj.tagline} onChange={e => handleArrayChange('projects', idx, 'tagline', e.target.value)} />
+                    <input className="input-field" value={proj.tagline} onChange={e => handleArrayChange('projects', idx, 'tagline', e.target.value)} placeholder="Real-time data visualization platform" />
                   </div>
                   <div>
                     <label className="input-label">Start Date</label>
-                    <input className="input-field" value={proj.start_date} onChange={e => handleArrayChange('projects', idx, 'start_date', e.target.value)} />
+                    <input className="input-field" value={proj.start_date} onChange={e => handleArrayChange('projects', idx, 'start_date', e.target.value)} placeholder="MM/YYYY" />
                   </div>
                   <div>
                     <label className="input-label">End Date</label>
-                    <input className="input-field" value={proj.end_date} onChange={e => handleArrayChange('projects', idx, 'end_date', e.target.value)} />
+                    <input className="input-field" value={proj.end_date} onChange={e => handleArrayChange('projects', idx, 'end_date', e.target.value)} placeholder="MM/YYYY" />
                   </div>
                 </div>
 
@@ -325,15 +388,15 @@ const KnowledgeBaseEditor = () => {
               <div key={edu.id || idx} className="item-card" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
                 <div style={{ flex: 1 }}>
                   <label className="input-label">Institution</label>
-                  <input className="input-field" value={edu.institution} onChange={e => handleArrayChange('education', idx, 'institution', e.target.value)} />
+                  <input className="input-field" value={edu.institution} onChange={e => handleArrayChange('education', idx, 'institution', e.target.value)} placeholder="University of Technology" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <label className="input-label">Degree / Major</label>
-                  <input className="input-field" value={edu.degree} onChange={e => handleArrayChange('education', idx, 'degree', e.target.value)} />
+                  <input className="input-field" value={edu.degree} onChange={e => handleArrayChange('education', idx, 'degree', e.target.value)} placeholder="B.S. Computer Science" />
                 </div>
                 <div style={{ flex: 0.5 }}>
                   <label className="input-label">Year</label>
-                  <input className="input-field" value={edu.year} onChange={e => handleArrayChange('education', idx, 'year', e.target.value)} />
+                  <input className="input-field" value={edu.year} onChange={e => handleArrayChange('education', idx, 'year', e.target.value)} placeholder="YYYY" />
                 </div>
                 <button className="btn-icon danger" onClick={() => removeArrayItem('education', idx)}><Trash2 size={16} /></button>
               </div>
@@ -350,15 +413,15 @@ const KnowledgeBaseEditor = () => {
               <div key={cert.id || idx} className="item-card" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
                 <div style={{ flex: 1 }}>
                   <label className="input-label">Certificate Name</label>
-                  <input className="input-field" value={cert.name} onChange={e => handleArrayChange('certifications', idx, 'name', e.target.value)} />
+                  <input className="input-field" value={cert.name} onChange={e => handleArrayChange('certifications', idx, 'name', e.target.value)} placeholder="AWS Certified Solutions Architect" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <label className="input-label">Issuer</label>
-                  <input className="input-field" value={cert.issuer} onChange={e => handleArrayChange('certifications', idx, 'issuer', e.target.value)} />
+                  <input className="input-field" value={cert.issuer} onChange={e => handleArrayChange('certifications', idx, 'issuer', e.target.value)} placeholder="Amazon Web Services" />
                 </div>
                 <div style={{ flex: 0.5 }}>
                   <label className="input-label">Year Earned</label>
-                  <input className="input-field" value={cert.date_earned} onChange={e => handleArrayChange('certifications', idx, 'date_earned', e.target.value)} />
+                  <input className="input-field" value={cert.date_earned} onChange={e => handleArrayChange('certifications', idx, 'date_earned', e.target.value)} placeholder="YYYY" />
                 </div>
                 <button className="btn-icon danger" onClick={() => removeArrayItem('certifications', idx)}><Trash2 size={16} /></button>
               </div>

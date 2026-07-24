@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import { Target, Plus, Trash2, Save, MapPin, Briefcase, Clock, Award, Wifi } from 'lucide-react'
+import { Target, Plus, Trash2, Save, MapPin, Briefcase, Clock, Award, Wifi, Sparkles } from 'lucide-react'
 import './ApplicationScope.css'
 
 const API_BASE = 'http://localhost:8000/api'
@@ -44,6 +44,7 @@ export default function ApplicationScope() {
   const [saved, setSaved]     = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving]   = useState(false)
+  const [detecting, setDetecting] = useState(false)
   const [error, setError]     = useState('')
 
   // New-tag input refs
@@ -69,6 +70,41 @@ export default function ApplicationScope() {
       setSaving(false)
     }
   }
+
+  const [suggestedRoles, setSuggestedRoles] = useState([]);
+  const [suggestedLocs, setSuggestedLocs] = useState([]);
+
+  const autoDetectScope = async () => {
+    setDetecting(true);
+    setError('');
+    try {
+      const res = await axios.get(`${API_BASE}/scope/suggest`);
+      if (res.data.status === "success" && res.data.data) {
+        setSuggestedRoles(res.data.data.roles || []);
+        setSuggestedLocs(res.data.data.locations || []);
+      } else {
+        setError(res.data.message || 'Failed to generate suggestions.');
+      }
+    } catch (e) {
+      setError('Auto-detect failed: ' + (e.response?.data?.detail || e.message));
+    } finally {
+      setDetecting(false);
+    }
+  }
+
+  const addSuggestedRole = (r) => {
+    if (!scope.roles.some(x => x.keyword.toLowerCase() === r.toLowerCase())) {
+      setScope(s => ({ ...s, roles: [...s.roles, { keyword: r, preference: 'apply' }] }));
+    }
+    setSuggestedRoles(prev => prev.filter(x => x !== r));
+  };
+
+  const addSuggestedLoc = (l) => {
+    if (!scope.locations.some(x => x.label.toLowerCase() === l.toLowerCase())) {
+      setScope(s => ({ ...s, locations: [...s.locations, { label: l, preference: 'apply' }] }));
+    }
+    setSuggestedLocs(prev => prev.filter(x => x !== l));
+  };
 
   // ── Locations ─────────────────────────────────────────────────────────────
   const addLocation = () => {
@@ -121,9 +157,11 @@ export default function ApplicationScope() {
             reputation. Changes take effect on the next discovery cycle (no restart needed).
           </p>
         </div>
-        <button className={`btn save-btn ${saved ? 'saved' : ''}`} onClick={save} disabled={saving}>
-          {saving ? 'Saving…' : saved ? '✓ Saved' : <><Save size={16} /> Save Scope</>}
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button className={`btn save-btn ${saved ? 'saved' : ''}`} onClick={save} disabled={saving}>
+            {saving ? 'Saving…' : saved ? '✓ Saved' : <><Save size={16} /> Save Scope</>}
+          </button>
+        </div>
       </div>
 
       {error && <div className="scope-error">{error}</div>}
@@ -132,8 +170,8 @@ export default function ApplicationScope() {
 
         {/* ── Work Mode ─────────────────────────────────────────────────── */}
         <div className="premium-card scope-card">
-          <h3><Wifi size={18} /> Work Mode</h3>
-          <p className="card-hint">Controls remote vs on-site filtering across all jobs.</p>
+          <h3><Wifi size={18} /> What is your preferred Work Mode?</h3>
+          <p className="card-hint">Controls remote vs on-site filtering. The AI will instantly reject jobs that do not match your requirement.</p>
           <div className="seg-control">
             {WORK_MODE_OPTIONS.map(opt => (
               <button
@@ -149,8 +187,8 @@ export default function ApplicationScope() {
 
         {/* ── Experience Level ──────────────────────────────────────────── */}
         <div className="premium-card scope-card">
-          <h3><Award size={18} /> Experience Level</h3>
-          <p className="card-hint">Filters by seniority signals found in the job title and description.</p>
+          <h3><Award size={18} /> What is your target Experience Level?</h3>
+          <p className="card-hint">Filters by seniority. If you select "Mid", the AI will block "Staff" or "Principal" roles.</p>
           <div className="seg-control">
             {EXP_OPTIONS.map(opt => (
               <button
@@ -166,22 +204,33 @@ export default function ApplicationScope() {
 
         {/* ── Locations ──────────────────────────────────────────────────── */}
         <div className="premium-card scope-card full-width">
-          <h3><MapPin size={18} /> Locations</h3>
+          <h3><MapPin size={18} /> Are you willing to relocate? Which locations do you target?</h3>
           <p className="card-hint">
-            Add cities, countries, or "Remote". Tag each as <em>Apply</em> (prefer),
-            <em>Exclude</em> (hard block), or <em>No Preference</em> (pass-through).
-            Only "Exclude" tags actually filter — "Apply" is a soft preference signal.
+            Add target cities or countries. Tag as <em>Apply</em> (preferred) or 
+            <em>Exclude</em> (hard block—do not apply here).
           </p>
 
           <div className="tag-input-row">
-            <input
-              ref={locInputRef}
-              type="text"
-              placeholder="City, Country, or 'Remote'…"
-              onKeyDown={e => e.key === 'Enter' && addLocation()}
-            />
+            <input ref={locInputRef} type="text" placeholder="City, Country, or 'Remote'..." onKeyDown={e => e.key === 'Enter' && addLocation()} />
             <button className="btn-icon" onClick={addLocation}><Plus size={14} /> Add</button>
           </div>
+            
+          {suggestedLocs.length === 0 && scope.locations.length === 0 && (
+            <button className="btn" onClick={autoDetectScope} disabled={detecting} style={{ background: 'rgba(79, 70, 229, 0.1)', color: 'var(--accent)', border: '1px solid rgba(79, 70, 229, 0.3)', marginBottom: '1rem', width: 'fit-content' }}>
+              {detecting ? 'Analyzing...' : <><Sparkles size={14} /> AI: Suggest Locations</>}
+            </button>
+          )}
+
+          {suggestedLocs.length > 0 && (
+            <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+              <Sparkles size={14} color="var(--accent)" /> <span style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>AI Suggestions:</span>
+              {suggestedLocs.map(l => (
+                <button key={l} onClick={() => addSuggestedLoc(l)} style={{ background: 'var(--bg-surface)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '0.3rem 0.6rem', borderRadius: '12px', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  {l} <Plus size={12} />
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="tag-list">
             {scope.locations.length === 0 && (
@@ -209,21 +258,33 @@ export default function ApplicationScope() {
 
         {/* ── Roles / Titles ─────────────────────────────────────────────── */}
         <div className="premium-card scope-card full-width">
-          <h3><Briefcase size={18} /> Job Roles / Titles</h3>
+          <h3><Briefcase size={18} /> Which Job Roles are you looking for?</h3>
           <p className="card-hint">
-            Keywords are matched against the extracted job title using fuzzy matching
-            (not exact string). "Exclude" is a hard block; "Apply" is a soft preference.
+            Enter target titles (e.g., "Backend Engineer"). The AI will fuzzy-match these against job titles. 
+            You can also Exclude titles you explicitly do not want.
           </p>
 
           <div className="tag-input-row">
-            <input
-              ref={roleInputRef}
-              type="text"
-              placeholder="e.g. Backend Engineer, Data Analyst…"
-              onKeyDown={e => e.key === 'Enter' && addRole()}
-            />
+            <input ref={roleInputRef} type="text" placeholder="e.g. Backend Engineer, Data Analyst..." onKeyDown={e => e.key === 'Enter' && addRole()} />
             <button className="btn-icon" onClick={addRole}><Plus size={14} /> Add</button>
           </div>
+
+          {suggestedRoles.length === 0 && scope.roles.length === 0 && (
+            <button className="btn" onClick={autoDetectScope} disabled={detecting} style={{ background: 'rgba(79, 70, 229, 0.1)', color: 'var(--accent)', border: '1px solid rgba(79, 70, 229, 0.3)', marginBottom: '1rem', width: 'fit-content' }}>
+              {detecting ? 'Analyzing...' : <><Sparkles size={14} /> AI: Suggest Roles</>}
+            </button>
+          )}
+
+          {suggestedRoles.length > 0 && (
+            <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+              <Sparkles size={14} color="var(--accent)" /> <span style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>AI Suggestions:</span>
+              {suggestedRoles.map(r => (
+                <button key={r} onClick={() => addSuggestedRole(r)} style={{ background: 'var(--bg-surface)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '0.3rem 0.6rem', borderRadius: '12px', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  {r} <Plus size={12} />
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="tag-list">
             {scope.roles.length === 0 && (

@@ -7,8 +7,8 @@ import time
 REQUIRED_MODELS = [
     "qwen2.5:7b-instruct",
     "deepseek-r1:7b",
-    "magnum-v4:9b",
-    "llama3.1:8b",
+    "bespoke-minicheck",
+    "hermes3:8b",
     "nomic-embed-text"
 ]
 

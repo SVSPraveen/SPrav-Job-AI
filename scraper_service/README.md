@@ -1,6 +1,9 @@
 # Scraper Service (`/scraper_service`)
 
-The Scraper Service is a specialized, headless automation suite designed to navigate complex Applicant Tracking Systems (ATS) and job board frontends that lack public APIs.
+> [!WARNING]
+> **DEPRECATED:** As part of the transition to a lower-risk profile, the Node.js Puppeteer stealth scrapers have been deprecated and eliminated from the production runtime. SPrav now relies on native, credential-free Python HTTP scrapers.
+
+The Scraper Service was a specialized, headless automation suite designed to navigate complex Applicant Tracking Systems (ATS) and job board frontends that lack public APIs.
 
 ## 🏗️ Architectural Overview
 

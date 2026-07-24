@@ -166,7 +166,13 @@ export default function Onboarding() {
 
       <div className="progress-bar">
         {STEP_LABELS.map((label, i) => (
-          <div key={i} className={`progress-step ${step >= i + 1 ? 'active' : ''} ${step > i + 1 ? 'completed' : ''}`}>
+          <div key={i} 
+               className={`progress-step ${step >= i + 1 ? 'active' : ''} ${step > i + 1 ? 'completed' : ''}`}
+               onClick={() => {
+                 // Allow going back to previous steps, but not skipping forward if not ready
+                 if (i + 1 < step) setStep(i + 1);
+               }}
+               style={{ cursor: i + 1 < step ? 'pointer' : 'default' }}>
             <div className="step-num">{i + 1}</div>
             <div className="step-label">{label}</div>
           </div>
@@ -212,11 +218,10 @@ export default function Onboarding() {
               <label>Personal Access Token <span className="hint">(Optional — boosts rate limit from 60/hr to 5000/hr)</span></label>
               <input type="password" value={githubToken} onChange={e => setGithubToken(e.target.value)} placeholder="ghp_…" />
             </div>
-            <div className="actions">
-              <button className="btn outline" onClick={() => setStep(3)}>Skip</button>
-              <button className="btn" onClick={handleGithubSubmit} disabled={!githubInput.trim()}>
-                Sync GitHub <ArrowRight size={16} />
-              </button>
+            <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+              <button className="btn btn-secondary" onClick={() => setStep(step - 1)}>Back</button>
+              <button className="btn" onClick={handleGithubSubmit}>Sync GitHub <ArrowRight size={18} /></button>
+              <button className="btn btn-secondary" onClick={() => setStep(3)}>Skip</button>
             </div>
           </div>
         )}
@@ -234,11 +239,10 @@ export default function Onboarding() {
               {linkedinFile ? <span>📦 {linkedinFile.name}</span> : <span>Click to select your LinkedIn export ZIP</span>}
             </div>
             <input id="li-input" type="file" accept=".zip" style={{ display: 'none' }} onChange={e => handleFileUpload(e, setLinkedinFile)} />
-            <div className="actions">
-              <button className="btn outline" onClick={() => setStep(4)}>Skip</button>
-              <button className="btn" onClick={handleLinkedinSubmit} disabled={!linkedinFile}>
-                Process LinkedIn <ArrowRight size={16} />
-              </button>
+            <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+              <button className="btn btn-secondary" onClick={() => setStep(step - 1)}>Back</button>
+              <button className="btn" onClick={handleLinkedinSubmit}>Process LinkedIn <ArrowRight size={18} /></button>
+              <button className="btn btn-secondary" onClick={() => setStep(4)}>Skip</button>
             </div>
           </div>
         )}
@@ -252,11 +256,10 @@ export default function Onboarding() {
               <label>Portfolio URL</label>
               <input type="url" value={portfolioUrl} onChange={e => setPortfolioUrl(e.target.value)} placeholder="https://yourname.dev" />
             </div>
-            <div className="actions">
-              <button className="btn outline" onClick={() => setStep(5)}>Skip</button>
-              <button className="btn" onClick={handlePortfolioSubmit} disabled={!portfolioUrl.trim()}>
-                Scan Portfolio <ArrowRight size={16} />
-              </button>
+            <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+              <button className="btn btn-secondary" onClick={() => setStep(step - 1)}>Back</button>
+              <button className="btn" onClick={handlePortfolioSubmit}>Scan Portfolio <ArrowRight size={18} /></button>
+              <button className="btn btn-secondary" onClick={() => setStep(5)}>Skip</button>
             </div>
           </div>
         )}
@@ -361,11 +364,9 @@ export default function Onboarding() {
               ))}
             </div>
 
-            <div className="actions">
-              <button className="btn outline" onClick={handleMerge}>Skip & Merge Now</button>
-              <button className="btn" onClick={handleManualAndMerge}>
-                Save & Merge All Sources <ArrowRight size={16} />
-              </button>
+            <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+              <button className="btn btn-secondary" onClick={() => setStep(step - 1)}>Back</button>
+              <button className="btn" onClick={handleManualAndMerge}>Save & Merge All Sources <ArrowRight size={16} /></button>
             </div>
           </div>
         )}
@@ -428,7 +429,8 @@ export default function Onboarding() {
               </div>
             )}
 
-            <div className="actions">
+            <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+              <button className="btn btn-secondary" onClick={() => setStep(step - 1)}>Back</button>
               <button className="btn" onClick={handleFinalSubmit} style={{ background: 'var(--success)', width: '100%' }}>
                 ✅ Save Knowledge Base & Complete Onboarding
               </button>

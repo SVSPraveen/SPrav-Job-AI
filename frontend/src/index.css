@@ -33,14 +33,14 @@
 }
 
 [data-theme='light'] {
-  --bg-base: #f8fafc;       /* Slate 50 */
-  --bg-surface: #ffffff;    /* White */
+  --bg-base: #e2e8f0;       /* Slate 200 (darker for contrast) */
+  --bg-surface: #f8fafc;    /* Slate 50 */
   --bg-surface-hover: #f1f5f9; /* Slate 100 */
-  --border-subtle: #e2e8f0; /* Slate 200 */
-  --border-strong: #cbd5e1; /* Slate 300 */
+  --border-subtle: #cbd5e1; /* Slate 300 */
+  --border-strong: #94a3b8; /* Slate 400 */
   
   --text-primary: #0f172a;  /* Slate 900 */
-  --text-secondary: #475569; /* Slate 600 */
+  --text-secondary: #334155; /* Slate 700 */
   --text-muted: #64748b;    /* Slate 500 */
   
   --accent: #4f46e5;        /* Indigo 600 */
@@ -100,7 +100,7 @@ p.subtitle {
 }
 
 .sidebar {
-  width: 260px;
+  width: 320px;
   background-color: var(--bg-base);
   border-right: 1px solid var(--border-subtle);
   padding: 2rem 1.25rem;
@@ -124,11 +124,11 @@ p.subtitle {
 }
 
 .nav-item {
-  padding: 0.625rem 0.875rem;
+  padding: 0.8rem 1.25rem;
   margin-bottom: 0.25rem;
   border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -348,14 +348,15 @@ p.subtitle {
 
 .input-field {
   width: 100%;
-  padding: 0.625rem 0.875rem;
+  padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
-  background-color: var(--bg-base);
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-strong);
   color: var(--text-primary);
   font-family: inherit;
-  font-size: 0.9375rem;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .input-field:hover {
@@ -365,7 +366,13 @@ p.subtitle {
 .input-field:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+  opacity: 0.5;
+  font-weight: 400;
 }
 
 textarea.input-field {

@@ -80,7 +80,7 @@ User Question: {user_prompt}
 Please answer the question based solely on the retrieved memory context above.
 """
         print("[SPrav] Synthesizing answer using LLM generation...")
-        # The generation model (llama3.1:8b) runs in VRAM
+        # The generation model (hermes3:8b) runs in VRAM
         response = generate(targeted_prompt, use_case="brain_retrieval")
         return response
         

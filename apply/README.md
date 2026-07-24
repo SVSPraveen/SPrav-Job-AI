@@ -12,5 +12,11 @@ Third-party APIs for job boards are notoriously expensive, rate-limited, and oft
 4. **Upload**: Attaches the tailored PDF.
 5. **Submission**: Clicks submit and returns the confirmation URL to the Tracking module.
 
-## ⚠️ Circuit Breakers
-To protect your professional reputation, this module is strictly rate-limited. If it detects abnormal form behaviors (e.g., unexpected required fields), it immediately aborts the run and flags the job for manual Human Review.
+## ⚠️ Circuit Breakers & Volume Limits
+To protect your professional reputation and prevent ATS ban-hammering, this module is strictly rate-limited using a multi-tiered defense:
+
+1. **Company Cap:** Maximum 5 applications per individual company per day.
+2. **Portal Cap:** Maximum 25 applications per job board (e.g., Greenhouse, Lever) per day.
+3. **Global Cap:** A hard ceiling of 150 total applications across all pipelines per day.
+
+If the engine detects abnormal form behaviors or consecutive Playwright failures, it immediately trips the `AUTO_APPLY_CIRCUIT_BREAKER_N` flag, aborts the run, and routes the job for manual Human Review.
