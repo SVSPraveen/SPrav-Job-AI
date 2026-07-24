@@ -12,6 +12,7 @@
   <a href="#-what-it-does">What</a> •
   <a href="#-how-it-works">How</a> •
   <a href="#-why-we-built-this">Why</a> •
+  <a href="#-security--offline-auth">Security</a> •
   <a href="#-architecture">Architecture</a> •
   <a href="#-installation">Install</a>
 </p>
@@ -52,6 +53,17 @@ When you turn on the engine, this is the exact flow that happens on your machine
 * **Absolute Privacy:** Because this runs 100% locally on your computer's GPU, your email, phone number, and employment history are never sent to OpenAI or Anthropic. Your data cannot be leaked.
 * **Zero Cost:** No cloud API keys or subscription fees. Ever.
 * **Beating the ATS:** Modern companies use AI Applicant Tracking Systems to automatically reject resumes that don't have the right keywords. We are fighting fire with fire—using AI to perfectly align your resume to their keyword filters before a human ever sees it.
+
+---
+
+## 🔒 Security & Offline Auth
+
+Because SPrav operates independently of any central cloud, traditional password recovery mechanisms (like an external auth server sending you an email) pose a security risk. We built a zero-trust local authentication system:
+
+* **Encrypted Credential Vault:** Your platform credentials (e.g., LinkedIn passwords used for Auto-Apply) are XOR-encrypted in a local SQLite database (`users.db`) using your private `.env` key. They are never stored in plain text.
+* **Master Recovery Key:** Upon sign-up, the system generates a unique `SPRAV-XXXX-XXXX` Master Recovery Key. If you forget your local password, this physical key is your ultimate fallback to regain access to your encrypted vault.
+* **Bring-Your-Own-SMTP (Optional):** If you prefer a modern Web 2.0 experience, you can hook up your own Gmail App Password to the `.env` file. The backend will natively generate and securely email you a 6-digit OTP for password recovery, completely bypassing the need for a paid, centralized email server like Twilio or SendGrid.
+* **Themed UI:** A sleek, fully responsive React frontend with built-in Light/Dark mode toggles to manage your agents in comfort.
 
 ---
 
