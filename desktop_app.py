@@ -6,11 +6,14 @@ import os
 
 from engine.ollama_manager import verify_ollama
 
+import threading
+
 def start_backend():
     print("Starting backend services...")
     
-    # Verify Ollama is installed and pull necessary models
-    verify_ollama()
+    # Verify Ollama is installed and pull necessary models in the background
+    # so it doesn't freeze the UI on first launch!
+    threading.Thread(target=verify_ollama, daemon=True).start()
     
     # Hide window for subprocesses on Windows
     startupinfo = subprocess.STARTUPINFO()
