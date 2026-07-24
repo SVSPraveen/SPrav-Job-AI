@@ -374,3 +374,17 @@ def get_user_credentials() -> tuple[str, str]:
     if row:
         return row[0], row[1]
     return "admin@localhost", "admin123"
+
+def get_system_credential(service: str, key: str) -> str | None:
+    """Helper for background tasks (daemons/LLM providers) to fetch credentials for the primary user."""
+    conn = sqlite3.connect(USERS_DB)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users LIMIT 1")
+    row = cursor.fetchone()
+    conn.close()
+    
+    if not row:
+        return None
+        
+    creds = get_credentials(row[0], service)
+    return creds.get(key)

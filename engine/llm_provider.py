@@ -3,6 +3,7 @@ import json
 import time
 import threading
 import os
+from engine.auth import get_system_credential
 
 gpu_mutex = threading.Lock()
 
@@ -208,18 +209,18 @@ def generate(prompt: str, use_case: str = "general") -> str:
             print(f"[Agnostic MoE] Missing Gemini key for '{use_case}'. Falling back to Ollama.")
             
     elif provider == "groq":
-        api_key = os.getenv("GROQ_API_KEY")
+        api_key = get_system_credential("groq", "api_key") or os.getenv("GROQ_API_KEY")
         if api_key:
             success, result = _generate_groq(model_name, prompt, api_key)
         else:
-            print(f"[Agnostic MoE] Missing Groq key for '{use_case}'. Falling back to Ollama.")
+            print(f"[Agnostic MoE] Missing Groq key for '{use_case}'. Configure it in the UI Settings. Falling back to Ollama.")
             
     elif provider == "openrouter":
-        api_key = os.getenv("OPENROUTER_API_KEY")
+        api_key = get_system_credential("openrouter", "api_key") or os.getenv("OPENROUTER_API_KEY")
         if api_key:
             success, result = _generate_openrouter(model_name, prompt, api_key)
         else:
-            print(f"[Agnostic MoE] Missing OpenRouter key for '{use_case}'. Falling back to Ollama.")
+            print(f"[Agnostic MoE] Missing OpenRouter key for '{use_case}'. Configure it in the UI Settings. Falling back to Ollama.")
             
     # Primary Local Execution or Cloud Fallback
     if not success:

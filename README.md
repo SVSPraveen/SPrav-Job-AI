@@ -130,10 +130,10 @@ To protect your privacy, all API keys and thresholds are stored strictly in a `.
 JWT_SECRET=super_secret_jwt_key_12345
 
 # -----------------------------
-# External APIs (Optional)
+# AI API Keys
 # -----------------------------
-GROQ_API_KEY=gsk_...
-OPENROUTER_API_KEY=sk-or-v1-...
+# Configure your Groq and OpenRouter keys directly inside the application's Settings UI.
+# They are securely encrypted in users.db and NO LONGER required in the .env file!
 
 # -----------------------------
 # SMTP Email Setup (Optional)
