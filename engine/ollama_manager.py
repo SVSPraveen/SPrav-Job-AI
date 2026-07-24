@@ -44,6 +44,32 @@ def install_ollama_windows():
         print(f"[Ollama Manager] Failed to install Ollama automatically: {e}")
         print("Please install it manually from https://ollama.com")
 
+def ensure_ollama_running():
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    
+    print("[Ollama Manager] Checking if Ollama server is awake...")
+    try:
+        # Check if server is reachable
+        result = subprocess.run(
+            ["ollama", "list"], 
+            capture_output=True, 
+            text=True, 
+            startupinfo=startupinfo
+        )
+        if "could not connect" in result.stderr.lower() or "error" in result.stderr.lower():
+            print("[Ollama Manager] Ollama is asleep. Waking it up in the background...")
+            # Start the server in the background
+            subprocess.Popen(
+                ["ollama", "serve"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                startupinfo=startupinfo,
+                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+            )
+            time.sleep(3) # Give it time to boot
+    except Exception as e:
+        print(f"[Ollama Manager] Error checking Ollama server state: {e}")
 def check_and_pull_models():
     startupinfo = subprocess.STARTUPINFO()
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -76,4 +102,5 @@ def verify_ollama():
             
     # Check models after ensuring installation
     if is_ollama_installed():
+        ensure_ollama_running()
         check_and_pull_models()
