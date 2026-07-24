@@ -47,25 +47,17 @@ def start_backend():
         stderr=subprocess.DEVNULL
     )
 
-    # Start Frontend (Vite)
-    # Using shell=True for npm, but CREATE_NO_WINDOW ensures it stays completely hidden
-    front_proc = subprocess.Popen(
-        "cd frontend && npm run dev",
-        shell=True,
-        startupinfo=startupinfo,
-        creationflags=subprocess.CREATE_NO_WINDOW,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
-
-    return api_proc, daemon_proc, front_proc
+    # Start Frontend (Vite) - REMOVED!
+    # The application is now compiled into frontend/dist and served natively by FastAPI
+    # This eliminates Node.js from production, resulting in instant booting and lower memory usage.
+    
+    return api_proc, daemon_proc
 
 def main():
-    api_proc, daemon_proc, front_proc = start_backend()
+    api_proc, daemon_proc = start_backend()
     
-    # Wait for Vite dev server to boot and bind
-    time.sleep(4)
+    # Wait briefly for FastAPI to bind
+    time.sleep(1)
     
     # Tell Windows this is a separate app, not just a generic 'python.exe' process.
     # This forces the taskbar to use the desktop shortcut's icon (or the one we pass).
@@ -78,11 +70,10 @@ def main():
     # Create the native desktop window using Windows Webview2
     window = webview.create_window(
         "SPrav Job AI", 
-        "http://localhost:5173", 
-        width=1280, 
-        height=850,
+        "http://127.0.0.1:8000/", 
         text_select=True,
-        zoomable=True
+        zoomable=True,
+        maximized=True
     )
     
     # Start the UI loop (passing the icon for the window title bar and taskbar)
@@ -95,7 +86,6 @@ def main():
     try:
         api_proc.kill()
         daemon_proc.kill()
-        front_proc.kill()
     except Exception:
         pass
     

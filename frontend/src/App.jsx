@@ -30,7 +30,7 @@ function App() {
   }, [theme])
 
   useEffect(() => {
-    const initializeAuth = async () => {
+    const initializeAuth = async (retries = 5) => {
       if (!token) {
         try {
           const res = await axios.get(`${API_BASE}/auto-login`);
@@ -41,7 +41,12 @@ function App() {
             }
           }
         } catch (e) {
-          console.error("Auto-login failed", e);
+          console.error(`Auto-login failed. Retries left: ${retries}`, e);
+          if (retries > 0) {
+            setTimeout(() => initializeAuth(retries - 1), 1000); // Retry after 1 second
+          } else {
+            alert("Failed to connect to SPrav Engine. Please restart the application.");
+          }
         }
       }
     };
