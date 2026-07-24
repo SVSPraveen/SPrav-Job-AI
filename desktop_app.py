@@ -4,6 +4,11 @@ import subprocess
 import sys
 import os
 
+# Fix pythonw.exe crashing on print() by redirecting to a file
+log_file = open("desktop_app.log", "w", encoding="utf-8")
+sys.stdout = log_file
+sys.stderr = log_file
+
 from engine.ollama_manager import verify_ollama
 
 import threading
@@ -26,14 +31,20 @@ def start_backend():
     api_proc = subprocess.Popen(
         [python_exe, "-m", "uvicorn", "api:app", "--host", "127.0.0.1", "--port", "8000"],
         startupinfo=startupinfo,
-        creationflags=subprocess.CREATE_NO_WINDOW
+        creationflags=subprocess.CREATE_NO_WINDOW,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
     )
 
     # Start Daemon
     daemon_proc = subprocess.Popen(
         [python_exe, "-m", "engine.daemon"],
         startupinfo=startupinfo,
-        creationflags=subprocess.CREATE_NO_WINDOW
+        creationflags=subprocess.CREATE_NO_WINDOW,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
     )
 
     # Start Frontend (Vite)
@@ -42,7 +53,10 @@ def start_backend():
         "cd frontend && npm run dev",
         shell=True,
         startupinfo=startupinfo,
-        creationflags=subprocess.CREATE_NO_WINDOW
+        creationflags=subprocess.CREATE_NO_WINDOW,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
     )
 
     return api_proc, daemon_proc, front_proc
