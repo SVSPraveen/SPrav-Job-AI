@@ -12,14 +12,23 @@ REQUIRED_MODELS = [
     "nomic-embed-text"
 ]
 
+def get_ollama_path():
+    """Returns the absolute path to ollama.exe if present, otherwise just 'ollama' for PATH resolution."""
+    if sys.platform == "win32":
+        local_app_data = os.environ.get("LOCALAPPDATA")
+        if local_app_data:
+            abs_path = os.path.join(local_app_data, "Programs", "Ollama", "ollama.exe")
+            if os.path.exists(abs_path):
+                return abs_path
+    return "ollama"
+
 def is_ollama_installed() -> bool:
     try:
-        # Hide the console window on Windows
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         
         result = subprocess.run(
-            ["ollama", "--version"], 
+            [get_ollama_path(), "--version"], 
             capture_output=True, 
             text=True, 
             startupinfo=startupinfo
@@ -50,18 +59,16 @@ def ensure_ollama_running():
     
     print("[Ollama Manager] Checking if Ollama server is awake...")
     try:
-        # Check if server is reachable
         result = subprocess.run(
-            ["ollama", "list"], 
+            [get_ollama_path(), "list"], 
             capture_output=True, 
             text=True, 
             startupinfo=startupinfo
         )
         if "could not connect" in result.stderr.lower() or "error" in result.stderr.lower():
             print("[Ollama Manager] Ollama is asleep. Waking it up in the background...")
-            # Start the server in the background
             subprocess.Popen(
-                ["ollama", "serve"],
+                [get_ollama_path(), "serve"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 startupinfo=startupinfo,
@@ -79,7 +86,7 @@ def check_and_pull_models():
         try:
             # Check if model exists
             result = subprocess.run(
-                ["ollama", "list"], 
+                [get_ollama_path(), "list"], 
                 capture_output=True, 
                 text=True, 
                 startupinfo=startupinfo
@@ -89,7 +96,7 @@ def check_and_pull_models():
                 
                 # Show a visible console window for the download progress
                 creationflags = subprocess.CREATE_NEW_CONSOLE if sys.platform == "win32" else 0
-                subprocess.run(["ollama", "pull", model], creationflags=creationflags)
+                subprocess.run([get_ollama_path(), "pull", model], creationflags=creationflags)
             else:
                 print(f"[Ollama Manager] Model {model} is already installed.")
         except Exception as e:
