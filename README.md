@@ -199,8 +199,13 @@ copy .env.example .env
 
 ### 4. Launch
 
-Execute the 1-click bootstrapper to instantly spin up the FastAPI backend, background daemon, and the pre-compiled desktop UI. This will also automatically install Ollama and pull any missing models if you don't have them!
+For Windows users, simply double-click the **`Start SPrav AI.vbs`** file. This will silently spin up the FastAPI backend, background daemon, and the pre-compiled desktop UI in the background without leaving an ugly command prompt window open. This will also automatically install Ollama and pull any missing models if you don't have them!
 
+```bash
+Start SPrav AI.vbs
+```
+
+Alternatively, you can run the batch file directly if you want to see the startup logs:
 ```bash
 LaunchJobAssistant.bat
 ```
