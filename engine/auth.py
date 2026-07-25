@@ -21,7 +21,9 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-SECRET_KEY = os.getenv("JWT_SECRET", "sprav-local-secret-key-2025-change-me")
+SECRET_KEY = os.getenv("JWT_SECRET")
+if not SECRET_KEY:
+    raise ValueError("CRITICAL SECURITY ERROR: JWT_SECRET is missing from your .env file. A unique secret is required for secure authentication.")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 30
 USERS_DB = "users.db"
