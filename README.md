@@ -105,7 +105,7 @@ SPrav-Job-AI/
 
 ## ⚙️ Configuration (`.env`)
 
-To protect your privacy, all API keys and thresholds are stored strictly in a `.env` file at the root of the project.
+To protect your privacy, all API keys and thresholds are stored strictly in a `.env` file within your secure `%LOCALAPPDATA%\SPravJobAI` data directory.
 
 ```env
 # -----------------------------
