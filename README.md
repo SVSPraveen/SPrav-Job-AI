@@ -115,7 +115,6 @@ JWT_SECRET=super_secret_jwt_key_12345
 # AI API Keys (Optional)
 # -----------------------------
 GROQ_API_KEY=your_groq_api_key
-OPENROUTER_API_KEY=your_openrouter_api_key
 
 # -----------------------------
 # SMTP Email Setup (Optional)
