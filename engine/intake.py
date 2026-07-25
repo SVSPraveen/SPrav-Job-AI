@@ -155,8 +155,8 @@ def _normalise_work_history(raw_entries: list, source: str) -> list:
     """Converts raw work history dicts into the full schema format with bullet IDs."""
     result = []
     for entry in raw_entries:
-        company = entry.get("company", "").strip()
-        role = entry.get("role", "").strip()
+        company = (entry.get("company") or "").strip()
+        role = (entry.get("role") or "").strip()
         if not company:
             continue
         entry_id = _make_id("work", company)
@@ -182,7 +182,7 @@ def _normalise_work_history(raw_entries: list, source: str) -> list:
             "type": entry.get("type", "full_time"),
             "start_date": entry.get("start_date", ""),
             "end_date": entry.get("end_date", ""),
-            "in_progress": entry.get("end_date", "").lower() in ("present", "current", ""),
+            "in_progress": (entry.get("end_date") or "").lower() in ("present", "current", ""),
             "last_reviewed": datetime.now().strftime("%Y-%m-%d"),
             "bullets": bullets,
             "_source": source,

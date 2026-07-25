@@ -507,7 +507,8 @@ def get_watchlist():
     # Augment with snapshot metadata for the UI
     companies = wl.get("companies", [])
     for company in companies:
-        slug = company["name"].lower().replace(" ", "_").replace(r"[^a-z0-9_]", "")
+        c_name = company.get("name") or "unknown"
+        slug = c_name.lower().replace(" ", "_").replace(r"[^a-z0-9_]", "")
         snap_path = os.path.join(SNAPSHOTS_DIR, f"{slug}.json")
         if os.path.exists(snap_path):
             with open(snap_path, "r", encoding="utf-8") as sf:

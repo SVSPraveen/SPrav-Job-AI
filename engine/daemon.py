@@ -454,7 +454,7 @@ def compile_dispatch_node(state: JobState) -> JobState:
         state['status'] = 'failed_generation'
         return state
 
-    url = job["url"].lower()
+    url = (job.get("url") or "").lower()
     auto_eligible = state.get('auto_apply_eligible', False)
     company = job.get('company', 'Unknown')
     title = job.get('title', 'Unknown')
