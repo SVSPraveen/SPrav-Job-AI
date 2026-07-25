@@ -252,6 +252,8 @@ def generate(prompt: str, use_case: str = "general") -> str:
                 fallback_model = "bespoke-minicheck"
             elif use_case == "resume_tailoring":
                 fallback_model = "qwen2.5-coder:7b-instruct"
+            elif use_case == "copilot":
+                fallback_model = "hermes3:8b"
             else:
                 fallback_model = "qwen2.5-coder:7b-instruct"
         else:

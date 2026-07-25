@@ -231,7 +231,7 @@ Be concise, warm, and practical. If the user seems lost, proactively guide them 
         if history:
             context = "\n".join([f"{h['role'].title()}: {h['content']}" for h in history[-4:]])
             full_prompt = system_prompt + "\n\nRecent conversation:\n" + context + "\n\nUser: " + query.message
-        reply = generate(full_prompt, use_case="extraction")
+        reply = generate(full_prompt, use_case="copilot")
     except Exception as e:
         reply = f"I'm having trouble connecting to the local AI right now. ({e})"
 
