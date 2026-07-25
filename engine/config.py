@@ -116,6 +116,13 @@ Output STRICTLY valid JSON. No markdown. No explanation. No text before or after
   ]
 }}
 
+═══ FEW-SHOT EXEMPLAR ═══
+If the original bullet is "Created a caching layer with Redis" and the JD requires "Latency Optimization":
+{{
+  "original_id": "bullet_4",
+  "rewritten_text": "Optimized system latency [X] by engineering a Redis caching layer [Z] that eliminated backend bottlenecks [Y]."
+}}
+
 User Knowledge Base:
 {kb_context}
 
