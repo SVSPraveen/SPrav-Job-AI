@@ -6,6 +6,7 @@ import time
 
 REQUIRED_MODELS = [
     "qwen2.5:7b-instruct",
+    "qwen2.5-coder:7b-instruct",
     "deepseek-r1:7b",
     "bespoke-minicheck",
     "hermes3:8b",
