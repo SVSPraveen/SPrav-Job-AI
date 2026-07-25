@@ -9,12 +9,19 @@ gpu_mutex = threading.Lock()
 
 def detect_loop(tokens_list: list) -> bool:
     """Infinite Word Chain State Tracker."""
-    for seq_len in range(3, 21):
-        if len(tokens_list) >= seq_len * 3:
+    for seq_len in range(4, 21):
+        if len(tokens_list) >= seq_len * 4:
             seq1 = tokens_list[-seq_len:]
             seq2 = tokens_list[-seq_len*2 : -seq_len]
             seq3 = tokens_list[-seq_len*3 : -seq_len*2]
-            if seq1 == seq2 == seq3:
+            seq4 = tokens_list[-seq_len*4 : -seq_len*3]
+            
+            # Check if all four sequences are identical
+            if seq1 == seq2 == seq3 == seq4:
+                # Ignore if the sequence is entirely whitespace/newlines
+                seq_str = "".join(seq1)
+                if seq_str.strip() == "":
+                    continue
                 return True
     return False
 
