@@ -327,7 +327,7 @@ def merge(sources: list[dict], kb_path: str = KB_PATH) -> dict:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_path = os.path.join(HISTORY_DIR, f"me.json.{timestamp}")
         shutil.copy2(kb_path, backup_path)
-        print(f"[KBMerger] Backed up previous me.json → {backup_path}")
+        print(f"[KBMerger] Backed up previous me.json -> {backup_path}")
 
     # ── Write merged KB ──────────────────────────────────────────────────────
     os.makedirs(os.path.dirname(kb_path), exist_ok=True)

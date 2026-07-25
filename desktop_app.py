@@ -24,6 +24,9 @@ def start_backend():
     startupinfo = subprocess.STARTUPINFO()
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     
+    env = os.environ.copy()
+    env["PYTHONIOENCODING"] = "utf-8"
+    
     venv_dir = os.path.join(os.path.dirname(__file__), ".venv", "Scripts")
     python_exe = os.path.join(venv_dir, "python.exe")
 
@@ -34,7 +37,8 @@ def start_backend():
         creationflags=subprocess.CREATE_NO_WINDOW,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stderr=subprocess.DEVNULL,
+        env=env
     )
 
     # Start Daemon
@@ -44,7 +48,8 @@ def start_backend():
         creationflags=subprocess.CREATE_NO_WINDOW,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stderr=subprocess.DEVNULL,
+        env=env
     )
 
     # Start Frontend (Vite) - REMOVED!

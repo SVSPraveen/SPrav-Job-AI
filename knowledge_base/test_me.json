@@ -1,0 +1,22 @@
+{
+  "personal": {},
+  "work_history": [],
+  "projects": [],
+  "github_projects": [],
+  "portfolio_projects": [],
+  "education": [],
+  "certifications": [
+    {
+      "id": "cert_oraclecloudinfrastructure2025certi",
+      "name": "Oracle Cloud Infrastructure 2025 Certi",
+      "issuer": "Oracle University",
+      "date_earned": "2025-10",
+      "expires": "102986081OCI25FNDCFA",
+      "credential_id": "",
+      "url": "https://catalog-education.oracle.com/p"
+    }
+  ],
+  "skills": {},
+  "needs_detail": [],
+  "pending_conflicts": []
+}
