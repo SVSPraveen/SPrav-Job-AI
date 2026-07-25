@@ -186,7 +186,11 @@ export default function Onboarding() {
         {step === 1 && (
           <div className="step-content">
             <h3><UploadCloud size={20} /> Upload Existing Resume</h3>
-            <p>We extract text and send it to the extraction model. PDF or DOCX accepted.</p>
+            <p className="step-desc">
+              Upload your most recent resume in PDF or DOCX format.<br/>
+              <br/>
+              <strong>Why a PDF/DOCX?</strong> While LinkedIn gives us raw structured spreadsheets, your resume gives the AI a baseline understanding of how you naturally frame your experience, your core identity, and your personal contact info. We use standard text extraction to pull this data directly into the engine.
+            </p>
             <div className="drop-zone" onClick={() => document.getElementById('resume-input').click()}>
               {resumeFile ? <span>📄 {resumeFile.name}</span> : <span>Click or drag & drop your resume here</span>}
             </div>
@@ -204,7 +208,11 @@ export default function Onboarding() {
         {step === 2 && (
           <div className="step-content">
             <h3><Link size={20} /> Sync GitHub Projects</h3>
-            <p>Enter your GitHub username to import all your public repos, or paste comma-separated repo URLs for specific projects only.</p>
+            <p className="step-desc">
+              Enter your GitHub username to import all your public repos, or paste comma-separated repo URLs for specific projects only.<br/>
+              <br/>
+              <strong>Why Web URLs and not a git clone?</strong> If we cloned your entire repository, the AI would be overwhelmed by thousands of raw code files. By using the GitHub API with your web URL, SPrav can instantly pinpoint your READMEs, top programming languages, and commit history to cleanly extract your exact technical achievements.
+            </p>
             <div className="form-group">
               <label>GitHub Username <em>or</em> repo URLs (comma-separated)</label>
               <input
