@@ -53,3 +53,5 @@ knowledge_base/master_identity.txt
 knowledge_base/scope.json
 config.json
 watchlist.json
+
+uvicorn.log
