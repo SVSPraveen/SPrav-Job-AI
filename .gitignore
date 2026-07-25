@@ -44,3 +44,5 @@ desktop_app.log
 knowledge_base/history/
 logs/
 *.db
+
+scraper_service/node_modules/
