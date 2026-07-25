@@ -40,7 +40,7 @@ Job hunting is a full-time job. **SPrav completely automates the most exhausting
 Instead of mindlessly scrolling through job boards, SPrav acts as your personal, highly-coordinated AI workforce:
 - 🌐 **Monitors the internet** for new job postings (Indeed, Hacker News, Y Combinator, Wellfound) using native, credential-free HTTP scrapers.
 - 🎯 **Explicitly targets** your preferred markets (e.g., India, Remote) and mathematically calculates if you are a good fit based on your background.
-- ✍️ **Custom-rewrites** your resume for that specific job to effortlessly bypass ATS keyword filters.
+- ✍️ **Custom-rewrites** your resume for that specific job to effortlessly bypass ATS keyword filters, while intelligently scanning your GitHub/Portfolio repositories to highlight **only the top 2 best-matching projects**.
 - 📨 **Drops a completely finished application** package and cold-email draft directly into your Human Review queue.
 
 *(Note: LinkedIn automation has been explicitly removed from this project to ensure your personal accounts remain safe from bot detection and ID verification).*
@@ -52,7 +52,7 @@ When you turn on the engine, this is the exact flow that happens on your machine
 1. **Discovery:** Python-based stealth scrapers silently wake up and scan top platforms (Indeed, YC, HN) without requiring any login credentials, bypassing Cloudflare and captchas to pull raw job postings directly into your pipeline.
 2. **Extraction:** The AI extracts the unstructured text of the job description and converts it into clean, structured JSON data.
 3. **Reasoning:** A deep-thinking logic model reads the job, cross-references your profile, and calculates a strict mathematical "Fit Score".
-4. **Tailoring:** If the score is high enough, the local AI drafts a custom resume and a personalized cold email, perfectly highlighting why you are the best fit for that exact role.
+4. **Tailoring:** If the score is high enough, the local AI drafts a custom resume and a personalized cold email. The orchestrator dynamically optimizes context windows (e.g., automatically truncating huge GitHub READMEs) to ensure flawless local execution without exceeding token limits.
 5. **Execution:** An automation bot navigates to ATS application pages (like Greenhouse or Lever) to auto-apply. For startup roles (YC/Hacker News), the system pushes a tailored email draft to your Dashboard's "Action Required" inbox for 1-click manual sending.
 
 ## 🔒 Security & Offline Auth
@@ -69,7 +69,9 @@ Because SPrav operates independently of any central cloud, traditional password 
 
 ## 🧠 Architecture
 
-SPrav utilizes a custom pipeline called the **SPrav MOE Model** (Mixture of Experts in spirit). Rather than relying on a monolithic Large Language Model, it intelligently routes tasks across highly specialized models for data extraction, fit scoring, tailoring, and verification.
+SPrav utilizes a custom pipeline called the **SPrav MOE Model** (Mixture of Experts in spirit). Rather than relying on a monolithic Large Language Model, it intelligently routes tasks across highly specialized models for data extraction, fit scoring, tailoring, and verification. 
+
+**Fault Tolerant Engine:** The core `daemon.py` orchestrator is heavily hardened. It features automatic database migrations, aggressive zero-token ATS extraction, Null-safe fallback logic for ghost jobs, and forced UTF-8 encoding checks on all native sub-processes to guarantee the daemon never crashes during an overnight discovery run.
 
 For Resume Tailoring, the system primarily routes to a high-tier cloud model (like `gpt-oss-120b` via Groq). If the cloud API hits a rate limit or exhausts, the system seamlessly triggers a **Dual Local Fallback**—falling back to `qwen2.5-coder:7b-instruct` for strict JSON outputs, and then `hermes3:8b` as an ultimate failsafe. The entire orchestrator is strictly memory-managed to run on an **8GB VRAM** ceiling without crashing.
 
