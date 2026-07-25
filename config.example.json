@@ -1,0 +1,23 @@
+{
+  "threshold": 4.0,
+  "filter_prompt": "You are a Ruthless Auditor. Read the Job Requirements and User Context.\nRule: If Job YoE > User YoE, output strictly False. Do not count personal projects or self-taught years towards corporate YoE. If the User lacks a hard core requirement (e.g. specific programming language), output False. If {threshold}% match, output True.\nUse <think> tags to reason, then output a final JSON strictly formatted as: {\"match\": true} or {\"match\": false}",
+  "resume_prompt": "Write a highly dense, ATS-optimized 1-page resume tailored for the job. Zero Hallucination Directive: Under no circumstances may you invent, infer, or hallucinate skills, metrics, company names, or job titles that are not explicitly provided in the User Knowledge Base.",
+  "providers": {
+    "extraction": {
+      "provider": "ollama",
+      "model": "qwen2.5-coder:7b-instruct"
+    },
+    "hard_filter": {
+      "provider": "ollama",
+      "model": "deepseek-r1:7b"
+    },
+    "resume_tailoring": {
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile"
+    },
+    "toxic_forensics": {
+      "provider": "ollama",
+      "model": "bespoke-minicheck"
+    }
+  }
+}

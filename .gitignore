@@ -46,3 +46,10 @@ logs/
 *.db
 
 scraper_service/node_modules/
+
+# Personal User Data
+knowledge_base/me.json
+knowledge_base/master_identity.txt
+knowledge_base/scope.json
+config.json
+watchlist.json
