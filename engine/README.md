@@ -9,7 +9,7 @@ Large Language Models hallucinate. To prevent this, the SPrav Engine explicitly 
 
 * **`auth.py`**: Handles local SQLite user authentication and credential obfuscation.
 * **`prompts.py`**: Stores the system prompts for Qwen, DeepSeek, and high-tier cloud models, explicitly engineered to force rigid JSON or strict logic outputs.
-* **`llm_provider.py`**: The state machine that routes data between the localized Ollama instances and the cloud API (e.g. OpenRouter), including strict VRAM management and dual local fallback logic.
+* **`llm_provider.py`**: The state machine that routes data between the localized Ollama instances and the lightning-fast Groq API, including strict VRAM management and dual local fallback logic.
 
 ## 🚀 Usage (Internal)
 The Engine is not meant to be called directly by the user. It is invoked natively by the FastAPI backend when a new batch of jobs arrives from the Discovery layer.

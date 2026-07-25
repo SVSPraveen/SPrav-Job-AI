@@ -12,8 +12,8 @@
       "model": "deepseek-r1:7b"
     },
     "resume_tailoring": {
-      "provider": "openrouter",
-      "model": "openai/gpt-oss-120b"
+      "provider": "groq",
+      "model": "llama-3.3-70b-versatile"
     },
     "toxic_forensics": {
       "provider": "ollama",
