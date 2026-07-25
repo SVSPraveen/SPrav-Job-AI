@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "c:\My Job APPLYING App\engine\daemon.py", line 846, in <module>
+    run_daemon()
+    ~~~~~~~~~~^^
+  File "c:\My Job APPLYING App\engine\daemon.py", line 780, in run_daemon
+    set_daemon_state("WAITING_FOR_ONBOARDING", "")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\My Job APPLYING App\discovery\db.py", line 256, in set_daemon_state
+    cursor.execute(
+    ~~~~~~~~~~~~~~^
+        "INSERT INTO daemon_state (key, value) VALUES (?, ?) "
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (key, value)
+        ^^^^^^^^^^^^
+    )
+    ^
+sqlite3.OperationalError: database is locked
+=========================================
+[Daemon] SPrav Multi-Threaded MoE Initialized (LangGraph Enabled).
+=========================================
+[Ollama] All 5 required GGUF models are present and ready.

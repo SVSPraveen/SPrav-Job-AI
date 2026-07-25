@@ -327,21 +327,22 @@ def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
 
 
 def _expand_keywords(base_keywords):
-    synonyms = {
-        "software engineer": ["software developer", "backend engineer", "full stack", "programmer", "SDE"],
-        "frontend": ["ui developer", "front end engineer", "react developer", "javascript developer"],
-        "backend": ["back end engineer", "api developer", "server side engineer", "python developer", "java developer", "node developer"],
-        "data scientist": ["machine learning engineer", "data analyst", "AI engineer"],
-        "product manager": ["program manager", "product owner"],
-        "devops": ["sre", "site reliability", "platform engineer", "cloud engineer"],
-        "qa": ["sdet", "test engineer", "quality assurance", "automation engineer"]
-    }
+    synonyms_groups = [
+        ["software engineer", "software developer", "backend engineer", "full stack", "programmer", "sde", "developer"],
+        ["frontend", "ui developer", "front end", "react developer", "javascript developer", "web developer"],
+        ["backend", "back end", "api developer", "server side", "python developer", "java developer", "node developer"],
+        ["data scientist", "machine learning", "ml engineer", "ai engineer", "artificial intelligence", "data analyst", "nlp developer", "deep learning", "generative ai", "rag", "research scientist"],
+        ["product manager", "program manager", "product owner", "technical lead", "tech lead", "project manager"],
+        ["devops", "sre", "site reliability", "platform engineer", "cloud engineer", "infrastructure"],
+        ["qa", "sdet", "test engineer", "quality assurance", "automation engineer"]
+    ]
     expanded = set(base_keywords)
     for kw in base_keywords:
         kw_lower = kw.lower()
-        for key, syn_list in synonyms.items():
-            if key in kw_lower or kw_lower in key:
-                expanded.update(syn_list)
+        for group in synonyms_groups:
+            # If the user keyword overlaps with any synonym in this group, include the whole group
+            if any(syn in kw_lower or kw_lower in syn for syn in group):
+                expanded.update(group)
     return list(expanded)
 
 def _get_dynamic_keywords():
