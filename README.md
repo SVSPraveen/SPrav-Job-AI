@@ -71,7 +71,7 @@ Because SPrav operates independently of any central cloud, traditional password 
 
 SPrav utilizes a custom pipeline called the **SPrav MOE Model** (Mixture of Experts in spirit). Rather than relying on a monolithic Large Language Model, it intelligently routes tasks across highly specialized models for data extraction, fit scoring, tailoring, and verification.
 
-For Resume Tailoring, the system primarily routes to a high-tier cloud model (like `gpt-oss-120b` via OpenRouter). If the cloud API hits a rate limit or exhausts, the system seamlessly triggers a **Dual Local Fallback**—falling back to `qwen2.5-coder:7b-instruct` for strict JSON outputs, and then `hermes3:8b` as an ultimate failsafe. The entire orchestrator is strictly memory-managed to run on an **8GB VRAM** ceiling without crashing.
+For Resume Tailoring, the system primarily routes to a high-tier cloud model (like `gpt-oss-120b` via Groq). If the cloud API hits a rate limit or exhausts, the system seamlessly triggers a **Dual Local Fallback**—falling back to `qwen2.5-coder:7b-instruct` for strict JSON outputs, and then `hermes3:8b` as an ultimate failsafe. The entire orchestrator is strictly memory-managed to run on an **8GB VRAM** ceiling without crashing.
 
 For the full details on the orchestrator design, pipeline diagram, and the models used, see [ARCHITECTURE.md](ARCHITECTURE.md).
 

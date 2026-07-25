@@ -210,7 +210,7 @@ def get_routing_config(use_case: str) -> dict:
             
     # Default local mapping if no config overrides
     if use_case == "extraction":
-        routing["model"] = "qwen2.5:7b-instruct"
+        routing["model"] = "qwen2.5-coder:7b-instruct"
     elif use_case in ["hard_filter", "brain_retrieval"]:
         routing["model"] = "deepseek-r1:7b" # DeepSeek-R1-Distill-Qwen-7B
     elif use_case == "toxic_forensics" or use_case == "strategy_generator":
@@ -273,7 +273,7 @@ def generate(prompt: str, use_case: str = "general") -> str:
             
             # Hard fallback to DeepSeek/Qwen mapping if we were trying a cloud model
             if use_case == "extraction":
-                fallback_model = "qwen2.5:7b-instruct"
+                fallback_model = "qwen2.5-coder:7b-instruct"
             elif use_case in ["hard_filter", "brain_retrieval"]:
                 fallback_model = "deepseek-r1:7b"
             elif use_case == "toxic_forensics" or use_case == "strategy_generator":

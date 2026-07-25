@@ -71,7 +71,7 @@ def _extract_text_from_docx(file_path: str) -> str:
 
 def _call_extraction_llm(text: str) -> dict:
     """
-    Calls qwen2.5:7b-instruct (the extraction model already in the MoE routing)
+    Calls qwen2.5-coder:7b-instruct (the extraction model already in the MoE routing)
     to parse raw resume text into structured JSON.
     """
     from engine.llm_provider import generate
@@ -198,7 +198,7 @@ def parse_resume(file_path: str) -> dict:
     """
     Extracts structured profile data from an existing resume PDF or DOCX.
     Uses pdfplumber for PDFs (handles multi-column layouts), python-docx for DOCX.
-    Then sends raw text to qwen2.5:7b-instruct for structured extraction.
+    Then sends raw text to qwen2.5-coder:7b-instruct for structured extraction.
     Returns the common intermediate dict.
     """
     path = Path(file_path)

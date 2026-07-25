@@ -737,7 +737,7 @@ def check_ollama_models():
         resp = requests.get("http://localhost:11434/api/tags", timeout=5)
         if resp.status_code == 200:
             models = [m['name'] for m in resp.json().get('models', [])]
-            required = ["qwen2.5:7b-instruct", "deepseek-r1:7b", "bespoke-minicheck", "hermes3:8b", "nomic-embed-text:latest"]
+            required = ["qwen2.5-coder:7b-instruct", "deepseek-r1:7b", "bespoke-minicheck", "hermes3:8b", "nomic-embed-text:latest"]
             missing = [m for m in required if not any(m in available for available in models)]
             if missing:
                 print(f"[WARNING] Missing recommended local models: {missing}. Fallbacks will be used or execution may fail.")
