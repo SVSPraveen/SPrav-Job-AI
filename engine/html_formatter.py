@@ -55,7 +55,7 @@ def generate_html_context(tailored_resume: dict, kb: dict) -> str:
         fallback = []
         for items in skills_kb.values():
             fallback.extend(items)
-        competency_text = " &bull; ".join(dict.fromkeys(fallback)[:18])
+        competency_text = " &bull; ".join(list(dict.fromkeys(fallback))[:18])
 
     context["COMPETENCIES"] = competency_text
 
