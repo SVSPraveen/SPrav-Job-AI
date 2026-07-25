@@ -36,7 +36,8 @@ def is_ollama_installed() -> bool:
             startupinfo=startupinfo,
             stdin=subprocess.DEVNULL
         )
-        return "ollama version" in result.stdout.lower()
+        stdout_lower = result.stdout.lower()
+        return "ollama version" in stdout_lower or "client version" in stdout_lower
     except Exception:
         return False
 

@@ -8,6 +8,10 @@ echo         AUTOJOB AI: NEXT-GEN UI
 echo ==================================================
 echo.
 
+taskkill /F /IM node.exe >nul 2>&1
+taskkill /F /IM python.exe >nul 2>&1
+taskkill /F /IM msedgewebview2.exe >nul 2>&1
+
 if not exist ".venv" (
     echo [ERROR] Virtual environment not found!
     echo Please run the following commands first:
@@ -34,3 +38,4 @@ echo.
 echo Closing SPrav Job AI...
 taskkill /F /IM node.exe >nul 2>&1
 taskkill /F /IM python.exe >nul 2>&1
+taskkill /F /IM msedgewebview2.exe >nul 2>&1
