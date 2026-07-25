@@ -88,6 +88,10 @@ Focus on:
 2. The most common Missing Skills (what do we need to learn?).
 3. Any notable companies we applied to.
 
+STRICT RULES:
+- Do NOT hallucinate or infer numbers. Count exactly what is in the log.
+- Do NOT invent companies that are not explicitly present in the log.
+
 RAW SQLITE LOG ({target_date}):
 {raw_log}
 

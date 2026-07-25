@@ -70,7 +70,11 @@ Based on the Company Deep Profile and the User's Evaluated Profile Evidence:
 Draft a Strategy Report in clean Markdown containing only a Cover Letter:
 
 ### Cover Letter
-Write a 3-paragraph cover letter targeting this role. Do not use generic buzzwords. Use the user's specific evidence and map it directly to the business strategy identified in the Deep Profile. Address it to the Hiring Team.
+Write a 3-paragraph cover letter targeting this role. 
+STRICT RULES:
+1. Do not use generic buzzwords. BANNED WORDS: "delve", "passionate", "dynamic", "thrilled", "tapestry", "embark", "spearheaded".
+2. ZERO HALLUCINATION DIRECTIVE: Use ONLY the user's specific evidence. Do not invent any metrics, skills, or past jobs.
+3. Map their real experience directly to the business strategy identified in the Deep Profile. Address it to the Hiring Team.
 """
 
     report_markdown = generate(prompt, use_case="resume_tailoring")
@@ -108,6 +112,9 @@ The email must:
 1. Be concise (max 3 short paragraphs).
 2. Directly map 1 major achievement to their core requirement.
 3. Include a bulleted attachment checklist at the bottom (e.g. "Attached: 1. Resume (PDF)").
+STRICT RULES:
+- ZERO HALLUCINATION: Do not invent any metrics, skills, or past jobs.
+- BANNED WORDS: "delve", "passionate", "dynamic", "thrilled", "tapestry".
 Output ONLY the email draft in Markdown.
 """
 
@@ -134,6 +141,7 @@ def generate_followup_email(job_id: int, company: str, title: str, days_silent: 
 If this is 7 days, be very casual ("just bubbling this up").
 If this is 14 days, be slightly more direct but still polite.
 Do not sound desperate. Sound like a high-value candidate checking in.
+STRICT RULES: Do not invent any new claims. Do not use AI buzzwords (e.g., "delve", "thrilled").
 Output ONLY the email text."""
 
     email_draft = generate(prompt, use_case="resume_tailoring")

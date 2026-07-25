@@ -104,6 +104,7 @@ class KnowledgeDistiller:
             
             map_prompt = f"""You are an elite Knowledge Distiller.
 Read the following Chunk of the User's Profile and extract their holistic narrative, leadership history, and all critical bullet points (technologies, metrics, achievements).
+STRICT RULE: Extract facts only. Do not embellish or assume leadership qualities unless explicitly backed by a metric. Do not hallucinate data.
 Ignore irrelevant noise. Output a dense summary.
 
 User Profile Chunk:

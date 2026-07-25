@@ -64,6 +64,8 @@ CRITICAL RULE FOR EXPERIENCE: When calculating Years of Experience (YoE) for the
 TAILOR_PROMPT = SYSTEM_PERSONA + """
 TASK: Analyze the Job Description and User Knowledge Base. Then produce a highly tailored, stop-the-scroll resume output.
 
+ZERO HALLUCINATION DIRECTIVE: Under no circumstances may you invent, infer, or hallucinate skills, metrics, company names, or job titles that are not explicitly provided in the User Knowledge Base. If it is not in the KB, you cannot use it.
+
 ═══ STEP 1: ATS KEYWORD EXTRACTION ═══
 Identify every technical skill, tool, methodology, and soft skill explicitly mentioned in the Job Description.
 These are your target keywords. Every single one that matches the user's background MUST appear verbatim in the output.
