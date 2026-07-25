@@ -1,4 +1,8 @@
 import pytest
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from engine.tailor import validate_selection, construct_prompt
 
 @pytest.fixture

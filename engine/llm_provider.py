@@ -32,9 +32,9 @@ def ensure_ollama_running():
             subprocess.Popen(["ollama", "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(3) # Give the engine a few seconds to warm up
 
-def _generate_ollama(model: str, prompt: str, temperature: float = 0.3) -> tuple[bool, str]:
+def _generate_ollama(model: str, prompt: str, temperature: float = 0.3, format_json: bool = False) -> tuple[bool, str]:
     ensure_ollama_running()
-    print(f"\n[Ollama] Loading Expert into VRAM: {model} (Temp: {temperature})")
+    print(f"\n[Ollama] Loading Expert into VRAM: {model} (Temp: {temperature}, JSON: {format_json})")
     url = "http://localhost:11434/api/generate"
     payload = {
         "model": model, 
@@ -43,10 +43,11 @@ def _generate_ollama(model: str, prompt: str, temperature: float = 0.3) -> tuple
         "keep_alive": 0,
         "options": {
             "num_ctx": 32768,
-            "kv_cache_type": "q4_k",
             "temperature": temperature
         }
     }
+    if format_json:
+        payload["format"] = "json"
     
     full_response = ""
     tokens_tracker = []
@@ -242,19 +243,26 @@ def generate(prompt: str, use_case: str = "general") -> str:
         if provider != "ollama":
             print(f"[Agnostic MoE] Cloud Provider '{provider}' failed: {result}. Failing over to Local Ollama.")
             
-        # Hard fallback to DeepSeek/Qwen mapping if we were trying a cloud model
-        if use_case == "extraction":
-            fallback_model = "qwen2.5:7b-instruct"
-        elif use_case in ["hard_filter", "brain_retrieval"]:
-            fallback_model = "deepseek-r1:7b"
-        elif use_case == "toxic_forensics" or use_case == "strategy_generator":
-            fallback_model = "bespoke-minicheck"
-        elif use_case == "resume_tailoring":
-            fallback_model = "hermes3:8b"
+            # Hard fallback to DeepSeek/Qwen mapping if we were trying a cloud model
+            if use_case == "extraction":
+                fallback_model = "qwen2.5:7b-instruct"
+            elif use_case in ["hard_filter", "brain_retrieval"]:
+                fallback_model = "deepseek-r1:7b"
+            elif use_case == "toxic_forensics" or use_case == "strategy_generator":
+                fallback_model = "bespoke-minicheck"
+            elif use_case == "resume_tailoring":
+                fallback_model = "hermes3:8b"
+            else:
+                fallback_model = "qwen2.5-coder:7b-instruct"
         else:
-            fallback_model = "qwen2.5-coder:7b-instruct"
+            # If Ollama is the primary provider, use the configured model_name
+            fallback_model = model_name
             
-        success, result = _generate_ollama(fallback_model, prompt, temperature=0.3)
+        if use_case == "resume_tailoring":
+            # Strict deterministic constraint for JSON formatting
+            success, result = _generate_ollama(fallback_model, prompt, temperature=0.0, format_json=True)
+        else:
+            success, result = _generate_ollama(fallback_model, prompt, temperature=0.3)
         
         # Fallback Resolution if the local word-chain tracker breaks a loop
         if not success and "[State Hash Tracker]" in result or not success:
