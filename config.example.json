@@ -12,12 +12,16 @@
       "model": "deepseek-r1:7b"
     },
     "resume_tailoring": {
-      "provider": "groq",
-      "model": "llama-3.3-70b-versatile"
+      "provider": "openrouter",
+      "model": "openai/gpt-oss-120b"
     },
     "toxic_forensics": {
       "provider": "ollama",
       "model": "bespoke-minicheck"
+    },
+    "copilot": {
+      "provider": "ollama",
+      "model": "hermes3:8b"
     }
   }
 }

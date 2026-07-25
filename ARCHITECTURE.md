@@ -19,7 +19,7 @@ The data follows a strict sequence through the orchestrator:
 |---|---|---|---|
 | **Extractor** | `qwen2.5` | Reads messy HR HTML/text and extracts core requirements. | Strict JSON |
 | **Evaluator** | `deepseek-r1:7b` | Calculates holistic Candidate-to-Job Fit Scoring. | Mathematical Float (0.0 to 5.0) |
-| **Tailor** | `llama-3.3-70b` | High-prose generative drafting of Resumes & Cold Emails. | Markdown / PDF |
+| **Tailor** | `gpt-oss-120b` via OpenRouter (Primary) or `qwen2.5-coder` (Local Fallback) | High-prose generative drafting of Resumes & Cold Emails. | Strict JSON |
 | **Verifier** | `bespoke-minicheck` | Fact-checks generated prose against the user's canonical Knowledge Base. | Boolean Pass/Fail |
 | **Memory** | `nomic-embed-text` | High-efficiency RAG retrieval against your local knowledge base. | Vector Embeddings |
 
