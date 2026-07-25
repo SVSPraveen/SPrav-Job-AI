@@ -609,8 +609,9 @@ def get_job_details(job_id: str):
     c = conn.cursor()
     c.execute("SELECT * FROM jobs WHERE id = ?", (job_id,))
     row = c.fetchone()
-    conn.close()
+    
     if not row:
+        conn.close()
         raise HTTPException(status_code=404, detail="Job not found")
     
     job = dict(row)
@@ -620,24 +621,17 @@ def get_job_details(job_id: str):
     if "Fit" not in rubric:
         rubric = None
         
-    audit = None
-    if job.get("status") in ["applied", "failed_submission"]:
-        audit = {
-            "status": job.get("status"),
-            "attempted_at": job.get("updated_at", ""),
-            "resume_version": "v" + job.get("updated_at", "").replace("-","").replace(":","").replace("T","")[:14]
-        }
+    # Check for audit log
+    c.execute("SELECT * FROM auto_apply_audit WHERE job_id = ? ORDER BY attempted_at DESC LIMIT 1", (job_id,))
+    audit_row = c.fetchone()
+    
+    if audit_row:
+        job["audit"] = dict(audit_row)
+    else:
+        job["audit"] = None
         
-    return {
-        "id": job["id"],
-        "title": job["title"],
-        "company": job["company"],
-        "url": job["url"],
-        "status": job["status"],
-        "fit_score": job.get("fit_score", 0),
-        "audit": audit,
-        "evaluation_rubric": rubric
-    }
+    conn.close()
+    return job
 
 @app.get("/api/kb")
 def get_kb():
