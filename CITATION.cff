@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: SPrav Job AI
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - name: "SVSPraveen (GitHub: SVSPraveen)"
+repository-code: 'https://github.com/SVSPraveen/SPrav-Job-AI'
+abstract: >-
+  A local-first, multi-model orchestration system (SPrav MOE State Machine) for job discovery, candidate fit scoring, resume tailoring, and automated application submission, with a verifier feedback loop designed to reduce hallucinated claims in generated resumes.
+license: MIT
+date-released: '2026-07-23'
