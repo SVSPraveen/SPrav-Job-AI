@@ -251,7 +251,7 @@ def generate(prompt: str, use_case: str = "general") -> str:
             elif use_case == "toxic_forensics" or use_case == "strategy_generator":
                 fallback_model = "bespoke-minicheck"
             elif use_case == "resume_tailoring":
-                fallback_model = "hermes3:8b"
+                fallback_model = "qwen2.5-coder:7b-instruct"
             else:
                 fallback_model = "qwen2.5-coder:7b-instruct"
         else:
@@ -264,10 +264,15 @@ def generate(prompt: str, use_case: str = "general") -> str:
         else:
             success, result = _generate_ollama(fallback_model, prompt, temperature=0.3)
         
-        # Fallback Resolution if the local word-chain tracker breaks a loop
+        # Secondary Fallback Resolution if the local generator breaks a loop or fails JSON compliance
         if not success and "[State Hash Tracker]" in result or not success:
-            print(f"[SPrav MoE] Initiating Fallback Resolution: High-Temperature {fallback_model}...")
-            _, fallback_result = _generate_ollama(fallback_model, prompt, temperature=0.8)
+            if use_case == "resume_tailoring":
+                secondary_model = "hermes3:8b"
+                print(f"[SPrav MoE] Initiating Secondary Fallback: {secondary_model}...")
+                _, fallback_result = _generate_ollama(secondary_model, prompt, temperature=0.0, format_json=True)
+            else:
+                print(f"[SPrav MoE] Initiating Fallback Resolution: High-Temperature {fallback_model}...")
+                _, fallback_result = _generate_ollama(fallback_model, prompt, temperature=0.8)
             return fallback_result
             
     return result
