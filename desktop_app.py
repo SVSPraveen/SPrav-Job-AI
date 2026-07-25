@@ -9,6 +9,9 @@ log_file = open("desktop_app.log", "w", encoding="utf-8")
 sys.stdout = log_file
 sys.stderr = log_file
 
+api_log = open("api.log", "w", encoding="utf-8")
+daemon_log = open("daemon.log", "w", encoding="utf-8")
+
 from engine.ollama_manager import verify_ollama
 
 import threading
@@ -36,8 +39,8 @@ def start_backend():
         startupinfo=startupinfo,
         creationflags=subprocess.CREATE_NO_WINDOW,
         stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=api_log,
+        stderr=subprocess.STDOUT,
         env=env
     )
 
@@ -47,8 +50,8 @@ def start_backend():
         startupinfo=startupinfo,
         creationflags=subprocess.CREATE_NO_WINDOW,
         stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=daemon_log,
+        stderr=subprocess.STDOUT,
         env=env
     )
 

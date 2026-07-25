@@ -4,6 +4,7 @@ import random
 import time
 
 import json
+from discovery.scraper import _expand_keywords
 
 DB_PATH = "jobs.db"
 # Public datasets of companies that use Greenhouse and Lever
@@ -74,6 +75,8 @@ def run_ats_discovery():
             keywords = ["engineer", "developer", "react", "python", "backend", "frontend"]
     except Exception:
         keywords = ["engineer", "developer", "react", "python", "backend", "frontend"]
+        
+    keywords = _expand_keywords(keywords)
         
     greenhouse_list, lever_list = fetch_companies()
     

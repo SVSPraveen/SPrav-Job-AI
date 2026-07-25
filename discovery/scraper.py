@@ -326,16 +326,34 @@ def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
     return all_jobs
 
 
+def _expand_keywords(base_keywords):
+    synonyms = {
+        "software engineer": ["software developer", "backend engineer", "full stack", "programmer", "SDE"],
+        "frontend": ["ui developer", "front end engineer", "react developer", "javascript developer"],
+        "backend": ["back end engineer", "api developer", "server side engineer", "python developer", "java developer", "node developer"],
+        "data scientist": ["machine learning engineer", "data analyst", "AI engineer"],
+        "product manager": ["program manager", "product owner"],
+        "devops": ["sre", "site reliability", "platform engineer", "cloud engineer"],
+        "qa": ["sdet", "test engineer", "quality assurance", "automation engineer"]
+    }
+    expanded = set(base_keywords)
+    for kw in base_keywords:
+        kw_lower = kw.lower()
+        for key, syn_list in synonyms.items():
+            if key in kw_lower or kw_lower in key:
+                expanded.update(syn_list)
+    return list(expanded)
+
 def _get_dynamic_keywords():
     try:
         with open("knowledge_base/scope.json", "r") as f:
             scope = json.load(f)
         kws = [r["keyword"] for r in scope.get("roles", []) if r.get("preference") == "apply"]
         if kws:
-            return kws
+            return _expand_keywords(kws)
     except:
         pass
-    return ["software engineer"] # Fallback only if scope is completely broken or missing
+    return _expand_keywords(["software engineer"]) # Fallback only if scope is completely broken or missing
 
 DEFAULT_KEYWORDS = _get_dynamic_keywords()
 

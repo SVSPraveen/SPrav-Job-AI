@@ -49,12 +49,32 @@ def init_db():
     try:
         cursor.execute("ALTER TABLE jobs ADD COLUMN scope_reason TEXT")
     except sqlite3.OperationalError:
-        pass  # Column already exists
-        
+        pass
+
     try:
         cursor.execute("ALTER TABLE jobs ADD COLUMN updated_at TEXT")
     except sqlite3.OperationalError:
-        pass  # Column already exists
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN evaluation_rubric TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN contact_message TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN star_stories TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN ats_score REAL DEFAULT 0.0")
+    except sqlite3.OperationalError:
+        pass
 
     # ── Auto-apply audit log ─────────────────────────────────────────────────
     # Records every Playwright submission attempt for audit and circuit-breaker

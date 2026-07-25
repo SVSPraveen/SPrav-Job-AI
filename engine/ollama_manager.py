@@ -34,7 +34,8 @@ def is_ollama_installed() -> bool:
             encoding='utf-8',
             errors='replace',
             startupinfo=startupinfo,
-            stdin=subprocess.DEVNULL
+            stdin=subprocess.DEVNULL,
+            timeout=10
         )
         stdout_lower = result.stdout.lower()
         return "ollama version" in stdout_lower or "client version" in stdout_lower
@@ -47,8 +48,8 @@ def install_ollama_windows():
     try:
         urllib.request.urlretrieve("https://ollama.com/download/OllamaSetup.exe", installer_path)
         print("[Ollama Manager] Download complete. Launching installer...")
-        # Run installer and wait for it to finish
-        subprocess.run([installer_path], check=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Run installer and wait for it to finish (10 minute max timeout)
+        subprocess.run([installer_path], check=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=600)
         print("[Ollama Manager] Installation completed.")
         
         # Give the background service a moment to start
@@ -70,7 +71,8 @@ def ensure_ollama_running():
             encoding='utf-8',
             errors='replace',
             startupinfo=startupinfo,
-            stdin=subprocess.DEVNULL
+            stdin=subprocess.DEVNULL,
+            timeout=10
         )
         if "could not connect" in result.stderr.lower() or "error" in result.stderr.lower():
             print("[Ollama Manager] Ollama is asleep. Waking it up in the background...")
@@ -100,7 +102,8 @@ def check_and_pull_models():
                 encoding='utf-8',
                 errors='replace',
                 startupinfo=startupinfo,
-                stdin=subprocess.DEVNULL
+                stdin=subprocess.DEVNULL,
+                timeout=10
             )
             if model not in result.stdout:
                 print(f"[Ollama Manager] Pulling {model}... This may take a while depending on your internet speed.")
@@ -114,10 +117,11 @@ def check_and_pull_models():
                         stdin=subprocess.DEVNULL,
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
-                        creationflags=cflags
+                        creationflags=cflags,
+                        timeout=3600
                     )
                 else:
-                    subprocess.run([get_ollama_path(), "pull", model], stdin=subprocess.DEVNULL)
+                    subprocess.run([get_ollama_path(), "pull", model], stdin=subprocess.DEVNULL, timeout=3600)
             else:
                 print(f"[Ollama Manager] Model {model} is already installed.")
         except Exception as e:

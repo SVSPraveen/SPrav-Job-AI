@@ -803,14 +803,18 @@ def run_daemon():
         print(f"\n--- [Cycle {cycle}] Starting Job Discovery ---")
         try:
             print("\n--- Triggering Node.js Stealth Scraper ---")
-            subprocess.run(
-                ["cmd", "/c", "node scraper_service/stealth_crawler.js"], 
-                check=False,
-                creationflags=subprocess.CREATE_NO_WINDOW,
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
+            try:
+                subprocess.run(
+                    ["cmd", "/c", "node scraper_service/stealth_crawler.js"], 
+                    check=False,
+                    timeout=300,  # 5 minute timeout to prevent daemon from freezing
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+            except subprocess.TimeoutExpired:
+                print("\n[Warning] Node.js Scraper timed out! Moving on to next phase.")
             
             print("\n--- Triggering Zero-Token ATS Discovery ---")
             try:
