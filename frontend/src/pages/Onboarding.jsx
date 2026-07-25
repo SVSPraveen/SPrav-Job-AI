@@ -230,10 +230,11 @@ export default function Onboarding() {
         {step === 3 && (
           <div className="step-content">
             <h3><Globe size={20} /> LinkedIn Data Export</h3>
-            <p>
-              We never scrape LinkedIn directly — that would violate ToS and risk your account.
-              Instead, export your data from <strong>LinkedIn Settings → Data Privacy → Get a copy of your data → All data</strong>,
-              then upload the ZIP here.
+            <p className="step-desc">
+              We never scrape LinkedIn directly — that would violate ToS and risk your account.<br/>
+              Instead, export your data from <strong>LinkedIn Settings → Data Privacy → Get a copy of your data → All data</strong>.<br/>
+              <br/>
+              <strong>Why a .zip instead of a PDF?</strong> When you export your profile as a PDF, LinkedIn generates a heavily stylized document. Trying to have an AI read that PDF perfectly is notoriously difficult—dates get mashed together, skills are lost in weird formatting, and descriptions get cut off. The .zip file contains raw, highly-structured spreadsheets that we can read with 100% perfect accuracy.
             </p>
             <div className="drop-zone" onClick={() => document.getElementById('li-input').click()}>
               {linkedinFile ? <span>📦 {linkedinFile.name}</span> : <span>Click to select your LinkedIn export ZIP</span>}
