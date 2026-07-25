@@ -71,6 +71,8 @@ Because SPrav operates independently of any central cloud, traditional password 
 
 SPrav utilizes a custom pipeline called the **SPrav MOE Model** (Mixture of Experts in spirit). Rather than relying on a monolithic Large Language Model, it intelligently routes tasks across highly specialized models for data extraction, fit scoring, tailoring, and verification.
 
+For Resume Tailoring, the system primarily routes to a high-tier cloud model (like `gpt-oss-120b` via OpenRouter). If the cloud API hits a rate limit or exhausts, the system seamlessly triggers a **Dual Local Fallback**—falling back to `qwen2.5-coder:7b-instruct` for strict JSON outputs, and then `hermes3:8b` as an ultimate failsafe. The entire orchestrator is strictly memory-managed to run on an **8GB VRAM** ceiling without crashing.
+
 For the full details on the orchestrator design, pipeline diagram, and the models used, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ---
@@ -112,7 +114,7 @@ JWT_SECRET=super_secret_jwt_key_12345
 # -----------------------------
 # AI API Keys (Optional)
 # -----------------------------
-GROQ_API_KEY=your_groq_api_key
+OPENROUTER_API_KEY=your_openrouter_api_key
 
 # -----------------------------
 # SMTP Email Setup (Optional)
@@ -142,7 +144,14 @@ TOTAL_DAILY_CAP=150
 
 # Pause bot if it gets blocked/fails X times in a row
 AUTO_APPLY_CIRCUIT_BREAKER_N=3
-```
+
+# -----------------------------
+# Ollama 8GB VRAM Optimization
+# -----------------------------
+OLLAMA_MAX_LOADED_MODELS=1
+OLLAMA_NUM_PARALLEL=1
+OLLAMA_KV_CACHE_TYPE=q8_0
+OLLAMA_FLASH_ATTENTION=1
 
 ---
 
@@ -171,7 +180,7 @@ playwright install chromium
 ### 2. Model Initialization
 
 If you plan to use local fallbacks, ensure [Ollama](https://ollama.com/) is installed. 
-*You do not need to manually pull models.* The SPrav `LaunchJobAssistant.bat` bootstrapper will automatically wake up Ollama in the background and pull `qwen2.5:7b-instruct`, `deepseek-r1:7b`, `bespoke-minicheck`, and `nomic-embed-text` for you on first launch!
+*You do not need to manually pull models.* The SPrav `LaunchJobAssistant.bat` bootstrapper will automatically wake up Ollama in the background and pull `qwen2.5-coder:7b-instruct`, `hermes3:8b`, `deepseek-r1:7b`, `bespoke-minicheck`, and `nomic-embed-text` for you on first launch!
 
 ### 3. Dashboard Configuration
 
