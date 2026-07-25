@@ -89,7 +89,7 @@ def run_ats_discovery():
     sample_gh = greenhouse_list[:20]
     sample_lv = lever_list[:20]
     
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     
     discovered_count = 0

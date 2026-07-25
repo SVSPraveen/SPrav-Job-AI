@@ -77,7 +77,7 @@ def _log_hn_application(job_id, company, title, url, post_text, email_to, kb):
     prompt = f"""Draft a 3-sentence cold email for {kb.get('personal', {}).get('name', 'Applicant')} to send to {email_to} at {company} for a role matching their profile based on this HN post: {post_text[:500]}"""
     email_draft = generate(prompt, use_case="resume_tailoring")
     
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     now = datetime.utcnow().isoformat()
     cursor.execute("""

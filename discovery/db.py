@@ -11,7 +11,7 @@ DB_PATH = "jobs.db"
 # ─────────────────────────────────────────────────────────────────────────────
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
 
     # ── Core jobs table ──────────────────────────────────────────────────────
@@ -120,7 +120,7 @@ def init_db():
 
 def save_job(job: dict):
     """Saves or updates a job in the database using named parameters for safety."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute('''
         INSERT INTO jobs (id, title, company, url, description, location, source, fit_score, scam_flags, status)
@@ -141,7 +141,7 @@ def save_job(job: dict):
 
 def get_jobs(status: str = None) -> list[dict]:
     """Fetches jobs from the DB using sqlite3.Row for column-safe dict conversion."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     if status:
@@ -162,7 +162,7 @@ def get_company_applies_today(company: str) -> int:
     Returns the count of successful auto-apply submissions to `company` today.
     Used to enforce the per-company daily cap (COMPANY_DAILY_CAP in config.py).
     """
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     today = date.today().isoformat()
     cursor.execute(
@@ -182,7 +182,7 @@ def has_been_applied_to(jd_hash: str, company: str, title: str) -> bool:
     Returns True if we have a successful 'submitted' record for this exact job
     (matched by jd_hash OR the company+title combo) to prevent double-applying.
     """
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
         """SELECT 1 FROM auto_apply_audit
@@ -217,7 +217,7 @@ def log_auto_apply_attempt(
     'circuit_open', 'downgraded'.
     """
     from datetime import datetime, timezone
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
         """INSERT INTO auto_apply_audit
@@ -241,7 +241,7 @@ def log_auto_apply_attempt(
 
 def get_daemon_state(key: str, default: str = "") -> str:
     """Reads a daemon state value from the daemon_state table."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT value FROM daemon_state WHERE key = ?", (key,))
     row = cursor.fetchone()
@@ -251,7 +251,7 @@ def get_daemon_state(key: str, default: str = "") -> str:
 
 def set_daemon_state(key: str, value: str) -> None:
     """Upserts a daemon state value."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO daemon_state (key, value) VALUES (?, ?) "

@@ -61,7 +61,7 @@ def _log_to_db(job_id, title, company, url, desc, loc, kb):
     prompt = f"Draft a short, punchy cold email (3 sentences) from {kb.get('personal', {}).get('name', 'Applicant')} to the founders of {company}, a YC startup, expressing interest in remote engineering roles."
     email_draft = generate(prompt, use_case="resume_tailoring")
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     now = datetime.utcnow().isoformat()
     cursor.execute("""

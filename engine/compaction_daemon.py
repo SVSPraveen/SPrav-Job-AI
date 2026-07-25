@@ -13,7 +13,7 @@ def run_compaction():
     followup_jobs = []  # Initialize before the with block to prevent NameError
     
     with db_mutex:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
         c = conn.cursor()
         
         # Ensure daily_summaries table exists
@@ -100,7 +100,7 @@ Output ONLY the formatted Executive Summary in clean Markdown."""
     summary = generate(prompt, use_case="hard_filter")
     
     with db_mutex:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
         c = conn.cursor()
         c.execute("INSERT INTO daily_summaries (date, summary) VALUES (?, ?)", (target_date, summary))
         conn.commit()

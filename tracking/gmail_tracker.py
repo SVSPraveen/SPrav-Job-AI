@@ -88,7 +88,7 @@ def update_job_status_from_email(company, status):
     if not company or status not in ['REJECTED', 'INTERVIEW_REQUEST']:
         return
         
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM jobs WHERE company LIKE ? AND status IN ('applied', 'manual_review', 'interviewing', 'new') ORDER BY rowid DESC LIMIT 1", (f"%{company}%",))
     row = cursor.fetchone()
@@ -179,7 +179,7 @@ def scan_inbox():
 
 def generate_digest():
     """Prints a daily digest of database activity."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     
     # Check if table exists

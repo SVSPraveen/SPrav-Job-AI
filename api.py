@@ -127,7 +127,7 @@ def auto_login():
         return {"access_token": token, "recovery_key": user_data["recovery_key"]}
     else:
         # Fetch the first user and generate a token
-        conn = sqlite3.connect("users.db")
+        conn = sqlite3.connect("users.db", timeout=30.0)
         cursor = conn.cursor()
         cursor.execute("SELECT id, name, email FROM users LIMIT 1")
         row = cursor.fetchone()
@@ -259,7 +259,7 @@ def _write_env_var(key: str, value: str):
 @app.post("/api/debug/reset-jobs")
 def reset_jobs():
     """Wipes the jobs and auto-apply audit tables so the user can start fresh after onboarding."""
-    conn = sqlite3.connect("jobs.db")
+    conn = sqlite3.connect("jobs.db", timeout=30.0)
     c = conn.cursor()
     c.execute("DELETE FROM jobs")
     c.execute("DELETE FROM auto_apply_audit")
@@ -340,7 +340,7 @@ def get_metrics():
     if not os.path.exists(DB_PATH):
         return {"total": 0, "applied": 0, "interviews": 0, "rejected": 0, "new": 0, "manual": 0}
     
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT status, COUNT(*) FROM jobs GROUP BY status")
     rows = dict(cursor.fetchall())
@@ -362,7 +362,7 @@ def get_jobs():
     if not os.path.exists(DB_PATH):
         return []
     
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute("SELECT id, title, company, fit_score, status, scam_flags, location, url, missing_skills, matched_skills FROM jobs ORDER BY fit_score DESC")
@@ -374,7 +374,7 @@ def get_jobs():
 def get_job_details(job_id: str):
     if not os.path.exists(DB_PATH):
         raise HTTPException(status_code=404, detail="DB not found")
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM jobs WHERE id = ?", (job_id,))
@@ -397,7 +397,7 @@ def get_manual_jobs():
     if not os.path.exists(DB_PATH):
         return []
     
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     # Include both manual_review and pending_cover_letter so the Cover Letter Gate is visible in UI
@@ -408,7 +408,7 @@ def get_manual_jobs():
 
 @app.post("/api/jobs/{job_id}/apply")
 def mark_job_applied(job_id: str):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("UPDATE jobs SET status = 'applied' WHERE id = ?", (job_id,))
     conn.commit()
@@ -551,7 +551,7 @@ def is_blacklisted(company: str) -> bool:
 def is_repost(company: str, title: str) -> bool:
     if not company or not title:
         return False
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     # Find any job with the exact same company and title
     c.execute("SELECT id FROM jobs WHERE company = ? AND title = ? LIMIT 1", (company, title))
@@ -567,7 +567,7 @@ async def add_job(job: dict):
     if is_repost(job.get('company', ''), job.get('title', '')):
         return {"status": "skipped_repost"}
         
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute('''
         INSERT OR IGNORE INTO jobs (id, title, company, url, description, location, source, fit_score, scam_flags, status)
@@ -579,7 +579,7 @@ async def add_job(job: dict):
 @app.post("/api/jobs/bulk")
 async def add_jobs_bulk(jobs: list = Body(...)):
     """Endpoint for Node.js Microservice to inject scraped jobs."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     inserted = 0
     for job in jobs:
@@ -603,7 +603,7 @@ async def add_jobs_bulk(jobs: list = Body(...)):
 
 @app.get("/api/jobs/{job_id}/details", dependencies=[Depends(verify_token)])
 def get_job_details(job_id: str):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     c.execute("SELECT * FROM jobs WHERE id = ?", (job_id,))
@@ -702,7 +702,7 @@ async def approve_cover_letter(job_id: str):
     Approves the cover letter draft and marks the job ready for final dispatch.
     """
     try:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
         c = conn.cursor()
         c.execute("UPDATE jobs SET status = 'approved_for_dispatch' WHERE id = ?", (job_id,))
         conn.commit()

@@ -22,7 +22,7 @@ def get_salary_gaps() -> dict:
 
 
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("SELECT company, title, evaluation_rubric FROM jobs WHERE evaluation_rubric IS NOT NULL")
     rows = c.fetchall()

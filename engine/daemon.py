@@ -71,7 +71,7 @@ def get_config():
 
 def update_job_status(job_id: str, status: str):
     with db_mutex:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
         cursor = conn.cursor()
         now_str = datetime.utcnow().isoformat()
         cursor.execute("UPDATE jobs SET status = ?, updated_at = ? WHERE id = ?", (status, now_str, job_id))
@@ -126,7 +126,7 @@ def verify_job_node(state: JobState) -> JobState:
     if is_ghost:
         print(f"[Phase 0.5] WARNING: Job rejected! Reason: {scam_reason}")
         with db_mutex:
-            conn_up = sqlite3.connect(DB_PATH)
+            conn_up = sqlite3.connect(DB_PATH, timeout=30.0)
             c_up = conn_up.cursor()
             c_up.execute("UPDATE jobs SET status = 'rejected', scam_flags = ? WHERE id = ?", (scam_reason, job['id']))
             conn_up.commit()
@@ -142,7 +142,7 @@ def verify_job_node(state: JobState) -> JobState:
     jd_hash = hashlib.md5(semantic_text.encode('utf-8')).hexdigest()
     
     with db_mutex:
-        conn_check = sqlite3.connect(DB_PATH)
+        conn_check = sqlite3.connect(DB_PATH, timeout=30.0)
         c_check = conn_check.cursor()
         c_check.execute("SELECT id FROM jobs WHERE jd_hash = ? AND id != ?", (jd_hash, job['id']))
         repost_match = c_check.fetchone()
@@ -174,7 +174,7 @@ def scope_gate_node(state: JobState) -> JobState:
     if not passes:
         print(f"[Phase 0.9] OUT OF SCOPE: {reason}")
         with db_mutex:
-            conn_s = sqlite3.connect(DB_PATH)
+            conn_s = sqlite3.connect(DB_PATH, timeout=30.0)
             c_s = conn_s.cursor()
             # Migrate scope_reason column if this is an older jobs.db
             try:
@@ -199,9 +199,9 @@ def scope_gate_node(state: JobState) -> JobState:
 def extraction_node(state: JobState) -> JobState:
     job = state['job']
     print("\n[Phase 1] Extracting structured data from raw HR post...")
-    extraction_prompt = """Extract Job Title, Requirements, and Years of Experience (YoE) from this unstructured text. 
+    extraction_prompt = f"""Extract Job Title, Requirements, and Years of Experience (YoE) from this unstructured text. 
 Strict JSON output only. If no YoE is stated, put 0.
-Text: {job['description']}"""
+Text: {job.get('description', '')}"""
     
     extracted_data_raw = generate(extraction_prompt, use_case="extraction")
     try:
@@ -220,7 +220,7 @@ Text: {job['description']}"""
     state['missing_skills'] = missing
     
     with db_mutex:
-        conn_up = sqlite3.connect(DB_PATH)
+        conn_up = sqlite3.connect(DB_PATH, timeout=30.0)
         c_up = conn_up.cursor()
         
         matched_str = ", ".join(matched)
@@ -258,7 +258,7 @@ def evaluate_fit_node(state: JobState) -> JobState:
     rubric = json.dumps(rubric_data)
     
     with db_mutex:
-        conn_up = sqlite3.connect(DB_PATH)
+        conn_up = sqlite3.connect(DB_PATH, timeout=30.0)
         c_up = conn_up.cursor()
         c_up.execute("UPDATE jobs SET fit_score = ?, evaluation_rubric = ? WHERE id = ?", (score, rubric, job['id']))
         conn_up.commit()
@@ -290,7 +290,7 @@ def prep_interview_node(state: JobState) -> JobState:
     contact_msg = generate_contact_message(master_identity, extracted_json)
     
     with db_mutex:
-        conn_up = sqlite3.connect(DB_PATH)
+        conn_up = sqlite3.connect(DB_PATH, timeout=30.0)
         c_up = conn_up.cursor()
         c_up.execute("UPDATE jobs SET star_stories = ?, contact_message = ? WHERE id = ?", 
                      (json.dumps(stories), contact_msg, job['id']))
@@ -339,7 +339,7 @@ def tailor_node(state: JobState) -> JobState:
 
         # Persist ATS score to DB
         with db_mutex:
-            conn_up = sqlite3.connect(DB_PATH)
+            conn_up = sqlite3.connect(DB_PATH, timeout=30.0)
             c_up = conn_up.cursor()
             c_up.execute("UPDATE jobs SET ats_score = ? WHERE id = ?",
                          (ats_score_pct, job['id']))
@@ -364,7 +364,7 @@ def tailor_node(state: JobState) -> JobState:
             state['disagreement_reason'] = reason
             print(f"[Phase 3.5] DISAGREEMENT — {reason}")
             with db_mutex:
-                conn_d = sqlite3.connect(DB_PATH)
+                conn_d = sqlite3.connect(DB_PATH, timeout=30.0)
                 c_d = conn_d.cursor()
                 c_d.execute("UPDATE jobs SET status='human_review_disagreement', "
                             "disagreement_reason=? WHERE id=?", (reason, job['id']))
@@ -381,7 +381,7 @@ def tailor_node(state: JobState) -> JobState:
             state['disagreement_reason'] = reason
             print(f"[Phase 3.5] DISAGREEMENT — {reason}")
             with db_mutex:
-                conn_d = sqlite3.connect(DB_PATH)
+                conn_d = sqlite3.connect(DB_PATH, timeout=30.0)
                 c_d = conn_d.cursor()
                 c_d.execute("UPDATE jobs SET status='human_review_disagreement', "
                             "disagreement_reason=? WHERE id=?", (reason, job['id']))
@@ -464,7 +464,7 @@ def compile_dispatch_node(state: JobState) -> JobState:
 
     # ── Global & Portal daily rate limits ──────────────────────────────────
     with db_mutex:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
         cursor = conn.cursor()
         
         # Check Total limit
@@ -702,7 +702,7 @@ def build_job_graph():
 
 def execute_sprav_moe_pipeline():
     with db_mutex:
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM jobs WHERE status = 'new'")

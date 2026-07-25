@@ -8,7 +8,7 @@ def match_invite(email_text: str) -> dict:
     """
     Fuzzy matches the text of an interview invite against applied/matched jobs in jobs.db
     """
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     # Check jobs that were recently processed (we don't strictly enforce time here for simplicity)
     c.execute("SELECT id, company, title, status FROM jobs WHERE status IN ('matched', 'applied', 'interviewing')")

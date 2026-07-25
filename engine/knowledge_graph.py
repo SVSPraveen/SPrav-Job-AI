@@ -6,7 +6,7 @@ KG_DB_PATH = "knowledge_base/knowledge_graph.sqlite3"
 
 def init_kg():
     os.makedirs(os.path.dirname(KG_DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(KG_DB_PATH)
+    conn = sqlite3.connect(KG_DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS kg_triples (
@@ -26,7 +26,7 @@ def add_triple(entity: str, relation: str, target: str, valid_from: str = None, 
     if not valid_from:
         valid_from = datetime.utcnow().isoformat()
         
-    conn = sqlite3.connect(KG_DB_PATH)
+    conn = sqlite3.connect(KG_DB_PATH, timeout=30.0)
     c = conn.cursor()
     
     # Check if duplicate triple already exists
@@ -43,7 +43,7 @@ def query_entity(entity: str) -> list:
     Retrieves all known relationships where the entity is either the source or the target.
     """
     init_kg()
-    conn = sqlite3.connect(KG_DB_PATH)
+    conn = sqlite3.connect(KG_DB_PATH, timeout=30.0)
     c = conn.cursor()
     
     c.execute("SELECT entity, relation, target, valid_from FROM kg_triples WHERE entity = ? OR target = ?", (entity, entity))

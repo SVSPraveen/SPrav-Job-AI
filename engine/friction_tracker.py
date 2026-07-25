@@ -7,7 +7,7 @@ def get_company_friction_rate(company: str) -> dict:
     Calculates the friction rate for a given company.
     Friction is defined as jobs where status is 'rejected' or ghosted vs total applied.
     """
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("SELECT status FROM jobs WHERE LOWER(company) = ?", ((company or "").lower(),))
     rows = c.fetchall()
@@ -28,7 +28,7 @@ def get_company_friction_rate(company: str) -> dict:
     }
 
 def get_all_friction_rates() -> list:
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("SELECT company, status FROM jobs")
     rows = c.fetchall()

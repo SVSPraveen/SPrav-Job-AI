@@ -84,7 +84,7 @@ STRICT RULES:
     
     try:
         with db_mutex:
-            conn = sqlite3.connect(DB_PATH)
+            conn = sqlite3.connect(DB_PATH, timeout=30.0)
             cursor = conn.cursor()
             cursor.execute("UPDATE jobs SET strategy_report = ? WHERE id = ?", (final_report, job_id))
             conn.commit()
@@ -122,7 +122,7 @@ Output ONLY the email draft in Markdown.
     
     try:
         with db_mutex:
-            conn = sqlite3.connect(DB_PATH)
+            conn = sqlite3.connect(DB_PATH, timeout=30.0)
             cursor = conn.cursor()
             # Overloading strategy_report column for email drafts
             cursor.execute("UPDATE jobs SET strategy_report = ? WHERE id = ?", (f"## Direct Application Email Draft\n\n{email_draft}", job_id))
@@ -148,7 +148,7 @@ Output ONLY the email text."""
     
     try:
         with db_mutex:
-            conn = sqlite3.connect(DB_PATH)
+            conn = sqlite3.connect(DB_PATH, timeout=30.0)
             cursor = conn.cursor()
             # Append follow-up to strategy report or store it
             cursor.execute("SELECT strategy_report FROM jobs WHERE id = ?", (job_id,))

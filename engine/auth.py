@@ -35,7 +35,7 @@ security = HTTPBearer()
 
 def init_users_db():
     """Create users and credentials tables if they don't exist."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.executescript("""
         CREATE TABLE IF NOT EXISTS users (
@@ -115,7 +115,7 @@ def _simple_decrypt(encrypted: str) -> str:
 
 def has_any_account() -> bool:
     """Returns True if at least one user account exists."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM users")
     count = cursor.fetchone()[0]
@@ -125,7 +125,7 @@ def has_any_account() -> bool:
 
 def create_user(name: str, email: str, password: str) -> dict:
     """Creates a new user. Raises HTTPException if email already taken."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     try:
         recovery_key = f"SPRAV-{os.urandom(4).hex().upper()}"
@@ -149,7 +149,7 @@ otp_store = {}
 def send_otp(email: str):
     email = email.strip().lower()
     
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     row = cursor.fetchone()
@@ -190,7 +190,7 @@ def reset_password(email: str, recovery_key: str, new_password: str):
     
     is_otp = recovery_key.strip().isdigit() and len(recovery_key.strip()) == 6
     
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     
     if is_otp:
@@ -239,7 +239,7 @@ def reset_password(email: str, recovery_key: str, new_password: str):
 
 def authenticate_user(email: str, password: str) -> dict:
     """Verifies credentials. Returns user dict or raises 401."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
         "SELECT id, name, email, password_hash FROM users WHERE email = ?",
@@ -289,7 +289,7 @@ def get_user_id_from_token(payload: dict) -> int:
 
 def save_credential(user_id: int, service: str, key: str, value: str):
     """Saves an encrypted credential for a user."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     encrypted = _simple_encrypt(value) if value else ""
     cursor.execute("""
@@ -305,7 +305,7 @@ def save_credential(user_id: int, service: str, key: str, value: str):
 
 def get_credentials(user_id: int, service: str) -> dict:
     """Returns all decrypted credentials for a service as a dict."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
         "SELECT cred_key, cred_value FROM credentials WHERE user_id = ? AND service = ?",
@@ -318,7 +318,7 @@ def get_credentials(user_id: int, service: str) -> dict:
 
 def get_all_credentials(user_id: int) -> dict:
     """Returns all services and their credentials (values masked for UI display)."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
         "SELECT service, cred_key, cred_value, updated_at FROM credentials WHERE user_id = ?",
@@ -342,7 +342,7 @@ def get_all_credentials(user_id: int) -> dict:
 # ─── Copilot History ─────────────────────────────────────────────────────────
 
 def save_copilot_message(user_id: int, role: str, content: str):
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO copilot_history (user_id, role, content) VALUES (?, ?, ?)",
@@ -353,7 +353,7 @@ def save_copilot_message(user_id: int, role: str, content: str):
 
 
 def get_copilot_history(user_id: int, limit: int = 20) -> list:
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
         "SELECT role, content FROM copilot_history WHERE user_id = ? ORDER BY id DESC LIMIT ?",
@@ -368,7 +368,7 @@ def get_copilot_history(user_id: int, limit: int = 20) -> list:
 
 def get_user_credentials() -> tuple[str, str]:
     """Legacy shim: returns (email, password) for any old code that calls this."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT email, password_hash FROM users LIMIT 1")
     row = cursor.fetchone()
@@ -379,7 +379,7 @@ def get_user_credentials() -> tuple[str, str]:
 
 def get_system_credential(service: str, key: str) -> str | None:
     """Helper for background tasks (daemons/LLM providers) to fetch credentials for the primary user."""
-    conn = sqlite3.connect(USERS_DB)
+    conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users LIMIT 1")
     row = cursor.fetchone()
