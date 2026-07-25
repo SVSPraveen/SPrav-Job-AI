@@ -3,7 +3,7 @@
 The final mile of the SPrav pipeline. This module physically executes the application on behalf of the user.
 
 ## 🛑 Why not use APIs?
-Third-party APIs for job boards are notoriously expensive, rate-limited, and often fail to support complex form logic. By using headless Playwright instances, SPrav mimics human interaction, bypassing API restrictions and ensuring 100% form completion.
+Third-party APIs for job boards are notoriously expensive, rate-limited, and often fail to support complex form logic. By using headless Playwright instances, SPrav mimics human interaction, bypassing API restrictions and ensuring reliable form completion.
 
 ## ⚙️ How it works
 1. **Intake**: Receives the tailored PDF resume and job URL from the Engine.

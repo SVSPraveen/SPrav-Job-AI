@@ -6,7 +6,7 @@
   SPrav Job AI
 </h1>
 
-<h4 align="center">The autonomous, offline-first AI agent for hyper-personalized job hunting and auto-applying.</h4>
+<h4 align="center">SPrav finds matching jobs, tailors your resume, fact-checks every claim, and submits the application — running locally, end to end.</h4>
 
 <p align="center">
   <a href="#-what-it-does">What</a> •
@@ -44,7 +44,7 @@ Instead of mindlessly scrolling through job boards, SPrav acts as your personal,
 - ✍️ **Custom-rewrites** your resume for that specific job to effortlessly bypass ATS keyword filters.
 - 📨 **Drops a completely finished application** package and cold-email draft directly into your Human Review queue.
 
-*(Note: LinkedIn automation has been explicitly removed from this project to ensure your personal accounts remain 100% safe from bot detection and ID verification).*
+*(Note: LinkedIn automation has been explicitly removed from this project to ensure your personal accounts remain safe from bot detection and ID verification).*
 
 ## ⚙️ How it works
 
@@ -68,77 +68,11 @@ Because SPrav operates independently of any central cloud, traditional password 
 
 ---
 
-## 🧠 Architecture (The "SPrav MOE Model")
+## 🧠 Architecture
 
-Instead of relying on a monolithic Large Language Model (which is prone to context degradation and hallucinations), SPrav utilizes a custom pipeline called the **SPrav MOE Model** (Mixture of Experts). 
+SPrav utilizes a custom pipeline called the **SPrav MOE Model** (Mixture of Experts in spirit). Rather than relying on a monolithic Large Language Model, it intelligently routes tasks across highly specialized models for data extraction, fit scoring, tailoring, and verification.
 
-This model is engineered as a strict **"Word Chain Game" State Machine**. It runs efficiently in system RAM, intelligently passing conversational state sequentially across highly specialized expert models (The Extractor → The Evaluator → The Tailor → The Fact Checker). 
-
-### The Word Chain Memory Loop
-The most critical feature of the SPrav MOE Model is its zero-hallucination feedback loop. If the internal Fact Checker (Verifier) detects that the Tailor hallucinated a skill or manipulated a timeline, the system does not simply retry the prompt blindly. Instead, it chains the data sequentially:
-1. It extracts the **Original Query / Context (1)**.
-2. It aggregates the **Flawed Generated Output (2)**.
-3. It captures the intermediate logic state **(3)**.
-4. It appends the **Verifier's Strict Feedback (4)**.
-
-This concatenated "word chain" `(1) + (2) + (3) + (4)` is fed directly back into the generative model. By forcing the model to explicitly read its own flawed output alongside the precise correction, it eliminates hallucinations and prevents infinite generation loops. This guarantees your tailored resumes remain 100% factually accurate.
-
-> [!NOTE]
-> **8GB VRAM Constraint & Zero-Downtime Failsafe:** The SPrav MOE Model dynamically routes tasks between the Groq API (Primary) and local Ollama models (Fallback). If a network failure occurs, the system fails over to your local machine. To ensure this runs flawlessly on consumer hardware with an **8GB VRAM bottleneck**, we implemented a strict `gpu_mutex` thread lock and pass `keep_alive: 0` to Ollama. This forces the GPU to purge memory between steps, guaranteeing that only one expert model occupies VRAM at a time, completely preventing Out-Of-Memory (OOM) crashes.
-
-```mermaid
-flowchart TD
-    %% Subgraphs for logical grouping
-    subgraph Discovery ["🔍 Phase 1: Discovery"]
-        Scrapers["🕸️ Python HTTP Scrapers<br/>(HN, YC, Indeed, Wellfound)"]
-    end
-
-    subgraph Engine ["🧠 Phase 2: AI Engine (MOE)"]
-        Extractor["🗂️ Qwen 2.5<br/>Data Extraction"]
-        Scorer{"⚖️ DeepSeek-R1<br/>Fit Scoring"}
-        Tailor["📝 Llama 3.3 / Groq<br/>Resume Tailoring"]
-        Verifier{"🔎 Bespoke-Minicheck<br/>Fact Verifier"}
-    end
-
-    subgraph Execution ["🚀 Phase 3: Execution"]
-        Reject["🛑 Reject / Watchlist"]
-        Apply["✅ Playwright ATS<br/>Auto-Apply / Inbox"]
-        DB[("💾 Local SQLite<br/>(jobs.db)")]
-    end
-
-    %% Edge connections
-    Scrapers -- "Raw HTML" --> Extractor
-    Extractor -- "Structured JSON" --> Scorer
-    Scorer -- "Score ≥ Threshold" --> Tailor
-    Scorer -- "Score < Threshold" --> Reject
-    Tailor -- "Draft Resume & Email" --> Verifier
-    Verifier -- "Pass (100% Factual)" --> Apply
-    Verifier -- "Fail (Hallucination)" --> Tailor
-    Apply --> DB
-    Reject --> DB
-
-    %% Professional styling
-    classDef default fill:#1E1E2E,stroke:#4C4F69,stroke-width:2px,color:#CDD6F4;
-    classDef decision fill:#313244,stroke:#89B4FA,stroke-width:2px,color:#CDD6F4;
-    classDef success fill:#40A02B,stroke:#A6E3A1,stroke-width:2px,color:#11111B;
-    classDef reject fill:#D20F39,stroke:#F38BA8,stroke-width:2px,color:#11111B;
-    classDef database fill:#1E66F5,stroke:#89B4FA,stroke-width:2px,color:#11111B;
-
-    class Scorer,Verifier decision;
-    class Apply success;
-    class Reject reject;
-    class DB database;
-```
-
-We utilize different specialized models to handle distinct tasks:
-
-| Subsystem | Model / Provider | Purpose |
-|-----------|------------------|---------|
-| **Data Extraction** | `qwen2.5` | **The Data Entry Clerk.** Reads messy HR text and extracts structured JSON. |
-| **Logic & Evaluation** | `deepseek-r1:7b` (Ollama) | **The Recruiter.** Uses local chain-of-thought `<think>` reasoning for holistic candidate-to-job fit scoring. |
-| **Culture Forensics** | `bespoke-minicheck` (Ollama) | **The Fact Checker.** State-of-the-Art grounded factuality and hallucination diagnosis. |
-| **Generative Prose** | `llama-3.3-70b` (Groq) | **The Copywriter.** Professional, completely AI-slop-free resume drafting and cold-email engineering. |
-| **Vector Memory** | `nomic-embed-text` | **The Librarian.** High-efficiency RAG retrieval against your local knowledge base. |
+For the full details on the orchestrator design, pipeline diagram, and the models used, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ---
 
@@ -269,6 +203,17 @@ python desktop_app.py
 
 ---
 
+
+## 👤 Author
+**SVSPraveen** ([GitHub](https://github.com/SVSPraveen))
+*Note: I designed and built the orchestration architecture (the SPrav MOE Model) to coordinate these tasks. I did not train or fine-tune any of the underlying LLMs.*
+
+## ⚖️ Responsible Use
+- **Terms of Service:** Users are solely responsible for ensuring their automated submissions comply with the Terms of Service of each respective job portal.
+- **Human Review:** The Verifier Feedback Loop is designed to reduce hallucinated claims, but it does not catch everything. You should periodically review the Human Review queue.
+- **Rate Limits:** The daily caps (`COMPANY_DAILY_CAP`, `PORTAL_DAILY_CAP`, `TOTAL_DAILY_CAP`) exist for a reason—do not remove them. They are designed to avoid overwhelming employers and ATS platforms with spam.
+
+---
 ## 🛡️ Privacy & Data Guarantee
 
 **SPrav operates on a strict single-source-of-truth paradigm.** Every generated bullet point and claim must trace back to a verifiable entry in your canonical Knowledge Base. The system is explicitly engineered to highlight your actual skill gaps rather than hallucinating false proficiencies. 

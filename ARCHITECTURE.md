@@ -2,11 +2,18 @@
 
 The SPrav Job AI is built upon a specialized local-first architecture known as the **SPrav MOE State Machine**. 
 
-Unlike standard AI wrapper applications that blindly forward user prompts to a single, monolithic API (which frequently results in hallucinations, context degradation, and repetitive loops), SPrav implements a strict, multi-agent logic pipeline.
+Unlike standard AI wrapper applications that blindly forward user prompts to a single, monolithic API, SPrav implements a strict, multi-agent logic pipeline.
 
-## 🧠 The Mixture of Experts Philosophy
+### On Originality
+**Note:** The models listed below are existing open-source and hosted models. They were NOT trained or fine-tuned by me. What is original in this project is the orchestration, routing, and verification logic (the SPrav MOE Model) that I designed to coordinate them.
 
-We assign highly specific, granular tasks to highly specialized models. By using smaller, fine-tuned models for exact tasks, we achieve lower latency, deterministic outputs, and strict data integrity.
+## 🧠 The Mixture of Experts Philosophy (SPrav MOE Model)
+
+This is a Mixture of Experts in spirit: several specialized models coordinated by custom routing logic, NOT a custom-trained model. We assign highly specific, granular tasks to highly specialized models to achieve lower latency and strict data integrity.
+
+### Pipeline Flow
+The data follows a strict sequence through the orchestrator:
+**Discovery** → **Extraction** → **Fit Scoring** → **Tailoring** → **Verification** → **Apply**
 
 | Node | Model Constraint | Responsibility | Output Format |
 |---|---|---|---|
@@ -14,28 +21,29 @@ We assign highly specific, granular tasks to highly specialized models. By using
 | **Evaluator** | `deepseek-r1:7b` | Calculates holistic Candidate-to-Job Fit Scoring. | Mathematical Float (0.0 to 5.0) |
 | **Tailor** | `llama-3.3-70b` | High-prose generative drafting of Resumes & Cold Emails. | Markdown / PDF |
 | **Verifier** | `bespoke-minicheck` | Fact-checks generated prose against the user's canonical Knowledge Base. | Boolean Pass/Fail |
+| **Memory** | `nomic-embed-text` | High-efficiency RAG retrieval against your local knowledge base. | Vector Embeddings |
 
-## 🔄 The Word Chain Memory Loop
+## 🔄 The Verifier Feedback Loop
 
-The core innovation of the SPrav Engine is the zero-hallucination **Feedback Loop**. 
+The core innovation of the SPrav Engine is the algorithmic **Verifier Feedback Loop**. 
 
-When a generative model (like Llama 3.3) attempts to artificially inflate a user's skills to match a job description, standard applications either allow the lie to pass or rely on complex prompt engineering to beg the model not to lie. SPrav uses algorithmic fact-checking.
+When a generative model attempts to artificially inflate a user's skills to match a job description, SPrav uses algorithmic fact-checking.
 
-If the **Verifier** node (`bespoke-minicheck`) detects an ungrounded claim (a hallucination), it rejects the output. However, it does not simply restart the prompt. It generates a "Word Chain":
+If the **Verifier** node (`bespoke-minicheck`) detects an ungrounded claim (a hallucination), it rejects the output. It does not simply restart the prompt. It generates a feedback chain:
 
 1. **Context:** The original User profile (`me.json`) and the Job Description.
 2. **Draft:** The flawed, generated output.
 3. **Diagnosis:** The specific hallucination detected by the Verifier.
 
-This entire block of concatenated state is fed back into the Tailor. By forcing the generative model to explicitly "read" its own mistake alongside the forensic correction, SPrav absolutely guarantees that infinite hallucination loops are broken and that your generated applications remain 100% factually accurate.
+This entire block of concatenated state is fed back into the Tailor. By forcing the generative model to explicitly "read" its own mistake alongside the forensic correction, SPrav is designed to reduce infinite hallucination loops and catches most fabrications to help ensure your generated applications remain factually accurate.
 
 ## 💾 Local VRAM Constraints (8GB Optimization)
 
 To democratize autonomous job hunting, SPrav is engineered to run on consumer-grade hardware (minimum 8GB VRAM). 
 
-Running four expert LLMs simultaneously would instantly trigger an Out-Of-Memory (OOM) crash. SPrav solves this using **Sequential Thread Locking (`gpu_mutex`)**. 
+Running multiple expert LLMs simultaneously would easily trigger an Out-Of-Memory (OOM) crash. SPrav manages this using **Sequential Thread Locking (`gpu_mutex`)**. 
 
-The state machine strictly enforces that only one expert model occupies the GPU at any given time. When the pipeline transitions from the Extractor to the Evaluator, it explicitly issues a `keep_alive: 0` command to Ollama, forcing an immediate VRAM purge before the next model is loaded into memory. This guarantees zero-downtime execution and complete local privacy without needing a high-end data center GPU.
+The state machine strictly enforces that only one expert model occupies the GPU at any given time. When the pipeline transitions from the Extractor to the Evaluator, it explicitly issues a `keep_alive: 0` command to Ollama, forcing an immediate VRAM purge before the next model is loaded into memory. This robust failover design helps maintain execution without needing a high-end data center GPU.
 
 ## 🛑 3-Tier Circuit Breakers
 

@@ -2,7 +2,7 @@
 
 This directory contains the automated test suite for the SPrav Job Application pipeline, built using the `pytest` framework. 
 
-Given the high stakes of an automated job application system, tests here are heavily focused on ensuring strict adherence to logic gates, preventing hallucinations, and guaranteeing data integrity during the parsing process.
+Given the high stakes of an automated job application system, tests here are heavily focused on ensuring strict adherence to logic gates, reducing hallucinations, and maintaining data integrity during the parsing process.
 
 ---
 

@@ -24,3 +24,8 @@ When proposing changes or new features, please adhere to these core principles:
 3. **Test Locally:** Ensure your changes do not break the core LangGraph state machine. Run the system locally and verify the logs before submitting.
 
 We review PRs weekly. Welcome to the resistance!
+
+## 📄 License & Attribution
+
+This project is open-source under the MIT License.
+If you fork or create derivative works, you must keep the original copyright notice intact in the `LICENSE` file. Credit back to this repository is appreciated but not required.
