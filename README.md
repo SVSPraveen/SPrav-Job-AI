@@ -92,12 +92,13 @@ SPrav-Job-AI/
 ├── frontend/            # React UI (Dashboard & Auth)
 │   ├── src/             # Vite application source code
 │   └── dist/            # Compiled static React assets (Served by FastAPI)
-├── knowledge_base/      # Your local RAG memory bank
+├── knowledge_base/      # Example configs & templates
 ├── discovery/           # Python HTTP Scrapers (HN, YC, Indeed, Wellfound)
 ├── api.py               # FastAPI server bridging Frontend, Engine, and Scraper
-├── desktop_app.py       # PyWebview wrapper for native desktop experience
-├── users.db             # Local SQLite (Auto-generated on first run)
-└── jobs.db              # Local SQLite tracking applied/rejected jobs
+├── desktop_app.py       # PyWebview wrapper & PyInstaller main entrypoint
+├── SPravJobAI.spec      # PyInstaller build configuration
+└── installer.iss        # Inno Setup compilation script
+
 ```
 
 ---
@@ -162,62 +163,19 @@ OLLAMA_FLASH_ATTENTION=1
 > [!IMPORTANT]
 > Running models entirely locally via Ollama requires a minimum of **8GB VRAM** and **16GB RAM** to prevent Out-of-Memory (OOM) failures. (Cloud APIs like Groq can be configured as an alternative).
 
-### 1. Environment Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/SVSPraveen/SPrav-Job-AI.git
-cd SPrav-Job-AI
-
-# Initialize virtual environment
-python -m venv .venv
-.venv\Scripts\activate
-
-# Install core dependencies and ATS automation browsers
-pip install -r requirements.txt
-pip install uuid_utils
-playwright install chromium
-```
+### 1. Download & Install
+Download the latest `SPravJobAI-Setup.exe` from the Releases page and run the installer. 
+- **Program Binaries** are installed safely to `%LOCALAPPDATA%\Programs\SPrav AI` (no admin rights required).
+- **User Data** (your databases, configuration, and private knowledge base) is stored separately in `%LOCALAPPDATA%\SPravJobAI` so your job history persists seamlessly across updates.
 
 ### 2. Model Initialization
-
 If you plan to use local fallbacks, ensure [Ollama](https://ollama.com/) is installed. 
-*You do not need to manually pull models.* The SPrav `LaunchJobAssistant.bat` bootstrapper will automatically wake up Ollama in the background and pull `qwen2.5-coder:7b-instruct`, `hermes3:8b`, `deepseek-r1:7b`, `bespoke-minicheck`, and `nomic-embed-text` for you on first launch!
+*You do not need to manually pull models.* SPrav will automatically wake up Ollama in the background and pull `qwen2.5-coder:7b-instruct`, `hermes3:8b`, `deepseek-r1:7b`, `bespoke-minicheck`, and `nomic-embed-text` for you on first launch!
 
-### 3. Dashboard Configuration
+### 3. Launch
+Just double-click the **SPrav AI** shortcut on your Desktop or in your Start Menu. On your very first launch, the system will automatically seed your `%LOCALAPPDATA%\SPravJobAI` folder with example configurations for you to fill out.
 
-```bash
-# Install frontend dependencies
-cd frontend
-npm install
-npm run build
-cd ..
-
-# Initialize configuration
-copy .env.example .env
-# Open .env and customize as needed!
-```
-
-### 4. Launch
-
-For Windows users, simply double-click the **`Start SPrav AI.vbs`** file. This will silently spin up the FastAPI backend, background daemon, and the pre-compiled desktop UI in the background without leaving an ugly command prompt window open. This will also automatically install Ollama and pull any missing models if you don't have them!
-
-> [!TIP]
-> **Pro Tip:** Right-click `Start SPrav AI.vbs` → **Send to** → **Desktop (create shortcut)**. Now you can launch SPrav just like any native desktop application with a simple double-click from your desktop!
-
-```bash
-Start SPrav AI.vbs
-```
-
-Alternatively, you can run the batch file directly if you want to see the startup logs:
-```bash
-LaunchJobAssistant.bat
-```
-
-Alternatively, you can launch the native desktop application window directly via python:
-```bash
-python desktop_app.py
-```
+*Note: For developers looking to build the PyInstaller executable from source or run via Python, refer to the developer sections in `ARCHITECTURE.md`.*
 
 ---
 
