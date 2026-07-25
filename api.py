@@ -465,8 +465,7 @@ def suggest_scope(req: SuggestScopeRequest):
     
     prompt = f"""
     Based on the following professional profile, suggest 10 highly relevant job titles (roles) and 5 geographic locations to target for their next job. 
-    If the user has a location, include it as one of the locations, plus other major tech/industry hubs that make sense.
-    CRITICAL: You MUST prioritize "India", specific Indian tech hubs (e.g., "Bangalore", "Hyderabad"), or "Remote India" as the top geographic locations.
+    If the user has a location, include it as one of the locations, plus other major tech/industry hubs that make sense globally or in their region.
     {exclude_text}
     
     Profile:

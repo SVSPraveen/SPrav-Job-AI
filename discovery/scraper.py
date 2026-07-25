@@ -6,6 +6,14 @@ import subprocess
 from engine.jd_extractor import fetch_jd_text
 
 def load_targeting() -> dict:
+    try:
+        with open("knowledge_base/scope.json", "r") as f:
+            scope = json.load(f)
+        locs = [l["label"] for l in scope.get("locations", []) if l.get("preference") == "apply"]
+        if locs:
+            return {"target_locations": locs}
+    except:
+        pass
     return {"target_locations": ["Remote", "Worldwide"]}
 
 def is_target_location(job_location: str, target_locations: list) -> bool:
@@ -166,7 +174,7 @@ def scrape_freshershunt() -> list:
             "company": "Freshershunt Extracted", # Usually need deeper extraction for company name
             "url": item.get("url", ""),
             "description": f"Extracted from {item.get('original_post')}",
-            "location": "India / Remote",
+            "location": item.get("location", "Unspecified"),
             "source": "Freshershunt",
             "fit_score": 0,
             "scam_flags": "",
@@ -235,7 +243,7 @@ def scrape_company_watchlist() -> list:
             "company": company,
             "url": job_url,
             "description": description,
-            "location": item.get("location", "India"),
+            "location": item.get("location", "Unspecified"),
             "source": "company_watcher",
             "fit_score": 0,
             "scam_flags": "",
@@ -311,7 +319,7 @@ def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
                     "company": item.get("company", ""),
                     "url": item.get("url", ""),
                     "description": item.get("description", ""),
-                    "location": item.get("location", "India"),
+                    "location": item.get("location", "Unspecified"),
                     "source": "Naukri",
                     "fit_score": 0,
                     "scam_flags": "",
@@ -396,7 +404,7 @@ def scrape_portal(source_name: str, js_file: str, keywords: list = None, limit_p
                     "company": item.get("company", ""),
                     "url": item.get("url", ""),
                     "description": item.get("description", ""),
-                    "location": item.get("location", "India"),
+                    "location": item.get("location", "Unspecified"),
                     "source": source_name.capitalize(),
                     "fit_score": 0,
                     "scam_flags": "",
