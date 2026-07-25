@@ -4,8 +4,9 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import sqlite3
 import os
+from engine.utils import get_data_dir
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(get_data_dir(), ".env"))
 import json
 import subprocess
 import PyPDF2
@@ -46,10 +47,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB_PATH = "jobs.db"
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 KB_PATH = "knowledge_base/me.json"
-CONFIG_PATH = "config.json"
-BLACKLIST_PATH = "blacklist.txt"
+CONFIG_PATH = os.path.join(get_data_dir(), "config.json")
+BLACKLIST_PATH = os.path.join(get_data_dir(), "blacklist.txt")
 
 class KBUpdate(BaseModel):
     kb_data: dict
@@ -127,7 +128,7 @@ def auto_login():
         return {"access_token": token, "recovery_key": user_data["recovery_key"]}
     else:
         # Fetch the first user and generate a token
-        conn = sqlite3.connect("users.db", timeout=30.0)
+        conn = sqlite3.connect(os.path.join(get_data_dir(), "users.db"), timeout=30.0)
         cursor = conn.cursor()
         cursor.execute("SELECT id, name, email FROM users LIMIT 1")
         row = cursor.fetchone()
@@ -259,7 +260,7 @@ def _write_env_var(key: str, value: str):
 @app.post("/api/debug/reset-jobs")
 def reset_jobs():
     """Wipes the jobs and auto-apply audit tables so the user can start fresh after onboarding."""
-    conn = sqlite3.connect("jobs.db", timeout=30.0)
+    conn = sqlite3.connect(os.path.join(get_data_dir(), "jobs.db"), timeout=30.0)
     c = conn.cursor()
     c.execute("DELETE FROM jobs")
     c.execute("DELETE FROM auto_apply_audit")
@@ -347,6 +348,10 @@ def get_metrics():
     conn.close()
     
     total = sum(rows.values())
+    
+    latest_error = get_daemon_state("LATEST_ERROR", "")
+    waiting_onboarding = get_daemon_state("WAITING_FOR_ONBOARDING", "")
+    
     return {
         "total": total,
         "applied": rows.get("applied", 0),
@@ -354,8 +359,15 @@ def get_metrics():
         "rejected": rows.get("rejected", 0),
         "new": rows.get("new", 0),
         "manual": rows.get("manual_review", 0),
-        "pending_approval": rows.get("pending_cover_letter", 0)
+        "pending_approval": rows.get("pending_cover_letter", 0),
+        "latest_error": latest_error,
+        "waiting_onboarding": waiting_onboarding
     }
+
+@app.post("/api/daemon/clear-error", dependencies=[Depends(verify_token)])
+def clear_daemon_error():
+    set_daemon_state("LATEST_ERROR", "")
+    return {"status": "ok"}
 
 @app.get("/api/jobs", dependencies=[Depends(verify_token)])
 def get_jobs():
@@ -417,8 +429,8 @@ def mark_job_applied(job_id: str):
 
 # ─── Watchlist Endpoints ──────────────────────────────────────────────────────
 
-WATCHLIST_PATH = "watchlist.json"
-SNAPSHOTS_DIR = os.path.join("scraper_service", "snapshots")
+WATCHLIST_PATH = os.path.join(get_data_dir(), "watchlist.json")
+SNAPSHOTS_DIR = os.path.join(get_data_dir(), "snapshots")
 
 def _load_watchlist() -> dict:
     if not os.path.exists(WATCHLIST_PATH):
@@ -661,7 +673,8 @@ async def extract_pdf(file: UploadFile = File(...)):
         return {"error": str(e)}
 
 def run_script(args):
-    subprocess.Popen(["python", "main.py"] + args)
+    import sys
+    subprocess.Popen([sys.executable, "--cli"] + args)
 
 @app.post("/api/action/discover", dependencies=[Depends(verify_token)])
 def trigger_discover():

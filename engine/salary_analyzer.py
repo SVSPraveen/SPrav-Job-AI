@@ -2,8 +2,12 @@ import sqlite3
 import json
 import os
 
-DB_PATH = "jobs.db"
-CONFIG_PATH = "config.json"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
+from engine.utils import get_data_dir
+import os
+CONFIG_PATH = os.path.join(get_data_dir(), "config.json")
 
 def get_salary_gaps() -> dict:
     """

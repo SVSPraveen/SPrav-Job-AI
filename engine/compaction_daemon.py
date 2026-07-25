@@ -5,7 +5,9 @@ from engine.db_utils import db_mutex
 from engine.llm_provider import generate
 from engine.strategy_generator import generate_followup_email
 
-DB_PATH = "jobs.db"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 
 def run_compaction():
     print("\n[Compaction Engine] Waking up. Initializing Daily Transcript Compaction...")

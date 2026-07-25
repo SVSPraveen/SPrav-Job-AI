@@ -5,7 +5,9 @@ from engine.memory_palace import get_relevant_lessons
 from engine.knowledge_graph import get_entity_context
 from engine.db_utils import db_mutex
 
-DB_PATH = "jobs.db"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 
 def generate_strategy_report(job_id: int, company: str, title: str, job_requirements: dict, master_evidence_sheet: str, evaluation_rubric: dict = None):
     """

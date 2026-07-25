@@ -169,6 +169,13 @@ function App() {
     }
   }
 
+  const clearDaemonError = async () => {
+    try {
+      await axios.post(`${API_BASE}/daemon/clear-error`)
+      fetchMetrics()
+    } catch (e) { console.error(e) }
+  }
+
 
 
   return (
@@ -219,6 +226,18 @@ function App() {
 
       {/* Main Content Area */}
       <div className="main-content">
+        {metrics?.latest_error && (
+          <div style={{background: 'rgba(239, 68, 68, 0.2)', color: '#fca5a5', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid rgba(239, 68, 68, 0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+             <div><strong>🚨 Daemon Error:</strong> {metrics.latest_error}</div>
+             <button onClick={clearDaemonError} style={{background: 'transparent', border: '1px solid #fca5a5', color: '#fca5a5', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', marginLeft: '1rem'}}>Dismiss</button>
+          </div>
+        )}
+        {metrics?.waiting_onboarding && (
+          <div style={{background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', border: '1px solid rgba(245, 158, 11, 0.3)'}}>
+             <strong>⚠️ Action Required:</strong> {metrics.waiting_onboarding}
+          </div>
+        )}
+        
         {activeTab === 'home' && (
           <div className="fade-in">
             <h2>Command Center</h2>

@@ -1,8 +1,9 @@
+from engine.utils import get_data_dir
 import sqlite3
 import os
 from datetime import datetime
 
-KG_DB_PATH = "knowledge_base/knowledge_graph.sqlite3"
+KG_DB_PATH = os.path.join(get_data_dir(), "knowledge_base", "knowledge_graph.sqlite3")
 
 def init_kg():
     os.makedirs(os.path.dirname(KG_DB_PATH), exist_ok=True)

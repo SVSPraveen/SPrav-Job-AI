@@ -1,9 +1,11 @@
+from engine.utils import get_data_dir
+import os
 import os
 import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(get_data_dir(), ".env"))
 
 def send_email_notification(job_title: str, company: str, job_url: str, pdf_path: str):
     """

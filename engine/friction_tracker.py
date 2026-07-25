@@ -1,6 +1,8 @@
 import sqlite3
 
-DB_PATH = "jobs.db"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 
 def get_company_friction_rate(company: str) -> dict:
     """

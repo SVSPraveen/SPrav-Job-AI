@@ -3,39 +3,37 @@ import time
 import subprocess
 import sys
 import os
-
-# Fix pythonw.exe crashing on print() by redirecting to a file
-log_file = open("desktop_app.log", "w", encoding="utf-8")
-sys.stdout = log_file
-sys.stderr = log_file
-
-api_log = open("api.log", "w", encoding="utf-8")
-daemon_log = open("daemon.log", "w", encoding="utf-8")
-
-from engine.ollama_manager import verify_ollama
-
 import threading
+from engine.utils import get_resource_path, get_data_dir, init_data_dir
+
+def run_api():
+    import uvicorn
+    from api import app
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+def run_daemon_worker():
+    from engine.daemon import run_daemon
+    run_daemon()
 
 def start_backend():
     print("Starting backend services...")
-    
-    # Verify Ollama is installed and pull necessary models in the background
-    # so it doesn't freeze the UI on first launch!
+    from engine.ollama_manager import verify_ollama
     threading.Thread(target=verify_ollama, daemon=True).start()
     
-    # Hide window for subprocesses on Windows
     startupinfo = subprocess.STARTUPINFO()
     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
     
-    venv_dir = os.path.join(os.path.dirname(__file__), ".venv", "Scripts")
-    python_exe = os.path.join(venv_dir, "python.exe")
-
-    # Start API using python -m uvicorn to avoid missing uvicorn.exe
+    # In PyInstaller, sys.executable is the .exe itself!
+    executable = sys.executable
+    
+    api_log = open(os.path.join(get_data_dir(), "api.log"), "w", encoding="utf-8")
+    daemon_log = open(os.path.join(get_data_dir(), "daemon.log"), "w", encoding="utf-8")
+    
     api_proc = subprocess.Popen(
-        [python_exe, "-m", "uvicorn", "api:app", "--host", "127.0.0.1", "--port", "8000"],
+        [executable, "--api"],
         startupinfo=startupinfo,
         creationflags=subprocess.CREATE_NO_WINDOW,
         stdin=subprocess.DEVNULL,
@@ -44,9 +42,8 @@ def start_backend():
         env=env
     )
 
-    # Start Daemon
     daemon_proc = subprocess.Popen(
-        [python_exe, "-m", "engine.daemon"],
+        [executable, "--daemon"],
         startupinfo=startupinfo,
         creationflags=subprocess.CREATE_NO_WINDOW,
         stdin=subprocess.DEVNULL,
@@ -54,28 +51,24 @@ def start_backend():
         stderr=subprocess.STDOUT,
         env=env
     )
-
-    # Start Frontend (Vite) - REMOVED!
-    # The application is now compiled into frontend/dist and served natively by FastAPI
-    # This eliminates Node.js from production, resulting in instant booting and lower memory usage.
     
-    return api_proc, daemon_proc
+    return api_proc, daemon_proc, api_log, daemon_log
 
 def main():
-    api_proc, daemon_proc = start_backend()
+    log_file = open(os.path.join(get_data_dir(), "desktop_app.log"), "w", encoding="utf-8")
+    sys.stdout = log_file
+    sys.stderr = log_file
     
-    # Wait briefly for FastAPI to bind
+    api_proc, daemon_proc, api_log, daemon_log = start_backend()
+    
     time.sleep(1)
     
-    # Tell Windows this is a separate app, not just a generic 'python.exe' process.
-    # This forces the taskbar to use the desktop shortcut's icon (or the one we pass).
     import ctypes
     try:
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('sprav.job.ai.app')
     except Exception:
         pass
     
-    # Create the native desktop window using Windows Webview2
     window = webview.create_window(
         "SPrav Job AI", 
         "http://127.0.0.1:8000/", 
@@ -84,37 +77,46 @@ def main():
         maximized=True
     )
     
-    import os
-    icon_path = os.path.join(os.path.dirname(__file__), 'app_icon_v2.ico')
+    icon_path = get_resource_path('app_icon_v2.ico')
+    profile_dir = os.path.join(get_data_dir(), "webview_profile")
     
-    # Isolate WebView2 profile to avoid locking conflicts with other pywebview apps
-    # We use a dedicated folder in LOCALAPPDATA
-    profile_dir = os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "SPravJobAI_WebView")
-    
-    # TARGETED ZOMBIE CLEANUP: Kill only webview processes that are locking OUR profile directory
-    # This ensures that even if the app crashed previously, the lock is cleared before we start!
     cleanup_ps1 = f"Get-CimInstance Win32_Process -Filter \"Name='msedgewebview2.exe'\" | Where-Object {{ $_.CommandLine -match 'SPravJobAI_WebView' }} | ForEach-Object {{ Stop-Process -Id $_.ProcessId -Force }}"
     subprocess.run(["powershell", "-Command", cleanup_ps1], creationflags=subprocess.CREATE_NO_WINDOW)
     
     try:
-        # Start the UI loop (passing the icon for the window title bar and taskbar)
         webview.start(private_mode=False, icon=icon_path, storage_path=profile_dir)
     finally:
-        # Clean up when the window is closed
         print("Shutting down AI engine...")
         try:
             api_proc.kill()
             daemon_proc.kill()
+            api_log.close()
+            daemon_log.close()
         except Exception:
             pass
         
-        # Hard fallback to kill orphaned Node.js Vite servers
-        subprocess.run(["taskkill", "/F", "/IM", "node.exe"], capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        app_dir = os.path.dirname(os.path.abspath(__file__))
+        cleanup_node_ps1 = f"Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Where-Object {{ $_.CommandLine -like '*{app_dir}*' }} | ForEach-Object {{ Stop-Process -Id $_.ProcessId -Force }}"
+        subprocess.run(["powershell", "-Command", cleanup_node_ps1], creationflags=subprocess.CREATE_NO_WINDOW)
         
-        # Kill orphaned WebView2 processes for OUR app to prevent locking errors on next launch
         subprocess.run(["powershell", "-Command", cleanup_ps1], creationflags=subprocess.CREATE_NO_WINDOW)
         
         sys.exit(0)
 
 if __name__ == '__main__':
-    main()
+    # Add multiprocessing freeze_support just in case
+    import multiprocessing
+    multiprocessing.freeze_support()
+    
+    init_data_dir()
+    
+    if "--api" in sys.argv:
+        run_api()
+    elif "--daemon" in sys.argv:
+        run_daemon_worker()
+    elif "--cli" in sys.argv:
+        import main
+        sys.argv.remove("--cli")
+        main.main()
+    else:
+        main()

@@ -61,3 +61,8 @@ config.json
 watchlist.json
 
 uvicorn.log
+
+# PyInstaller
+build/
+dist/
+*.spec

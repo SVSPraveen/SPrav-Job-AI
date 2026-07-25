@@ -19,8 +19,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const WATCHLIST_PATH = path.join(__dirname, '..', 'watchlist.json');
-const SNAPSHOTS_DIR = path.join(__dirname, 'snapshots');
+const WATCHLIST_PATH = process.env.SPRAV_DATA_DIR ? path.join(process.env.SPRAV_DATA_DIR, 'watchlist.json') : path.join(__dirname, '..', 'watchlist.json');
+const SNAPSHOTS_DIR = process.env.SPRAV_DATA_DIR ? path.join(process.env.SPRAV_DATA_DIR, 'snapshots') : path.join(__dirname, 'snapshots');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

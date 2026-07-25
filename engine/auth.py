@@ -26,7 +26,9 @@ if not SECRET_KEY:
     raise ValueError("CRITICAL SECURITY ERROR: JWT_SECRET is missing from your .env file. A unique secret is required for secure authentication.")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 30
-USERS_DB = "users.db"
+from engine.utils import get_data_dir
+import os
+USERS_DB = os.path.join(get_data_dir(), "users.db")
 
 security = HTTPBearer()
 

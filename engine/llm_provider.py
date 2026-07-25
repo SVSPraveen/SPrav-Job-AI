@@ -3,6 +3,7 @@ import json
 import time
 import threading
 import os
+from engine.utils import get_data_dir
 from engine.auth import get_system_credential
 
 gpu_mutex = threading.Lock()
@@ -203,7 +204,7 @@ def _generate_gemini(model: str, prompt: str, api_key: str) -> tuple[bool, str]:
         return False, str(e)
 
 def get_routing_config(use_case: str) -> dict:
-    config_path = "config.json"
+    config_path = os.path.join(get_data_dir(), "config.json")
     routing = {"provider": "ollama", "model": "qwen2.5-coder:7b-instruct"}
     if os.path.exists(config_path):
         try:

@@ -1,7 +1,9 @@
+from engine.utils import get_data_dir
+import os
 import pytest
 import os
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(get_data_dir(), ".env"))
 
 from engine.tailor import validate_selection, construct_prompt
 

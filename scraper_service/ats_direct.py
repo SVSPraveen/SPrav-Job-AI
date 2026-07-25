@@ -6,7 +6,9 @@ import time
 import json
 from discovery.scraper import _expand_keywords
 
-DB_PATH = "jobs.db"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 # Public datasets of companies that use Greenhouse and Lever
 DATASET_BASE = "https://raw.githubusercontent.com/Feashliaa/job-board-aggregator/main/data"
 

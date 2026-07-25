@@ -1,8 +1,9 @@
+from engine.utils import get_data_dir
 import re
 import json
 import os
 
-KB_PATH = "knowledge_base/me.json"
+KB_PATH = os.path.join(get_data_dir(), "knowledge_base", "me.json")
 
 # A conservative skill-token extractor.
 # Looks for capitalized words, optionally with some symbols like C++, C#

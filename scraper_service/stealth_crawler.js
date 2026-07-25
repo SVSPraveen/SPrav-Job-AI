@@ -11,7 +11,9 @@ puppeteer.use(StealthPlugin());
 function getDynamicTargets() {
     let targets = [];
     try {
-        const scopeStr = fs.readFileSync('knowledge_base/scope.json', 'utf8');
+        const path = require('path');
+        const scopePath = path.join(process.env.SPRAV_DATA_DIR || '.', 'knowledge_base', 'scope.json');
+        const scopeStr = fs.readFileSync(scopePath, 'utf8');
         const scope = JSON.parse(scopeStr);
         
         const activeRoles = (scope.roles || [])
@@ -35,7 +37,17 @@ function getDynamicTargets() {
             for (const loc of sampleLocs) {
                 const q = encodeURIComponent(role);
                 const l = encodeURIComponent(loc);
-                targets.push({ name: "Indeed", url: `https://www.indeed.co.in/jobs?q=${q}&l=${l}` });
+                
+                // Dynamically determine Indeed domain based on location
+                const locLower = loc.toLowerCase();
+                let indeedDomain = "www.indeed.com";
+                if (locLower.includes("india")) indeedDomain = "in.indeed.com";
+                else if (locLower.includes("uk") || locLower.includes("united kingdom")) indeedDomain = "uk.indeed.com";
+                else if (locLower.includes("canada")) indeedDomain = "ca.indeed.com";
+                else if (locLower.includes("australia")) indeedDomain = "au.indeed.com";
+                else if (locLower.includes("germany")) indeedDomain = "de.indeed.com";
+
+                targets.push({ name: "Indeed", url: `https://${indeedDomain}/jobs?q=${q}&l=${l}` });
                 
                 // Wellfound uses role/xxx format
                 const slug = role.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -45,7 +57,7 @@ function getDynamicTargets() {
     } catch (e) {
         console.error("[Node Scraper] Could not load scope.json, falling back to defaults.", e);
         targets = [
-            { name: "Indeed", url: "https://www.indeed.co.in/jobs?q=Software+Engineer&l=Remote" },
+            { name: "Indeed", url: "https://www.indeed.com/jobs?q=Software+Engineer&l=Remote" },
             { name: "Wellfound", url: "https://wellfound.com/role/software-engineer" }
         ];
     }

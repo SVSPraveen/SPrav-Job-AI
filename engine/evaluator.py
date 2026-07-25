@@ -1,10 +1,11 @@
+from engine.utils import get_data_dir
 import json
 import os
 from datetime import datetime
 from engine.llm_provider import generate
 
-KB_PATH = "knowledge_base/me.json"
-MASTER_IDENTITY_PATH = "knowledge_base/master_identity.txt"
+KB_PATH = os.path.join(get_data_dir(), "knowledge_base", "me.json")
+MASTER_IDENTITY_PATH = os.path.join(get_data_dir(), "knowledge_base", "master_identity.txt")
 
 class KnowledgeDistiller:
     def __init__(self):

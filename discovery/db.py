@@ -3,7 +3,9 @@ import os
 import hashlib
 from datetime import date
 
-DB_PATH = "jobs.db"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

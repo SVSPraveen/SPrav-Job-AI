@@ -8,7 +8,9 @@ from engine.email_extractor import get_best_email
 from engine.llm_provider import generate
 from engine.tailor import load_kb
 
-DB_PATH = "jobs.db"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 from discovery.scraper import load_targeting
 
 HN_API_BASE = "https://hacker-news.firebaseio.com/v0"

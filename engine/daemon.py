@@ -1,6 +1,7 @@
 import os
+from engine.utils import get_data_dir
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(get_data_dir(), ".env"))
 import sqlite3
 import time
 import random
@@ -10,6 +11,7 @@ import json
 import re
 import hashlib
 import concurrent.futures
+import traceback
 from typing import TypedDict, Optional
 
 from langgraph.graph import StateGraph, END
@@ -47,6 +49,7 @@ from engine.config import (
     TOTAL_DAILY_CAP,
     AUTO_APPLY_CIRCUIT_BREAKER_N,
 )
+from engine.utils import get_node_path
 from discovery.db import (
     get_company_applies_today,
     has_been_applied_to,
@@ -56,8 +59,23 @@ from discovery.db import (
 )
 from engine.scope_enforcer import load_scope, check_scope
 
-DB_PATH = "jobs.db"
-CONFIG_PATH = "config.json"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
+from engine.utils import get_data_dir
+import os
+CONFIG_PATH = os.path.join(get_data_dir(), "config.json")
+
+def _log_error(context: str, e: Exception):
+    error_msg = str(e)
+    print(f"[{context}] {error_msg}")
+    set_daemon_state("LATEST_ERROR", f"[{context}] {error_msg}")
+    try:
+        with open(os.path.join(get_data_dir(), "crash.log"), "a", encoding="utf-8") as f:
+            f.write(f"\n--- {datetime.utcnow().isoformat()} - {context} ---\n")
+            f.write(traceback.format_exc() + "\n")
+    except Exception:
+        pass
 
 def get_config():
     if os.path.exists(CONFIG_PATH):
@@ -737,7 +755,7 @@ def execute_sprav_moe_pipeline():
             try:
                 future.result()
             except Exception as e:
-                print(f"[Daemon Error] Parallel Job Worker crashed: {e}")
+                _log_error("Parallel Job Worker crashed", e)
 
 def check_ollama_models():
     import requests
@@ -785,7 +803,7 @@ def run_daemon():
             try:
                 run_compaction()
             except Exception as e:
-                print(f"[Daemon Error] Compaction failed: {e}")
+                _log_error("Compaction failed", e)
                 
         # Run Naukri profile touch at 9 AM and 6 PM (pushes profile to top of recruiter searches)
         touch_key = f"{now.date()}_{now.hour}"
@@ -798,19 +816,22 @@ def run_daemon():
                     touch_naukri_profile(naukri_email, naukri_password)
                     _profile_touch_dates.add(touch_key)
                 except Exception as e:
-                    print(f"[Profile Touch Error] {e}")
+                    _log_error("Profile Touch Error", e)
 
         print(f"\n--- [Cycle {cycle}] Starting Job Discovery ---")
         try:
             print("\n--- Triggering Node.js Stealth Scraper ---")
             try:
+                env = os.environ.copy()
+                env["SPRAV_DATA_DIR"] = get_data_dir()
                 subprocess.run(
-                    ["cmd", "/c", "node scraper_service/stealth_crawler.js"], 
+                    [get_node_path(), "scraper_service/stealth_crawler.js"], 
                     check=False,
                     timeout=300,  # 5 minute timeout to prevent daemon from freezing
                     creationflags=subprocess.CREATE_NO_WINDOW,
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL,
+                    env=env,
                     stderr=subprocess.DEVNULL
                 )
             except subprocess.TimeoutExpired:
@@ -820,13 +841,13 @@ def run_daemon():
             try:
                 run_ats_discovery()
             except Exception as e:
-                print(f"ATS Discovery error: {e}")
+                _log_error("ATS Discovery error", e)
             
             print("\n--- Executing SPrav MoE Pipeline ---")
             execute_sprav_moe_pipeline()
             
         except Exception as e:
-            print(f"[Daemon Error] Pipeline failed this cycle: {e}")
+            _log_error("Pipeline failed this cycle", e)
             
         # Run external platform scanners every other cycle (~30 min cadence)
         if cycle % 2 == 0:
@@ -836,7 +857,7 @@ def run_daemon():
                 run_hn_scanner()
                 run_yc_scanner()
             except Exception as e:
-                print(f"Platform Scanners error: {e}")
+                _log_error("Platform Scanners error", e)
 
         sleep_minutes = random.randint(5, 15)
         print(f"\n[Daemon] Cycle {cycle} complete. Sleeping for {sleep_minutes} minutes...")

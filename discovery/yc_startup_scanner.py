@@ -7,7 +7,9 @@ from engine.scope_enforcer import load_scope
 from engine.llm_provider import generate
 from engine.tailor import load_kb
 
-DB_PATH = "jobs.db"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 YC_URL = "https://www.ycombinator.com/companies?isHiring=true&regions=Remote"
 
 def run_yc_scanner() -> list:

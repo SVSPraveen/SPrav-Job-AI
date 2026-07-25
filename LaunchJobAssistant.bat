@@ -8,9 +8,8 @@ echo         AUTOJOB AI: NEXT-GEN UI
 echo ==================================================
 echo.
 
-taskkill /F /IM node.exe >nul 2>&1
-taskkill /F /IM python.exe >nul 2>&1
-taskkill /F /IM msedgewebview2.exe >nul 2>&1
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='node.exe' OR Name='python.exe'\" | Where-Object { $_.CommandLine -like '*%~dp0*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }" >nul 2>&1
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='msedgewebview2.exe'\" | Where-Object { $_.CommandLine -like '*SPravJobAI_WebView*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }" >nul 2>&1
 
 if not exist ".venv" (
     echo [ERROR] Virtual environment not found!
@@ -36,6 +35,5 @@ echo.
 
 echo.
 echo Closing SPrav Job AI...
-taskkill /F /IM node.exe >nul 2>&1
-taskkill /F /IM python.exe >nul 2>&1
-taskkill /F /IM msedgewebview2.exe >nul 2>&1
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='node.exe' OR Name='python.exe'\" | Where-Object { $_.CommandLine -like '*%~dp0*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }" >nul 2>&1
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='msedgewebview2.exe'\" | Where-Object { $_.CommandLine -like '*SPravJobAI_WebView*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }" >nul 2>&1

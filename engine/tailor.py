@@ -1,10 +1,13 @@
+from engine.utils import get_data_dir
+import os
 import json
 import re
 from engine.llm_provider import generate
 from engine.config import TAILOR_PROMPT
 
 
-def load_kb(path: str = "knowledge_base/me.json") -> dict:
+def load_kb(path: str = None) -> dict:
+    if path is None: path = os.path.join(get_data_dir(), "knowledge_base", "me.json")
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 

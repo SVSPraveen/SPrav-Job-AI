@@ -1,3 +1,4 @@
+from engine.utils import get_data_dir, get_node_path
 import requests
 import os
 import uuid
@@ -7,7 +8,7 @@ from engine.jd_extractor import fetch_jd_text
 
 def load_targeting() -> dict:
     try:
-        with open("knowledge_base/scope.json", "r") as f:
+        with open(os.path.join(get_data_dir(), "knowledge_base", "scope.json"), "r") as f:
             scope = json.load(f)
         locs = [l["label"] for l in scope.get("locations", []) if l.get("preference") == "apply"]
         if locs:
@@ -150,7 +151,7 @@ def scrape_freshershunt() -> list:
         
     try:
         # We pass 10 as the limit
-        result = subprocess.run(["node", js_script, "10"], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=120)
+        result = subprocess.run([get_node_path(), js_script, "10"], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=120, env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()})
         
         # The JS script outputs JSON on the very last line
         output = result.stdout.strip()
@@ -200,12 +201,12 @@ def scrape_company_watchlist() -> list:
 
     try:
         result = subprocess.run(
-            ["node", js_script],
+            [get_node_path(), js_script],
             capture_output=True,
             text=True,
             encoding='utf-8',
             errors='replace',
-            timeout=300  # 5 min max — 20 companies × ~15s each
+            timeout=300, env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()} # 5 min max — 20 companies × ~15s each
         )
 
         # career_watcher.js outputs one JSON array as the LAST line on stdout
@@ -303,10 +304,11 @@ def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
         print(f"  Naukri: '{keyword}'...")
         try:
             result = subprocess.run(
-                ["node", js_script, keyword, str(limit_per_keyword)],
+                [get_node_path(), js_script, keyword, str(limit_per_keyword)],
                 capture_output=True,
                 text=True,
-                timeout=120
+                timeout=120,
+                env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()}
             )
             output = result.stdout.strip()
             if not output:
@@ -355,7 +357,7 @@ def _expand_keywords(base_keywords):
 
 def _get_dynamic_keywords():
     try:
-        with open("knowledge_base/scope.json", "r") as f:
+        with open(os.path.join(get_data_dir(), "knowledge_base", "scope.json"), "r") as f:
             scope = json.load(f)
         kws = [r["keyword"] for r in scope.get("roles", []) if r.get("preference") == "apply"]
         if kws:
@@ -385,13 +387,13 @@ def scrape_portal(source_name: str, js_file: str, keywords: list = None, limit_p
         print(f"  {source_name}: '{keyword}'...")
         try:
             result = subprocess.run(
-                ["node", js_script, keyword, str(limit_per_keyword)],
+                [get_node_path(), js_script, keyword, str(limit_per_keyword)],
                 capture_output=True,
                 text=True,
                 encoding='utf-8',
                 errors='replace',
                 timeout=120,
-                env={**__import__('os').environ}
+                env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()}
             )
             output = result.stdout.strip()
             if not output:

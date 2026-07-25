@@ -1,3 +1,5 @@
+from engine.utils import get_data_dir
+import os
 import argparse
 import json
 import os
@@ -5,7 +7,7 @@ from engine.tailor import tailor_resume
 from engine.formatter import generate_docx, generate_pdf
 
 def load_config():
-    config_path = "config.json"
+    config_path = os.path.join(get_data_dir(), "config.json")
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -70,7 +72,7 @@ def main():
     try:
         # We need to make sure the env vars are loaded if they exist
         from dotenv import load_dotenv
-        load_dotenv()
+        load_dotenv(dotenv_path=os.path.join(get_data_dir(), ".env"))
 
         from engine.tailor import load_kb
 
@@ -81,12 +83,12 @@ def main():
         print(json.dumps(tailored_resume, indent=2))
 
         print("\nGenerating DOCX...")
-        output_docx = "output/tailored_resume.docx"
+        output_docx = os.path.join(get_data_dir(), "output", "tailored_resume.docx")
         generate_docx(tailored_resume, kb, output_docx)
         print(f"Saved: {output_docx}")
 
         print("Generating PDF...")
-        output_pdf = "output/tailored_resume.pdf"
+        output_pdf = os.path.join(get_data_dir(), "output", "tailored_resume.pdf")
         if generate_pdf(output_docx, output_pdf):
             print(f"Saved: {output_pdf}")
         else:

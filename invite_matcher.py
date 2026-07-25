@@ -2,7 +2,9 @@ import sqlite3
 import argparse
 import sys
 
-DB_PATH = "jobs.db"
+from engine.utils import get_data_dir
+import os
+DB_PATH = os.path.join(get_data_dir(), "jobs.db")
 
 def match_invite(email_text: str) -> dict:
     """
