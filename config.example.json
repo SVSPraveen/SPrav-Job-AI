@@ -12,7 +12,7 @@
       "model": "deepseek-r1:7b"
     },
     "resume_tailoring": {
-      "provider": "openrouter",
+      "provider": "groq",
       "model": "openai/gpt-oss-120b"
     },
     "toxic_forensics": {

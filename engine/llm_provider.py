@@ -99,16 +99,44 @@ def _generate_openai(model: str, prompt: str, api_key: str) -> tuple[bool, str]:
     except Exception as e:
         return False, str(e)
 
-def _generate_groq(model: str, prompt: str, api_key: str) -> tuple[bool, str]:
+def _generate_groq(model: str, prompt: str, api_key: str, use_case: str = "default") -> tuple[bool, str]:
     print(f"\n[Cloud API] Routing to Groq endpoint: {model} (Bypassing GPU Mutex)")
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.3
+        "temperature": 0.0,
+        "reasoning_effort": "high",
+        "disable_tool_validation": True
     }
+    
+    if use_case == "resume_tailoring":
+        payload["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "resume_tailoring_output",
+                "strict": True,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "tailored_bullets": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "description": "A single resume bullet point strictly following the XYZ formula based on contextual grounding."
+                            }
+                        }
+                    },
+                    "required": ["tailored_bullets"],
+                    "additionalProperties": False
+                }
+            }
+        }
+    else:
+        payload["response_format"] = {"type": "json_object"}
+
     try:
-        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=60)
+        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=90)
         response.raise_for_status()
         content = response.json()["choices"][0]["message"]["content"]
         return True, content
@@ -227,7 +255,7 @@ def generate(prompt: str, use_case: str = "general") -> str:
     elif provider == "groq":
         api_key = get_system_credential("groq", "api_key") or os.getenv("GROQ_API_KEY")
         if api_key:
-            success, result = _generate_groq(model_name, prompt, api_key)
+            success, result = _generate_groq(model_name, prompt, api_key, use_case)
         else:
             print(f"[Agnostic MoE] Missing Groq key for '{use_case}'. Configure it in the UI Settings. Falling back to Ollama.")
             

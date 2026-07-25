@@ -11,7 +11,7 @@ whole history. When in doubt, this file wins over enthusiasm mid-session.
 - ID-based bullet selection + deterministic hydration + parent-scoped
   validation (see `PROJECT_VISION.md` for why this exists)
 - Gap-flagging when a JD wants something not in the KB
-- Provider abstraction: local Ollama (free), OpenRouter, Groq, Anthropic
+- Provider abstraction: local Ollama (free), Groq, Anthropic
   (paid/free tiers) — same interface, config-only switch
 - Docx resume generation from tailored output
 - PDF export (currently Windows/Word-dependent — see tech debt)
