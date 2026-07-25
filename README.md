@@ -201,6 +201,9 @@ copy .env.example .env
 
 For Windows users, simply double-click the **`Start SPrav AI.vbs`** file. This will silently spin up the FastAPI backend, background daemon, and the pre-compiled desktop UI in the background without leaving an ugly command prompt window open. This will also automatically install Ollama and pull any missing models if you don't have them!
 
+> [!TIP]
+> **Pro Tip:** Right-click `Start SPrav AI.vbs` → **Send to** → **Desktop (create shortcut)**. Now you can launch SPrav just like any native desktop application with a simple double-click from your desktop!
+
 ```bash
 Start SPrav AI.vbs
 ```
