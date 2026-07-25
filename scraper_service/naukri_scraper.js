@@ -144,6 +144,13 @@ async function scrapeNaukri(keyword = 'software developer', limit = 30) {
     console.log(JSON.stringify(jobs));
 }
 
-const keyword = process.argv[2] || 'software developer';
+let defaultKeyword = 'software developer';
+try {
+    const scope = JSON.parse(fs.readFileSync('knowledge_base/scope.json', 'utf8'));
+    const roles = scope.roles.filter(r => r.preference === 'apply').map(r => r.keyword);
+    if (roles.length > 0) defaultKeyword = roles[0];
+} catch(e) {}
+
+const keyword = process.argv[2] || defaultKeyword;
 const limit = parseInt(process.argv[3] || '30', 10);
 scrapeNaukri(keyword, limit);

@@ -78,10 +78,14 @@ export default function ApplicationScope() {
     setDetecting(true);
     setError('');
     try {
-      const res = await axios.get(`${API_BASE}/scope/suggest`);
+      const payload = {
+        current_roles: scope.roles.map(r => r.keyword),
+        current_locations: scope.locations.map(l => l.label)
+      };
+      const res = await axios.post(`${API_BASE}/scope/suggest`, payload);
       if (res.data.status === "success" && res.data.data) {
-        setSuggestedRoles(res.data.data.roles || []);
-        setSuggestedLocs(res.data.data.locations || []);
+        setSuggestedRoles(prev => Array.from(new Set([...prev, ...(res.data.data.roles || [])])));
+        setSuggestedLocs(prev => Array.from(new Set([...prev, ...(res.data.data.locations || [])])));
       } else {
         setError(res.data.message || 'Failed to generate suggestions.');
       }
@@ -211,15 +215,31 @@ export default function ApplicationScope() {
           </p>
 
           <div className="tag-input-row">
-            <input ref={locInputRef} type="text" placeholder="City, Country, or 'Remote'..." onKeyDown={e => e.key === 'Enter' && addLocation()} />
+            <input ref={locInputRef} type="text" list="popular-locations" placeholder="City, Country, or 'Remote'..." onKeyDown={e => e.key === 'Enter' && addLocation()} />
+            <datalist id="popular-locations">
+              <option value="Pune, Maharashtra, India" />
+              <option value="Bangalore, Karnataka, India" />
+              <option value="Hyderabad, Telangana, India" />
+              <option value="Mumbai, Maharashtra, India" />
+              <option value="Delhi NCR, India" />
+              <option value="Chennai, Tamil Nadu, India" />
+              <option value="Remote India" />
+              <option value="San Francisco, CA, USA" />
+              <option value="New York, NY, USA" />
+              <option value="Seattle, WA, USA" />
+              <option value="Austin, TX, USA" />
+              <option value="London, UK" />
+              <option value="Toronto, ON, Canada" />
+              <option value="Remote Global" />
+            </datalist>
             <button className="btn-icon" onClick={addLocation}><Plus size={14} /> Add</button>
           </div>
             
-          {suggestedLocs.length === 0 && scope.locations.length === 0 && (
-            <button className="btn" onClick={autoDetectScope} disabled={detecting} style={{ background: 'rgba(79, 70, 229, 0.1)', color: 'var(--accent)', border: '1px solid rgba(79, 70, 229, 0.3)', marginBottom: '1rem', width: 'fit-content' }}>
-              {detecting ? 'Analyzing...' : <><Sparkles size={14} /> AI: Suggest Locations</>}
+          <div style={{ marginBottom: '1rem' }}>
+            <button className="btn" onClick={autoDetectScope} disabled={detecting} style={{ background: 'rgba(79, 70, 229, 0.1)', color: 'var(--accent)', border: '1px solid rgba(79, 70, 229, 0.3)', width: 'fit-content' }}>
+              {detecting ? 'Analyzing...' : <><Sparkles size={14} /> AI: Suggest More Locations</>}
             </button>
-          )}
+          </div>
 
           {suggestedLocs.length > 0 && (
             <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
@@ -269,11 +289,11 @@ export default function ApplicationScope() {
             <button className="btn-icon" onClick={addRole}><Plus size={14} /> Add</button>
           </div>
 
-          {suggestedRoles.length === 0 && scope.roles.length === 0 && (
-            <button className="btn" onClick={autoDetectScope} disabled={detecting} style={{ background: 'rgba(79, 70, 229, 0.1)', color: 'var(--accent)', border: '1px solid rgba(79, 70, 229, 0.3)', marginBottom: '1rem', width: 'fit-content' }}>
-              {detecting ? 'Analyzing...' : <><Sparkles size={14} /> AI: Suggest Roles</>}
+          <div style={{ marginBottom: '1rem' }}>
+            <button className="btn" onClick={autoDetectScope} disabled={detecting} style={{ background: 'rgba(79, 70, 229, 0.1)', color: 'var(--accent)', border: '1px solid rgba(79, 70, 229, 0.3)', width: 'fit-content' }}>
+              {detecting ? 'Analyzing...' : <><Sparkles size={14} /> AI: Suggest More Roles</>}
             </button>
-          )}
+          </div>
 
           {suggestedRoles.length > 0 && (
             <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>

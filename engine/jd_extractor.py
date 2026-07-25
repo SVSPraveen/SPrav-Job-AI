@@ -82,7 +82,7 @@ def fetch_jd_text(url: str, timeout: int = 15) -> Optional[str]:
 
         result = subprocess.run(
             ["node", extractor_js, url],
-            capture_output=True, text=True, timeout=30
+            capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=30
         )
         output = result.stdout.strip()
         if output:

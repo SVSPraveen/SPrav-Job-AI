@@ -57,7 +57,7 @@ def guess_email(poster_name: str, company: str) -> Optional[str]:
     Only returns a guess if the domain has a valid MX record.
     """
     # Clean name
-    name_parts = poster_name.strip().lower().split()
+    name_parts = (poster_name or "").strip().lower().split()
     if len(name_parts) < 2:
         return None
 
@@ -65,7 +65,7 @@ def guess_email(poster_name: str, company: str) -> Optional[str]:
     last = re.sub(r'[^a-z]', '', name_parts[-1])
 
     # Find domain
-    company_lower = company.lower().strip()
+    company_lower = (company or "").lower().strip()
     domain = None
     for key, dom in KNOWN_DOMAINS.items():
         if key in company_lower:

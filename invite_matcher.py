@@ -15,7 +15,7 @@ def match_invite(email_text: str) -> dict:
     rows = c.fetchall()
     conn.close()
     
-    email_lower = email_text.lower()
+    email_lower = (email_text or "").lower()
     
     best_match = None
     highest_score = 0

@@ -430,8 +430,12 @@ def _save_watchlist(data: dict):
     with open(WATCHLIST_PATH, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-@app.get("/api/scope/suggest")
-def suggest_scope():
+class SuggestScopeRequest(BaseModel):
+    current_roles: list[str] = []
+    current_locations: list[str] = []
+
+@app.post("/api/scope/suggest")
+def suggest_scope(req: SuggestScopeRequest):
     """Uses LLM to suggest locations and job roles based on the Knowledge Base (me.json)."""
     kb = get_kb()
     
@@ -439,25 +443,39 @@ def suggest_scope():
     personal = kb.get("personal", {})
     work = kb.get("work_history", [])
     skills = kb.get("skills", {})
+    gh_projects = kb.get("github_projects", [])
+    port_projects = kb.get("portfolio_projects", [])
     
     summary = f"Location: {personal.get('location', '')}\n"
     summary += "Work History:\n"
     for w in work:
         summary += f"- {w.get('role', '')} at {w.get('company', '')}\n"
+    summary += "GitHub Projects:\n"
+    for p in gh_projects:
+        summary += f"- {p.get('name', '')}: {str(p.get('description', ''))[:150]} (Tech: {', '.join(p.get('tech_stack', []))})\n"
+    summary += "Portfolio Projects:\n"
+    for p in port_projects:
+        summary += f"- {p.get('name', '')}: {str(p.get('description', ''))[:150]} (Tech: {', '.join(p.get('tech_stack', []))})\n"
     summary += f"Skills: {json.dumps(skills)}\n"
     
+    exclude_text = ""
+    if req.current_roles or req.current_locations:
+        exclude_text = f"CRITICAL: Do NOT suggest any of these roles: {', '.join(req.current_roles)}\n"
+        exclude_text += f"CRITICAL: Do NOT suggest any of these locations: {', '.join(req.current_locations)}\n"
+    
     prompt = f"""
-    Based on the following professional profile, suggest the 5 best job titles (roles) and 3 best geographic locations to target for their next job. 
-    If the user has a location, include it as one of the 3 locations, plus 2 other major tech/industry hubs that make sense.
+    Based on the following professional profile, suggest 10 highly relevant job titles (roles) and 5 geographic locations to target for their next job. 
+    If the user has a location, include it as one of the locations, plus other major tech/industry hubs that make sense.
     CRITICAL: You MUST prioritize "India", specific Indian tech hubs (e.g., "Bangalore", "Hyderabad"), or "Remote India" as the top geographic locations.
+    {exclude_text}
     
     Profile:
     {summary}
     
     Return EXACTLY a JSON object with this schema and NO other text:
     {{
-        "roles": ["Role 1", "Role 2", "Role 3", "Role 4", "Role 5"],
-        "locations": ["Location 1", "Location 2", "Location 3"]
+        "roles": ["Role 1", "Role 2", "Role 3", "Role 4", "Role 5", "Role 6", "Role 7", "Role 8", "Role 9", "Role 10"],
+        "locations": ["Location 1", "Location 2", "Location 3", "Location 4", "Location 5"]
     }}
     """
     
@@ -468,6 +486,16 @@ def suggest_scope():
             response = json_match.group(1)
             
         data = json.loads(response)
+        
+        # Strict programmatic filtering to guarantee duplicates are removed
+        if "roles" in data:
+            current_roles_lower = {r.lower() for r in req.current_roles}
+            data["roles"] = [r for r in data["roles"] if r.lower() not in current_roles_lower]
+            
+        if "locations" in data:
+            current_locs_lower = {l.lower() for l in req.current_locations}
+            data["locations"] = [l for l in data["locations"] if l.lower() not in current_locs_lower]
+            
         return {"status": "success", "data": data}
     except Exception as e:
         print(f"[Scope Suggestion Error] {e}")
@@ -572,6 +600,43 @@ async def add_jobs_bulk(jobs: list = Body(...)):
     conn.commit()
     conn.close()
     return {"status": "ok", "inserted": inserted}
+
+@app.get("/api/jobs/{job_id}/details", dependencies=[Depends(verify_token)])
+def get_job_details(job_id: str):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute("SELECT * FROM jobs WHERE id = ?", (job_id,))
+    row = c.fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    job = dict(row)
+    
+    # Optionally parse evaluation logic from scam_flags or description if used for storing rubric
+    rubric = job.get("scam_flags", "")
+    if "Fit" not in rubric:
+        rubric = None
+        
+    audit = None
+    if job.get("status") in ["applied", "failed_submission"]:
+        audit = {
+            "status": job.get("status"),
+            "attempted_at": job.get("updated_at", ""),
+            "resume_version": "v" + job.get("updated_at", "").replace("-","").replace(":","").replace("T","")[:14]
+        }
+        
+    return {
+        "id": job["id"],
+        "title": job["title"],
+        "company": job["company"],
+        "url": job["url"],
+        "status": job["status"],
+        "fit_score": job.get("fit_score", 0),
+        "audit": audit,
+        "evaluation_rubric": rubric
+    }
 
 @app.get("/api/kb")
 def get_kb():

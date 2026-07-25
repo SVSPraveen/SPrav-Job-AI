@@ -41,6 +41,7 @@ from discovery.hn_whoishiring import run_hn_scanner
 from discovery.yc_startup_scanner import run_yc_scanner
 from engine.config import (
     FIT_AUTO_APPLY_THRESHOLD,
+    ATS_AUTO_APPLY_THRESHOLD,
     COMPANY_DAILY_CAP,
     PORTAL_DAILY_CAP,
     TOTAL_DAILY_CAP,
@@ -117,7 +118,7 @@ def verify_job_node(state: JobState) -> JobState:
         
     print("\n[Phase 0.5] Executing Block G Posting-Legitimacy Check...")
     is_ghost, scam_reason = detect_ghost_job(
-        job['description'],
+        job.get('description') or '',
         job.get('location', ''),
         company=job.get('company', ''),
         title=job.get('title', '')
@@ -134,7 +135,7 @@ def verify_job_node(state: JobState) -> JobState:
         return state
         
     print("\n[Phase 0.75] Hashing Job Description to detect reposts...")
-    semantic_text = job['description'].lower()
+    semantic_text = (job.get('description') or '').lower()
     semantic_text = re.sub(r'\d{1,2}/\d{1,2}/\d{2,4}', '', semantic_text)
     semantic_text = re.sub(r'posted \d+ days ago', '', semantic_text)
     semantic_text = re.sub(r'\s+', '', semantic_text)
@@ -665,12 +666,19 @@ def build_job_graph():
     
     workflow.add_edge("prep_interview", "tailor")
     
-    workflow.add_conditional_edges("tailor", lambda x: x['status'], {
+    def route_tailor(state: JobState):
+        status = state['status']
+        if status == 'failed_generation':
+            return 'failed_generation'
+        if status == 'human_review_disagreement':
+            return 'human_review_disagreement'
+        return 'fact_check'
+        
+    workflow.add_conditional_edges("tailor", route_tailor, {
         'failed_generation': END,
-        # Disagreement jobs skip fact-check and go directly to dispatch
-        # (dispatch will route them to Human Apply with the reason note)
         'human_review_disagreement': 'dispatch',
-    }, default="fact_check")
+        'fact_check': 'fact_check'
+    })
 
     def route_fact_check(state: JobState):
         status = state['status']
@@ -795,7 +803,14 @@ def run_daemon():
         print(f"\n--- [Cycle {cycle}] Starting Job Discovery ---")
         try:
             print("\n--- Triggering Node.js Stealth Scraper ---")
-            subprocess.run(["cmd", "/c", "node scraper_service/stealth_crawler.js"], check=False)
+            subprocess.run(
+                ["cmd", "/c", "node scraper_service/stealth_crawler.js"], 
+                check=False,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
             
             print("\n--- Triggering Zero-Token ATS Discovery ---")
             try:

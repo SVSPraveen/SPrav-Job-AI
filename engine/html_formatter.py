@@ -92,6 +92,34 @@ def generate_html_context(tailored_resume: dict, kb: dict) -> str:
 
     # ── PROJECTS ─────────────────────────────────────────────────────────────
     context["SECTION_PROJECTS"] = "Projects"
+    all_rendered_projects = []
+
+    # 1. GITHUB / PORTFOLIO PROJECTS (Prioritized)
+    extended_projects_map = {p["id"]: p for p in kb.get("github_projects", []) + kb.get("portfolio_projects", []) if "id" in p}
+    for proj_data in tailored_resume.get("generated_project_bullets", []):
+        pid = proj_data.get("project_id")
+        if pid in extended_projects_map:
+            parent = extended_projects_map[pid]
+            bullets = proj_data.get("bullets", [])
+            tagline = parent.get("description", "")
+            if len(tagline) > 100:
+                tagline = tagline[:97] + "..."
+            tagline_html = f'<div class="project-tagline">{tagline}</div>' if tagline else ""
+            bullets_html = "".join(f"<li>{b}</li>" for b in bullets)
+            end_date = parent.get("last_commit_date", "")
+            
+            snippet = f'''
+<div class="project">
+  <div class="project-header">
+    <span class="project-period">{end_date}</span>
+    <span class="project-title">{parent.get("name", "")}</span>
+  </div>
+  {tagline_html}
+  <ul>{bullets_html}</ul>
+</div>'''
+            all_rendered_projects.append(snippet)
+
+    # 2. MANUAL PROJECTS (Fallback)
     projects_map = {p["id"]: p for p in kb.get("projects", [])}
     proj_map: dict = {}
 
@@ -102,7 +130,6 @@ def generate_html_context(tailored_resume: dict, kb: dict) -> str:
                 proj_map[pid] = {"parent": projects_map[pid], "bullets": []}
             proj_map[pid]["bullets"].append(bullet)
 
-    proj_html = ""
     for pid, data in proj_map.items():
         parent = data["parent"]
         bullets = data["bullets"]
@@ -111,7 +138,7 @@ def generate_html_context(tailored_resume: dict, kb: dict) -> str:
         bullets_html = "".join(f"<li>{b.get('text', '')}</li>" for b in bullets)
         end_date = parent.get("end_date", "")
 
-        proj_html += f'''
+        snippet = f'''
 <div class="project">
   <div class="project-header">
     <span class="project-period">{parent.get("start_date", "")} {("&ndash; " + end_date) if end_date else ""}</span>
@@ -120,8 +147,10 @@ def generate_html_context(tailored_resume: dict, kb: dict) -> str:
   {tagline_html}
   <ul>{bullets_html}</ul>
 </div>'''
+        all_rendered_projects.append(snippet)
 
-    context["PROJECTS"] = proj_html
+    # Keep only the top 2 projects overall
+    context["PROJECTS"] = "".join(all_rendered_projects[:2])
 
     # ── EDUCATION ────────────────────────────────────────────────────────────
     context["SECTION_EDUCATION"] = "Education"

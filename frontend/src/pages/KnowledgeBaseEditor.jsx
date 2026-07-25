@@ -10,6 +10,8 @@ const KnowledgeBaseEditor = () => {
     personal: {},
     work_history: [],
     projects: [],
+    github_projects: [],
+    portfolio_projects: [],
     education: [],
     certifications: [],
     resume_bullets: [],
@@ -31,6 +33,8 @@ const KnowledgeBaseEditor = () => {
       let data = res.data;
       if (!data.work_history) data.work_history = [];
       if (!data.projects) data.projects = [];
+      if (!data.github_projects) data.github_projects = [];
+      if (!data.portfolio_projects) data.portfolio_projects = [];
       if (!data.education) data.education = [];
       if (!data.certifications) data.certifications = [];
       if (!data.resume_bullets) data.resume_bullets = [];
@@ -88,6 +92,8 @@ const KnowledgeBaseEditor = () => {
         },
         work_history: [],
         projects: [],
+        github_projects: [],
+        portfolio_projects: [],
         education: [],
         certifications: [],
         resume_bullets: [],
@@ -258,6 +264,11 @@ const KnowledgeBaseEditor = () => {
               <label className="input-label">Professional Summary</label>
               <textarea className="input-field" rows="4" value={kbData.personal.summary || ''} onChange={e => handlePersonalChange('summary', e.target.value)} placeholder="A brief overview of your professional brand..."></textarea>
             </div>
+            <div style={{ marginTop: '1.5rem' }}>
+              <label className="input-label">Custom AI Instructions</label>
+              <textarea className="input-field" rows="3" value={kbData.personal.custom_instructions || ''} onChange={e => handlePersonalChange('custom_instructions', e.target.value)} placeholder="E.g., 'Never use the word passionate', 'Always emphasize my background in fintech', 'Focus on backend systems over UI'"></textarea>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>These overarching rules will be passed directly to the AI Engine during the resume tailoring phase.</span>
+            </div>
           </div>
         )}
 
@@ -320,8 +331,46 @@ const KnowledgeBaseEditor = () => {
 
         {activeTab === 'projects' && (
           <div className="fade-in">
+            {kbData.github_projects?.length > 0 && (
+              <div style={{ marginBottom: '2rem' }}>
+                <h3 style={{ color: 'var(--accent)', marginBottom: '1rem' }}>GitHub Projects (Imported)</h3>
+                {kbData.github_projects.map((proj) => (
+                  <div key={proj.id} className="item-card" style={{ borderLeft: '3px solid #10b981', padding: '1.5rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                      <h4 style={{ margin: 0, fontSize: '1.1rem' }}>{proj.name}</h4>
+                      {proj.url && <a href={proj.url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', fontSize: '0.9rem' }}>View Source ↗</a>}
+                    </div>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.95rem' }}>{proj.description}</p>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.85rem' }}>
+                      {proj.tech_stack?.length > 0 && <span style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>{proj.tech_stack.join(', ')}</span>}
+                      {proj.stars > 0 && <span style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>⭐ {proj.stars}</span>}
+                      {proj.last_commit_date && <span style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>Updated: {proj.last_commit_date}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {kbData.portfolio_projects?.length > 0 && (
+              <div style={{ marginBottom: '2rem' }}>
+                <h3 style={{ color: 'var(--accent)', marginBottom: '1rem' }}>Portfolio Projects (Imported)</h3>
+                {kbData.portfolio_projects.map((proj) => (
+                  <div key={proj.id} className="item-card" style={{ borderLeft: '3px solid #8b5cf6', padding: '1.5rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                      <h4 style={{ margin: 0, fontSize: '1.1rem' }}>{proj.name}</h4>
+                      {proj.url && <a href={proj.url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', fontSize: '0.9rem' }}>View Live ↗</a>}
+                    </div>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.95rem' }}>{proj.description}</p>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.85rem' }}>
+                      {proj.tech_stack?.length > 0 && <span style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>{proj.tech_stack.join(', ')}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h3 style={{ color: 'var(--accent)' }}>Projects</h3>
+              <h3 style={{ color: 'var(--accent)' }}>Manual Projects</h3>
               <button className="btn-small" onClick={() => addArrayItem('projects', { name: '', tagline: '', start_date: '', end_date: '' })}>
                 <Plus size={16} /> Add Project
               </button>

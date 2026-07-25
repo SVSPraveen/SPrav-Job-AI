@@ -3,13 +3,56 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 
+const fs = require('fs');
+
 puppeteer.use(StealthPlugin());
 
-// Configurable multi-platform targets
-const TARGETS = [
-    { name: "Indeed", url: "https://www.indeed.co.in/jobs?q=Software+Engineer&l=Remote" },
-    { name: "Wellfound", url: "https://wellfound.com/role/software-engineer" }
-];
+// Dynamically construct targets from Application Scope
+function getDynamicTargets() {
+    let targets = [];
+    try {
+        const scopeStr = fs.readFileSync('knowledge_base/scope.json', 'utf8');
+        const scope = JSON.parse(scopeStr);
+        
+        const activeRoles = (scope.roles || [])
+            .filter(r => r.preference === 'apply')
+            .map(r => r.keyword);
+            
+        const activeLocs = (scope.locations || [])
+            .filter(l => l.preference === 'apply')
+            .map(l => l.label);
+            
+        // Fallbacks if user hasn't defined any
+        if (activeRoles.length === 0) activeRoles.push("Software Engineer");
+        if (activeLocs.length === 0) activeLocs.push("Remote");
+        
+        // Take a small sample to avoid crawling thousands of pages per cycle
+        // In a real production system, this would paginate or rotate through them
+        const sampleRoles = activeRoles.sort(() => 0.5 - Math.random()).slice(0, 2);
+        const sampleLocs = activeLocs.sort(() => 0.5 - Math.random()).slice(0, 2);
+        
+        for (const role of sampleRoles) {
+            for (const loc of sampleLocs) {
+                const q = encodeURIComponent(role);
+                const l = encodeURIComponent(loc);
+                targets.push({ name: "Indeed", url: `https://www.indeed.co.in/jobs?q=${q}&l=${l}` });
+                
+                // Wellfound uses role/xxx format
+                const slug = role.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                targets.push({ name: "Wellfound", url: `https://wellfound.com/role/${slug}` });
+            }
+        }
+    } catch (e) {
+        console.error("[Node Scraper] Could not load scope.json, falling back to defaults.", e);
+        targets = [
+            { name: "Indeed", url: "https://www.indeed.co.in/jobs?q=Software+Engineer&l=Remote" },
+            { name: "Wellfound", url: "https://wellfound.com/role/software-engineer" }
+        ];
+    }
+    return targets;
+}
+
+const TARGETS = getDynamicTargets();
 
 async function randomDelay(min = 2000, max = 5000) {
     const delay = Math.floor(Math.random() * (max - min + 1)) + min;

@@ -31,6 +31,8 @@ def is_ollama_installed() -> bool:
             [get_ollama_path(), "--version"], 
             capture_output=True, 
             text=True, 
+            encoding='utf-8',
+            errors='replace',
             startupinfo=startupinfo,
             stdin=subprocess.DEVNULL
         )
@@ -64,6 +66,8 @@ def ensure_ollama_running():
             [get_ollama_path(), "list"], 
             capture_output=True, 
             text=True, 
+            encoding='utf-8',
+            errors='replace',
             startupinfo=startupinfo,
             stdin=subprocess.DEVNULL
         )
@@ -92,6 +96,8 @@ def check_and_pull_models():
                 [get_ollama_path(), "list"], 
                 capture_output=True, 
                 text=True, 
+                encoding='utf-8',
+                errors='replace',
                 startupinfo=startupinfo,
                 stdin=subprocess.DEVNULL
             )
@@ -99,10 +105,16 @@ def check_and_pull_models():
                 print(f"[Ollama Manager] Pulling {model}... This may take a while depending on your internet speed.")
                 
                 if sys.platform == "win32":
-                    # Use 'start' to spawn a completely detached console window with a title and an explanation
-                    # This avoids all handle inheritance issues and ensures the progress bar renders correctly.
-                    cmd_str = f'start "SPrav AI Downloader" cmd /c "echo [SPrav AI Engine] && echo Downloading required model: {model}... && echo This may take a few minutes depending on your internet connection. && echo. && "{get_ollama_path()}" pull {model}"'
-                    subprocess.run(cmd_str, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    # Run the pull command completely silently in the background
+                    # This prevents the blank black CMD box from popping up over the app UI
+                    cflags = subprocess.CREATE_NO_WINDOW
+                    subprocess.run(
+                        [get_ollama_path(), "pull", model],
+                        stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        creationflags=cflags
+                    )
                 else:
                     subprocess.run([get_ollama_path(), "pull", model], stdin=subprocess.DEVNULL)
             else:

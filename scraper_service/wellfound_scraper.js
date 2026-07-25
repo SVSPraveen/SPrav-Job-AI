@@ -11,10 +11,11 @@
 
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
 puppeteer.use(StealthPlugin());
 
 const path = require('path');
-const fs = require('fs');
 
 const SEEN_PATH = path.join(__dirname, 'snapshots', 'wellfound_seen.json');
 
@@ -130,6 +131,13 @@ async function scrapeWellfound(keyword = 'software engineer', limit = 20) {
     console.log(JSON.stringify(jobs));
 }
 
-const keyword = process.argv[2] || 'software engineer';
+let defaultKeyword = 'software engineer';
+try {
+    const scope = JSON.parse(fs.readFileSync('knowledge_base/scope.json', 'utf8'));
+    const roles = scope.roles.filter(r => r.preference === 'apply').map(r => r.keyword);
+    if (roles.length > 0) defaultKeyword = roles[0];
+} catch(e) {}
+
+const keyword = process.argv[2] || defaultKeyword;
 const limit   = parseInt(process.argv[3] || '20', 10);
 scrapeWellfound(keyword, limit);

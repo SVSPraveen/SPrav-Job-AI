@@ -78,8 +78,14 @@ function App() {
       fetchMetrics()
       fetchJobs()
       fetchConfig()
+      
+      const intervalId = setInterval(() => {
+          fetchMetrics()
+          fetchJobs()
+      }, 5000)
 
       return () => {
+        clearInterval(intervalId)
         axios.interceptors.request.eject(reqInterceptor);
         axios.interceptors.response.eject(resInterceptor);
       }
@@ -153,8 +159,14 @@ function App() {
   const triggerAction = async (action) => {
     try {
       await axios.post(`${API_BASE}/action/${action}`)
-      alert(`Triggered ${action} in background! Check terminal logs.`)
-    } catch (e) { console.error(e) }
+      if (action === 'apply') {
+        alert("Auto-Apply is continuously running in the background via the LangGraph daemon! You can watch the Job Portal tab to see the live updates.")
+      } else {
+        alert(`Triggered ${action} in background! The dashboard will update automatically.`)
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
 
 

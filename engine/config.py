@@ -89,13 +89,18 @@ CRITICAL RULES FOR REWRITING:
 - The rewritten text must not sound like AI wrote it. Be direct, specific, confident.
 - Remove every red flag: gaps, vague responsibilities, passive voice, "helped with", "assisted in", "worked on".
 
-═══ STEP 4: WRITE THE TAILORED SUMMARY ═══
+═══ STEP 4: SELECT AND WRITE PROJECTS ═══
+Analyze the user's `github_projects` and `portfolio_projects`.
+Select a MAXIMUM of the 2 BEST projects that match the exact tech stack required by the Job Description.
+For each selected project, write exactly 3 custom bullet points using the Google XYZ formula. Base these bullets on the project's `description` and `readme_summary`, emphasizing the technologies used.
+
+═══ STEP 5: WRITE THE TAILORED SUMMARY ═══
 Write a 2-sentence professional summary.
 Sentence 1: Who the candidate is + primary tech stack or domain from the JD.
 Sentence 2: One specific, quantified achievement (use only real metrics from their KB) that maps to the JD's top priority.
 DO NOT write a 3rd sentence. Do NOT use "passionate", "dynamic", "hard-working", "results-driven", or any other AI cliché.
 
-═══ STEP 5: COVER LETTER BODY ═══
+═══ STEP 6: COVER LETTER BODY ═══
 Write 3 short paragraphs.
 Para 1: Why THIS company, not "a company" — reference something specific from the JD or company context.
 Para 2: One hard story (XYZ) that directly mirrors their biggest technical challenge.
@@ -113,6 +118,13 @@ Output STRICTLY valid JSON. No markdown. No explanation. No text before or after
       "original_id": "<same id as in selected_bullet_ids>",
       "rewritten_text": "<one-line XYZ rewrite with JD keywords naturally embedded>"
     }}
+  ],
+  "selected_project_ids": ["<project id 1>", "<project id 2>"],
+  "generated_project_bullets": [
+    {{
+      "project_id": "<same id as in selected_project_ids>",
+      "bullets": ["<bullet 1>", "<bullet 2>", "<bullet 3>"]
+    }}
   ]
 }}
 
@@ -122,6 +134,8 @@ If the original bullet is "Created a caching layer with Redis" and the JD requir
   "original_id": "bullet_4",
   "rewritten_text": "Optimized system latency [X] by engineering a Redis caching layer [Z] that eliminated backend bottlenecks [Y]."
 }}
+
+{custom_instructions_block}
 
 User Knowledge Base:
 {kb_context}

@@ -45,6 +45,8 @@ def _run_node(script: str, *args, timeout: int = 120) -> dict:
             ["node", script, *args],
             capture_output=True,
             text=True,
+            encoding='utf-8',
+            errors='replace',
             timeout=timeout,
             env={**os.environ}
         )

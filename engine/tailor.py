@@ -25,7 +25,14 @@ def flatten_bullets(kb: dict) -> list:
 
 def construct_prompt(jd_text: str, kb: dict) -> str:
     kb_str = json.dumps(kb, indent=2)
-    return TAILOR_PROMPT.format(kb_context=kb_str, jd_text=jd_text)
+    
+    custom_inst = kb.get("personal", {}).get("custom_instructions", "").strip()
+    if custom_inst:
+        custom_block = f"═══ USER CUSTOM INSTRUCTIONS ═══\nTHE USER HAS PROVIDED OVERRIDE INSTRUCTIONS. YOU MUST OBEY THESE STRICTLY:\n{custom_inst}\n"
+    else:
+        custom_block = ""
+
+    return TAILOR_PROMPT.format(kb_context=kb_str, jd_text=jd_text, custom_instructions_block=custom_block)
 
 
 def validate_selection(selected_ids: list, kb: dict) -> list:
@@ -51,8 +58,23 @@ def tailor_resume(jd_text: str, kb_path: str = "knowledge_base/me.json") -> dict
     # Feed only the relevant subset to the LLM to save tokens and improve focus
     if relevant_ids and all_bullets:
         kb["resume_bullets"] = [b for b in all_bullets if b["id"] in relevant_ids]
+        
+    # Create a truncated copy of KB for the LLM to avoid context limits
+    llm_kb = dict(kb)
+    llm_kb.pop("work_history", None)
+    llm_kb.pop("projects", None)
+    
+    # Truncate long readmes in github and portfolio projects
+    for proj_type in ["github_projects", "portfolio_projects"]:
+        llm_kb[proj_type] = []
+        for p in kb.get(proj_type, []):
+            p_copy = dict(p)
+            if "readme_summary" in p_copy and isinstance(p_copy["readme_summary"], str):
+                rs = p_copy["readme_summary"]
+                p_copy["readme_summary"] = rs[:300] + ("..." if len(rs) > 300 else "")
+            llm_kb[proj_type].append(p_copy)
 
-    prompt = construct_prompt(jd_text, kb)
+    prompt = construct_prompt(jd_text, llm_kb)
 
     # Restore full bullet list for hydration step
     kb["resume_bullets"] = all_bullets
@@ -96,4 +118,15 @@ def tailor_resume(jd_text: str, kb_path: str = "knowledge_base/me.json") -> dict
             hydrated_bullets.append(bullet)
 
     parsed_response["hydrated_bullets"] = hydrated_bullets
+    
+    # ── Projects Constraints ──────────────────────────────────────────────────
+    selected_projects = parsed_response.get("selected_project_ids", [])[:2]
+    parsed_response["selected_project_ids"] = selected_projects
+    
+    # Filter generated project bullets to only the selected ones (safety check)
+    gen_bullets = parsed_response.get("generated_project_bullets", [])
+    parsed_response["generated_project_bullets"] = [
+        gb for gb in gen_bullets if gb.get("project_id") in selected_projects
+    ]
+    
     return parsed_response

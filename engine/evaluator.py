@@ -48,7 +48,7 @@ class KnowledgeDistiller:
         valid_types = {"full-time", "part-time", "internship", "contract"}
         
         for job in kb.get("work_history", []):
-            emp_type = job.get("employment_type", "full-time").lower()
+            emp_type = (job.get("employment_type") or "full-time").lower()
             if emp_type not in valid_types:
                 continue
                 
@@ -62,7 +62,7 @@ class KnowledgeDistiller:
                 start_fmt = "%Y-%m-%d" if len(start_str) > 7 else "%Y-%m"
                 start_date = datetime.strptime(start_str, start_fmt)
                 
-                if not end_str or end_str.lower() == "present":
+                if not end_str or str(end_str).lower() == "present":
                     end_date = datetime.now()
                 else:
                     end_fmt = "%Y-%m-%d" if len(end_str) > 7 else "%Y-%m"

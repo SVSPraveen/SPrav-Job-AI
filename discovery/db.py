@@ -40,6 +40,17 @@ def init_db():
         )
     ''')
 
+    # ── Migrations ───────────────────────────────────────────────────────────
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN jd_hash TEXT")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+        
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN scope_reason TEXT")
+    except sqlite3.OperationalError:
+        pass  # Column already exists
+
     # ── Auto-apply audit log ─────────────────────────────────────────────────
     # Records every Playwright submission attempt for audit and circuit-breaker
     # tracking. Never deleted — provides a full tamper-evident application log.

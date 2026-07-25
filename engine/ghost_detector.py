@@ -81,10 +81,10 @@ def detect_ghost_job(description: str, location: str, company: str = "", title: 
     using the Bespoke-Minicheck model for disguised toxic culture patterns.
     Returns: (is_ghost_or_scam: bool, reason: str)
     """
-    desc_lower = description.lower()
-    loc_lower = location.lower()
-    company_lower = company.lower().strip()
-    title_lower = title.lower().strip()
+    desc_lower = (description or "").lower()
+    loc_lower = (location or "").lower()
+    company_lower = (company or "").lower().strip()
+    title_lower = (title or "").lower().strip()
     flags = []
 
     # ── Gate 0: User-managed company blacklist ───────────────────────────────

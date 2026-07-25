@@ -142,7 +142,7 @@ def scrape_freshershunt() -> list:
         
     try:
         # We pass 10 as the limit
-        result = subprocess.run(["node", js_script, "10"], capture_output=True, text=True, timeout=120)
+        result = subprocess.run(["node", js_script, "10"], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=120)
         
         # The JS script outputs JSON on the very last line
         output = result.stdout.strip()
@@ -195,6 +195,8 @@ def scrape_company_watchlist() -> list:
             ["node", js_script],
             capture_output=True,
             text=True,
+            encoding='utf-8',
+            errors='replace',
             timeout=300  # 5 min max — 20 companies × ~15s each
         )
 
@@ -271,9 +273,7 @@ def run_all_scrapers() -> list:
     jobs.extend(scrape_portal("hirist", "hirist_scraper.js"))
 
     print("Scraping Wellfound (Startup Ecosystem)...")
-    jobs.extend(scrape_portal("wellfound", "wellfound_scraper.js",
-                              keywords=["software engineer", "backend engineer",
-                                        "frontend engineer", "full stack engineer"]))
+    jobs.extend(scrape_portal("wellfound", "wellfound_scraper.js"))
 
     print(f"Total jobs discovered: {len(jobs)}")
     return jobs
@@ -281,17 +281,9 @@ def run_all_scrapers() -> list:
 def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
     """
     Runs naukri_scraper.js for each target keyword and returns new job listings.
-    Keywords default to common SDE/tech roles if not specified.
     """
     if keywords is None:
-        keywords = [
-            "software developer",
-            "backend developer",
-            "frontend developer",
-            "full stack developer",
-            "python developer",
-            "react developer",
-        ]
+        keywords = DEFAULT_KEYWORDS
 
     js_script = os.path.join(os.path.dirname(__file__), "..", "scraper_service", "naukri_scraper.js")
     if not os.path.exists(js_script):
@@ -334,13 +326,18 @@ def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
     return all_jobs
 
 
-DEFAULT_KEYWORDS = [
-    "software developer",
-    "backend developer",
-    "full stack developer",
-    "python developer",
-    "react developer",
-]
+def _get_dynamic_keywords():
+    try:
+        with open("knowledge_base/scope.json", "r") as f:
+            scope = json.load(f)
+        kws = [r["keyword"] for r in scope.get("roles", []) if r.get("preference") == "apply"]
+        if kws:
+            return kws
+    except:
+        pass
+    return ["software engineer"] # Fallback only if scope is completely broken or missing
+
+DEFAULT_KEYWORDS = _get_dynamic_keywords()
 
 
 def scrape_portal(source_name: str, js_file: str, keywords: list = None, limit_per_keyword: int = 20) -> list:
@@ -364,6 +361,8 @@ def scrape_portal(source_name: str, js_file: str, keywords: list = None, limit_p
                 ["node", js_script, keyword, str(limit_per_keyword)],
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
+                errors='replace',
                 timeout=120,
                 env={**__import__('os').environ}
             )

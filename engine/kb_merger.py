@@ -126,9 +126,9 @@ def _merge_personal(sources: list[dict], existing: dict) -> tuple[dict, list]:
 
 def _find_existing_role(work_history: list, company: str, start: str, end: str) -> dict | None:
     """Finds an existing role entry by company + overlapping date range."""
-    company_lower = company.lower().strip()
+    company_lower = (company or "").lower().strip()
     for entry in work_history:
-        if entry.get("company", "").lower().strip() == company_lower:
+        if (entry.get("company") or "").lower().strip() == company_lower:
             if _dates_overlap(entry.get("start_date", ""), entry.get("end_date", ""), start, end):
                 return entry
     return None
@@ -157,9 +157,9 @@ def _merge_work_history(sources: list[dict], existing: list) -> tuple[list, list
 
             if existing_entry:
                 # ── Dedup: merge bullets into existing ──────────────────────
-                existing_bullet_texts = {b["text"].strip().lower() for b in existing_entry.get("bullets", [])}
+                existing_bullet_texts = {(b.get("text") or "").strip().lower() for b in existing_entry.get("bullets", [])}
                 for bullet in entry.get("bullets", []):
-                    if bullet.get("text", "").strip().lower() not in existing_bullet_texts:
+                    if (bullet.get("text") or "").strip().lower() not in existing_bullet_texts:
                         existing_entry.setdefault("bullets", []).append(bullet)
 
                 # ── Conflict detection on date fields ───────────────────────
@@ -196,10 +196,10 @@ def _merge_simple_list(key: str, sources: list[dict], existing: list, id_field: 
     Merges a simple list (education, certifications) by deduplication on `id_field`.
     No conflict detection — last non-empty value wins.
     """
-    seen: dict[str, dict] = {e.get(id_field, "").lower(): e for e in existing}
+    seen: dict[str, dict] = {(e.get(id_field) or "").lower(): e for e in existing}
     for source in sources:
         for item in source.get(key, []):
-            item_key = item.get(id_field, "").lower()
+            item_key = (item.get(id_field) or "").lower()
             if item_key and item_key not in seen:
                 clean = dict(item)
                 clean.pop("_source", None)
@@ -213,9 +213,9 @@ def _merge_skills(sources: list[dict], existing: dict) -> dict:
     for source in sources:
         for category, items in source.get("skills", {}).items():
             current = merged.setdefault(category, [])
-            current_lower = {s.lower() for s in current}
+            current_lower = {(s or "").lower() for s in current}
             for item in items:
-                if item.strip().lower() not in current_lower:
+                if (item or "").strip().lower() not in current_lower:
                     current.append(item.strip())
     return merged
 

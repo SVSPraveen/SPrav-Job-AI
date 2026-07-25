@@ -9,7 +9,7 @@ def get_company_friction_rate(company: str) -> dict:
     """
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT status FROM jobs WHERE LOWER(company) = ?", (company.lower(),))
+    c.execute("SELECT status FROM jobs WHERE LOWER(company) = ?", ((company or "").lower(),))
     rows = c.fetchall()
     conn.close()
 

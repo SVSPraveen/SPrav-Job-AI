@@ -21,6 +21,8 @@ def run_indeed_scanner() -> list:
             ["node", script_path],
             capture_output=True,
             text=True,
+            encoding='utf-8',
+            errors='replace',
             timeout=300
         )
         print("[Indeed Scanner] Stealth Crawler finished successfully.")
