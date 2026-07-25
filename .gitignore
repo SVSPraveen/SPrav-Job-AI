@@ -38,6 +38,11 @@ frontend/dist/
 Thumbs.db
 
 # Logs & History
+*.log
+*.txt
+!requirements.txt
+!tests/*.txt
+!knowledge_base/*.txt
 crash.log
 error.log
 desktop_app.log
@@ -46,6 +51,7 @@ logs/
 *.db
 
 scraper_service/node_modules/
+scraper_service/snapshots/
 
 # Personal User Data
 knowledge_base/me.json
