@@ -25,7 +25,6 @@
   <img src="https://img.shields.io/badge/Python-3.13+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
   <img src="https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
-  <img src="https://img.shields.io/badge/Groq%20API-A020F0?style=for-the-badge&logo=ollama&logoColor=white" alt="Groq API">
 </p>
 
 <br/>
@@ -53,7 +52,7 @@ When you turn on the engine, this is the exact flow that happens on your machine
 1. **Discovery:** Python-based stealth scrapers silently wake up and scan top platforms (Indeed, YC, HN) without requiring any login credentials, bypassing Cloudflare and captchas to pull raw job postings directly into your pipeline.
 2. **Extraction:** The AI extracts the unstructured text of the job description and converts it into clean, structured JSON data.
 3. **Reasoning:** A deep-thinking logic model reads the job, cross-references your profile, and calculates a strict mathematical "Fit Score".
-4. **Tailoring:** If the score is high enough, the Groq API drafts a custom resume and a personalized cold email, perfectly highlighting why you are the best fit for that exact role.
+4. **Tailoring:** If the score is high enough, the local AI drafts a custom resume and a personalized cold email, perfectly highlighting why you are the best fit for that exact role.
 5. **Execution:** An automation bot navigates to ATS application pages (like Greenhouse or Lever) to auto-apply. For startup roles (YC/Hacker News), the system pushes a tailored email draft to your Dashboard's "Action Required" inbox for 1-click manual sending.
 
 ## 🔒 Security & Offline Auth
@@ -85,7 +84,7 @@ SPrav-Job-AI/
 ├── engine/              # Python Backend (Core AI Logic)
 │   ├── auth.py          # SQLite auth and credential encryption
 │   ├── daemon.py        # Pipeline orchestrating the scrapers and AI logic
-│   └── llm_provider.py  # Advanced routing between Groq API and Local Ollama
+│   └── llm_provider.py  # Advanced routing for Local Ollama (with optional Cloud API fallback)
 ├── frontend/            # React UI (Dashboard & Auth)
 │   ├── src/             # Vite application source code
 │   └── dist/            # Compiled static React assets (Served by FastAPI)
@@ -111,7 +110,7 @@ To protect your privacy, all API keys and thresholds are stored strictly in a `.
 JWT_SECRET=super_secret_jwt_key_12345
 
 # -----------------------------
-# AI API Keys
+# AI API Keys (Optional)
 # -----------------------------
 GROQ_API_KEY=your_groq_api_key
 
@@ -129,7 +128,7 @@ EMAIL_RECEIVER=your-personal-email@gmail.com
 # Minimum match score required to trigger an Auto-Apply (0.0 to 1.0)
 ATS_AUTO_APPLY_THRESHOLD=0.88
 
-# DeepSeek/Groq Fit Score required to consider a job a "Fit" (1.0 to 5.0)
+# DeepSeek Fit Score required to consider a job a "Fit" (1.0 to 5.0)
 FIT_AUTO_APPLY_THRESHOLD=4.0
 
 # Max applications per company per day
@@ -150,7 +149,7 @@ AUTO_APPLY_CIRCUIT_BREAKER_N=3
 ## 🚀 Installation
 
 > [!IMPORTANT]
-> If you plan to heavily rely on local Ollama fallbacks instead of the Groq API, a minimum of **8GB VRAM** and **16GB RAM** is required to prevent Out-of-Memory (OOM) failures.
+> Running models entirely locally via Ollama requires a minimum of **8GB VRAM** and **16GB RAM** to prevent Out-of-Memory (OOM) failures. (Cloud APIs like Groq can be configured as an alternative).
 
 ### 1. Environment Setup
 
@@ -185,7 +184,7 @@ cd ..
 
 # Initialize configuration
 copy .env.example .env
-# Open .env and add your Groq API key!
+# Open .env and customize as needed!
 ```
 
 ### 4. Launch
@@ -218,7 +217,7 @@ python desktop_app.py
 
 **SPrav operates on a strict single-source-of-truth paradigm.** Every generated bullet point and claim must trace back to a verifiable entry in your canonical Knowledge Base. The system is explicitly engineered to highlight your actual skill gaps rather than hallucinating false proficiencies. 
 
-Your data never leaves your hard drive unless you explicitly configure a cloud AI provider like Groq. 
+Your data never leaves your hard drive unless you explicitly configure an optional cloud AI provider. 
 
 <br/>
 <div align="center">
