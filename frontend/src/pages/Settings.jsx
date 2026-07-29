@@ -10,6 +10,7 @@ function Settings({ token }) {
     const [naukriPassword, setNaukriPassword] = useState('');
     const [groqKey, setGroqKey] = useState('');
     const [openrouterKey, setOpenrouterKey] = useState('');
+    const [githubToken, setGithubToken] = useState('');
     const [saving, setSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState('');
     const [activeSave, setActiveSave] = useState('');
@@ -67,6 +68,20 @@ function Settings({ token }) {
             }, { headers: { Authorization: `Bearer ${token}` } });
             setSaveStatus('OpenRouter API Key saved.');
             setOpenrouterKey('');
+            fetchCredentials();
+        } catch (e) { setSaveStatus('Failed to save.'); } finally { setSaving(false); }
+    };
+
+    const handleSaveGithub = async (e) => {
+        e.preventDefault();
+        setSaving(true); setSaveStatus(''); setActiveSave('github');
+        try {
+            await axios.post(`${API_BASE}/credentials`, {
+                service: 'github',
+                credentials: { token: githubToken }
+            }, { headers: { Authorization: `Bearer ${token}` } });
+            setSaveStatus('GitHub Token saved.');
+            setGithubToken('');
             fetchCredentials();
         } catch (e) { setSaveStatus('Failed to save.'); } finally { setSaving(false); }
     };
@@ -172,6 +187,36 @@ function Settings({ token }) {
                         {saving && activeSave === 'openrouter' ? 'Saving...' : 'Save OpenRouter Key'}
                     </button>
                     {activeSave === 'openrouter' && saveStatus && <span style={{ fontSize: '0.85rem', color: 'var(--success)' }}>{saveStatus}</span>}
+                </form>
+            </div>
+
+            <div className="premium-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
+                <h2 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    GitHub Personal Access Token
+                </h2>
+                <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                    <p style={{ margin: '0 0 0.5rem 0', color: 'var(--text-secondary)' }}>
+                        <strong>Why is this needed?</strong> Used for finding recruiter and hiring manager emails on GitHub for the Recruiter Outreach module.
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
+                        <span>Current Status:</span>
+                        <strong style={{ color: creds['github']?.['token']?.is_set ? 'var(--success)' : 'var(--error)' }}>
+                            {creds['github']?.['token']?.is_set ? '🟢 Configured' : '🔴 Not configured'}
+                        </strong>
+                    </div>
+                </div>
+                <form onSubmit={handleSaveGithub} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>GitHub Token</label>
+                        <input type="password" className="input" style={{ width: '100%' }} value={githubToken}
+                            onChange={e => setGithubToken(e.target.value)}
+                            placeholder={creds['github']?.['token']?.is_set ? 'ghp_••••••••••••••••••••••••' : 'Enter GitHub PAT'} required />
+                    </div>
+                    <button type="submit" className="btn" disabled={saving && activeSave === 'github'}>
+                        {saving && activeSave === 'github' ? 'Saving...' : 'Save GitHub Token'}
+                    </button>
+                    {activeSave === 'github' && saveStatus && <span style={{ fontSize: '0.85rem', color: 'var(--success)' }}>{saveStatus}</span>}
                 </form>
             </div>
 

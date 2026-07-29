@@ -32,22 +32,25 @@ def authenticate_gmail():
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    token_path = os.path.join(get_data_dir(), 'token.json')
+    creds_path = os.path.join(get_data_dir(), 'credentials.json')
+    
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
         
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            if not os.path.exists('credentials.json'):
-                print("Missing credentials.json. Please download it from Google Cloud Console.")
+            if not os.path.exists(creds_path):
+                print(f"Missing {creds_path}. Please download it from Google Cloud Console.")
                 return None
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                creds_path, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('token.json', 'w') as token:
+        with open(token_path, 'w') as token:
             token.write(creds.to_json())
             
     return creds
@@ -65,6 +68,23 @@ def get_message_body(payload):
     elif 'body' in payload and 'data' in payload['body']:
         data = payload['body']['data']
         body = base64.urlsafe_b64decode(data).decode('utf-8', errors='replace')
+    return body
+
+def get_html_body(payload):
+    body = ""
+    if 'parts' in payload:
+        for part in payload['parts']:
+            if part['mimeType'] == 'text/html':
+                data = part['body'].get('data', '')
+                if data:
+                    body += base64.urlsafe_b64decode(data).decode('utf-8', errors='replace')
+            elif 'parts' in part:
+                body += get_html_body(part)
+    elif 'body' in payload and 'data' in payload['body']:
+        # If it's a single part email and it's HTML, the payload might not have 'parts'
+        if payload.get('mimeType') == 'text/html':
+            data = payload['body']['data']
+            body = base64.urlsafe_b64decode(data).decode('utf-8', errors='replace')
     return body
 
 def classify_email_with_llm(subject, body):
@@ -149,32 +169,104 @@ def scan_inbox():
         service = build('gmail', 'v1', credentials=creds)
         print("Connected to Gmail API successfully.")
         
-        # Example query: search for rejections, interviews, or confirmations
-        query = 'subject:("application" OR "interview" OR "rejected" OR "update")'
-        results = service.users().messages().list(userId='me', q=query, maxResults=10).execute()
-        messages = results.get('messages', [])
+        # 1. Scan for Application Updates (Rejections, Interviews)
+        query_updates = 'subject:("application" OR "interview" OR "rejected" OR "update") -from:wellfound.com'
+        results_updates = service.users().messages().list(userId='me', q=query_updates, maxResults=10).execute()
+        messages_updates = results_updates.get('messages', [])
 
-        if not messages:
-            print('No recent job-related messages found.')
-            return
+        if messages_updates:
+            print('Scanning recent application update messages:')
+            for msg in messages_updates:
+                msg_data = service.users().messages().get(userId='me', id=msg['id'], format='full').execute()
+                payload = msg_data.get('payload', {})
+                headers = payload.get('headers', [])
+                subject = next((header['value'] for header in headers if header['name'] == 'Subject'), 'No Subject')
+                print(f"- {subject}")
+                
+                body = get_message_body(payload)
+                classification = classify_email_with_llm(subject, body)
+                
+                if classification:
+                    company = classification.get('company')
+                    status = classification.get('status')
+                    print(f"  -> Detected: {company} | Status: {status}")
+                    if status in ['REJECTED', 'INTERVIEW_REQUEST']:
+                        update_job_status_from_email(company, status)
 
-        print('Scanning recent messages:')
-        for msg in messages:
-            msg_data = service.users().messages().get(userId='me', id=msg['id'], format='full').execute()
-            payload = msg_data.get('payload', {})
-            headers = payload.get('headers', [])
-            subject = next((header['value'] for header in headers if header['name'] == 'Subject'), 'No Subject')
-            print(f"- {subject}")
+        # 2. Scan for Wellfound Job Alerts (Discovery via Email)
+        query_discovery = 'from:wellfound.com subject:("jobs" OR "alert" OR "matches")'
+        results_discovery = service.users().messages().list(userId='me', q=query_discovery, maxResults=5).execute()
+        messages_discovery = results_discovery.get('messages', [])
+
+        if messages_discovery:
+            print('Scanning Wellfound Job Alert emails for discovery:')
+            import uuid
+            import requests
+            from bs4 import BeautifulSoup
             
-            body = get_message_body(payload)
-            classification = classify_email_with_llm(subject, body)
-            
-            if classification:
-                company = classification.get('company')
-                status = classification.get('status')
-                print(f"  -> Detected: {company} | Status: {status}")
-                if status in ['REJECTED', 'INTERVIEW_REQUEST']:
-                    update_job_status_from_email(company, status)
+            for msg in messages_discovery:
+                msg_data = service.users().messages().get(userId='me', id=msg['id'], format='full').execute()
+                payload = msg_data.get('payload', {})
+                
+                # We need the HTML body to extract exact, unhallucinated URLs
+                html_body = get_html_body(payload)
+                if not html_body:
+                    html_body = get_message_body(payload) # Fallback to text if no HTML part exists
+                    
+                soup = BeautifulSoup(html_body, 'html.parser')
+                
+                # Extract all Wellfound job links directly from the DOM
+                links = soup.find_all('a', href=True)
+                job_links = []
+                for a in links:
+                    href = a['href']
+                    text = a.get_text(strip=True)
+                    if ('wellfound.com/jobs/' in href or 'angel.co/jobs/' in href) and text:
+                        if not any(j['url'] == href for j in job_links):
+                            job_links.append({"text": text, "url": href})
+                
+                if not job_links:
+                    continue
+                    
+                # Use LLM to structure title/company/location from surrounding text, strictly mapping to the provided exact URLs
+                prompt = f"""You are a data extractor. I have extracted the following exact job URLs and their link text from a Wellfound digest email.
+Please analyze the email content and provide the exact Company Name, Job Title, and Location for each URL. Do NOT change the URLs.
+
+Exact Job Links Found:
+{json.dumps(job_links, indent=2)}
+
+Output STRICT JSON as an array of objects: [{{"title": "...", "company": "...", "url": "...", "location": "...", "description": "..."}}]
+If you cannot determine the details for a URL, provide your best guess based on the link text."""
+
+                try:
+                    res = generate(prompt, use_case="extraction")
+                    res = res.replace("```json", "").replace("```", "").strip()
+                    extracted_jobs = json.loads(res)
+                    
+                    if extracted_jobs:
+                        formatted = []
+                        for j in extracted_jobs:
+                            # Verify the URL was one of our exact extracted URLs to prevent hallucinations
+                            exact_url = j.get("url", "")
+                            if not any(exact_url == l["url"] for l in job_links):
+                                continue # Skip hallucinated URLs
+                                
+                            formatted.append({
+                                "id": f"wellfound_email_{uuid.uuid4().hex[:8]}",
+                                "title": j.get("title", "Unknown"),
+                                "company": j.get("company", "Unknown"),
+                                "url": exact_url,
+                                "description": j.get("description", "Source: Wellfound Email Alert"),
+                                "location": j.get("location", "Remote"),
+                                "source": "wellfound_email"
+                            })
+                        
+                        if formatted:
+                            print(f"  -> Extracted {len(formatted)} verified jobs from Wellfound email. Sending to pipeline...")
+                            resp = requests.post('http://127.0.0.1:8000/api/jobs/bulk', json=formatted)
+                            print(f"  -> Ingestion response: {resp.text}")
+                except Exception as e:
+                    print(f"  -> Failed to parse Wellfound email: {e}")
 
     except Exception as error:
         print(f'An error occurred: {error}')

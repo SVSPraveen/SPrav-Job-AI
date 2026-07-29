@@ -106,6 +106,7 @@ p.subtitle {
   padding: 2rem 1.25rem;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .sidebar h1 {
@@ -151,7 +152,7 @@ p.subtitle {
 
 .main-content {
   flex: 1;
-  padding: 3rem 4rem;
+  padding: 3rem 6.5rem 7rem 4rem; /* right: 6.5rem=104px clears FAB at 32+56=88px from right; bottom: 7rem clears Copilot */
   overflow-y: auto;
   background-color: var(--bg-base);
 }

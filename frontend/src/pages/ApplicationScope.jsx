@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { Target, Plus, Trash2, Save, MapPin, Briefcase, Clock, Award, Wifi, Sparkles } from 'lucide-react'
+import LocationTypeahead from '../LocationTypeahead'
 import './ApplicationScope.css'
 
-const API_BASE = 'http://localhost:8000/api'
+const API_BASE = '/api'
 
 const PREF_OPTIONS = ['apply', 'exclude', 'no_preference']
 const PREF_LABEL   = { apply: 'Apply', exclude: 'Exclude', no_preference: 'No Preference' }
@@ -52,9 +53,41 @@ export default function ApplicationScope() {
   const roleInputRef = useRef(null)
 
   useEffect(() => {
-    axios.get(`${API_BASE}/scope`)
-      .then(r => { setScope({ ...DEFAULT_SCOPE, ...r.data }); setLoading(false) })
-      .catch(() => { setLoading(false); setError('Could not load scope config from backend.') })
+    const init = async () => {
+      try {
+        const r = await axios.get(`${API_BASE}/scope`)
+        const initialScope = { ...DEFAULT_SCOPE, ...r.data }
+        setScope(initialScope)
+        setLoading(false)
+
+        if (!initialScope.roles || initialScope.roles.length === 0) {
+          setDetecting(true)
+          try {
+            const res = await axios.post(`${API_BASE}/scope/suggest`, {
+              current_roles: [],
+              current_locations: initialScope.locations ? initialScope.locations.map(l => l.label) : []
+            })
+            if (res.data.status === "success" && res.data.data) {
+              const suggested = res.data.data.roles || []
+              if (suggested.length > 0) {
+                setSuggestedRoles(suggested)
+              }
+              if (res.data.data.locations) {
+                setSuggestedLocs(res.data.data.locations)
+              }
+            }
+          } catch (e) {
+            console.error('Auto-detect on load failed:', e)
+          } finally {
+            setDetecting(false)
+          }
+        }
+      } catch (err) {
+        setLoading(false)
+        setError('Could not load scope config from backend.')
+      }
+    }
+    init()
   }, [])
 
   const save = async () => {
@@ -214,25 +247,10 @@ export default function ApplicationScope() {
             <em>Exclude</em> (hard block—do not apply here).
           </p>
 
-          <div className="tag-input-row">
-            <input ref={locInputRef} type="text" list="popular-locations" placeholder="City, Country, or 'Remote'..." onKeyDown={e => e.key === 'Enter' && addLocation()} />
-            <datalist id="popular-locations">
-              <option value="Pune, Maharashtra, India" />
-              <option value="Bangalore, Karnataka, India" />
-              <option value="Hyderabad, Telangana, India" />
-              <option value="Mumbai, Maharashtra, India" />
-              <option value="Delhi NCR, India" />
-              <option value="Chennai, Tamil Nadu, India" />
-              <option value="Remote India" />
-              <option value="San Francisco, CA, USA" />
-              <option value="New York, NY, USA" />
-              <option value="Seattle, WA, USA" />
-              <option value="Austin, TX, USA" />
-              <option value="London, UK" />
-              <option value="Toronto, ON, Canada" />
-              <option value="Remote Global" />
-            </datalist>
-            <button className="btn-icon" onClick={addLocation}><Plus size={14} /> Add</button>
+          <div className="tag-input-row" style={{ alignItems: 'flex-start' }}>
+            <LocationTypeahead onAdd={(val) => {
+              if (val) setScope(s => ({ ...s, locations: [...s.locations, { label: val, preference: 'apply' }] }));
+            }} />
           </div>
             
           <div style={{ marginBottom: '1rem' }}>
@@ -242,13 +260,23 @@ export default function ApplicationScope() {
           </div>
 
           {suggestedLocs.length > 0 && (
-            <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-              <Sparkles size={14} color="var(--accent)" /> <span style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>AI Suggestions:</span>
-              {suggestedLocs.map(l => (
-                <button key={l} onClick={() => addSuggestedLoc(l)} style={{ background: 'var(--bg-surface)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '0.3rem 0.6rem', borderRadius: '12px', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  {l} <Plus size={12} />
-                </button>
-              ))}
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                <Sparkles size={14} color="var(--accent)" />
+                <span style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>AI Suggestions ({suggestedLocs.length}) — click <Plus size={11} style={{display:'inline',verticalAlign:'middle'}} /> to add, <span style={{fontSize:'0.8rem'}}>✕</span> to dismiss:</span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {suggestedLocs.map(l => (
+                  <span key={l} style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--bg-surface)', border: '1px solid var(--accent)', borderRadius: '12px', fontSize: '0.8rem', overflow: 'hidden' }}>
+                    <button onClick={() => addSuggestedLoc(l)} title="Add to scope" style={{ background: 'transparent', border: 'none', color: 'var(--accent)', padding: '0.3rem 0.5rem 0.3rem 0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      {l} <Plus size={11} />
+                    </button>
+                    <button onClick={() => setSuggestedLocs(prev => prev.filter(x => x !== l))} title="Dismiss" style={{ background: 'transparent', border: 'none', borderLeft: '1px solid rgba(99,102,241,0.3)', color: 'var(--text-muted)', padding: '0.3rem 0.5rem', cursor: 'pointer', fontSize: '0.8rem', lineHeight: 1 }}>
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 
@@ -296,13 +324,23 @@ export default function ApplicationScope() {
           </div>
 
           {suggestedRoles.length > 0 && (
-            <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-              <Sparkles size={14} color="var(--accent)" /> <span style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>AI Suggestions:</span>
-              {suggestedRoles.map(r => (
-                <button key={r} onClick={() => addSuggestedRole(r)} style={{ background: 'var(--bg-surface)', border: '1px solid var(--accent)', color: 'var(--accent)', padding: '0.3rem 0.6rem', borderRadius: '12px', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  {r} <Plus size={12} />
-                </button>
-              ))}
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                <Sparkles size={14} color="var(--accent)" />
+                <span style={{fontSize: '0.85rem', color: 'var(--text-secondary)'}}>AI Suggestions ({suggestedRoles.length}) — click <Plus size={11} style={{display:'inline',verticalAlign:'middle'}} /> to add, <span style={{fontSize:'0.8rem'}}>✕</span> to dismiss:</span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {suggestedRoles.map(r => (
+                  <span key={r} style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--bg-surface)', border: '1px solid var(--accent)', borderRadius: '12px', fontSize: '0.8rem', overflow: 'hidden' }}>
+                    <button onClick={() => addSuggestedRole(r)} title="Add to scope" style={{ background: 'transparent', border: 'none', color: 'var(--accent)', padding: '0.3rem 0.5rem 0.3rem 0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      {r} <Plus size={11} />
+                    </button>
+                    <button onClick={() => setSuggestedRoles(prev => prev.filter(x => x !== r))} title="Dismiss" style={{ background: 'transparent', border: 'none', borderLeft: '1px solid rgba(99,102,241,0.3)', color: 'var(--text-muted)', padding: '0.3rem 0.5rem', cursor: 'pointer', fontSize: '0.8rem', lineHeight: 1 }}>
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
           )}
 

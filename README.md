@@ -6,123 +6,153 @@
   SPrav Job AI
 </h1>
 
-<h4 align="center">SPrav finds matching jobs, tailors your resume, fact-checks every claim, and submits the application — running locally, end to end.</h4>
+<h4 align="center">
+  A local-first, human-in-the-loop job-search assistant that discovers relevant roles, evaluates candidate fit, tailors application materials, and verifies generated claims.
+</h4>
 
 <p align="center">
   <a href="#-what-it-does">What</a> •
   <a href="#-how-it-works">How</a> •
+  <a href="#-for-teams">For Teams</a> •
   <a href="#-security--offline-auth">Security</a> •
   <a href="#-architecture">Architecture</a> •
   <a href="#-repository-structure">Structure</a> •
   <a href="#-configuration-env">Config</a> •
-  <a href="#-installation">Install</a>
+  <a href="#-installation">Install</a> •
+  <a href="#-current-limitations">Limitations</a>
 </p>
 
 <p align="center">
   <a href="https://github.com/SVSPraveen/SPrav-Job-AI/stargazers"><img src="https://img.shields.io/github/stars/SVSPraveen/SPrav-Job-AI?style=for-the-badge&color=FF6B6B" alt="Stars"></a>
   <a href="https://github.com/SVSPraveen/SPrav-Job-AI/network/members"><img src="https://img.shields.io/github/forks/SVSPraveen/SPrav-Job-AI?style=for-the-badge&color=4ECDC4" alt="Forks"></a>
   <a href="https://github.com/SVSPraveen/SPrav-Job-AI/issues"><img src="https://img.shields.io/github/issues/SVSPraveen/SPrav-Job-AI?style=for-the-badge&color=FFD93D" alt="Issues"></a>
-  <img src="https://img.shields.io/badge/Python-3.13+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
   <img src="https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
 </p>
 
 <br/>
 
-> *Companies use AI to filter candidates. SPrav gives candidates AI to filter and apply to companies.*
+> *Companies use AI to screen candidates. SPrav helps candidates discover relevant roles and prepare accurate, tailored applications.*
+
+---
+
+## 📖 Why I Built This
+
+I built SPrav Job AI because I found the repetitive parts of job hunting—finding relevant roles, tailoring resumes, and tracking applications—time-consuming. The goal was to automate repetitive work while keeping humans responsible for every application submitted.
 
 ---
 
 ## 🎯 What it does
 
-Job hunting is a full-time job. **SPrav completely automates the most exhausting parts of the process.** 
+Job hunting is a full-time job. **SPrav automates the most repetitive, exhausting parts of it — while keeping a human in the loop wherever automation is genuinely risky.**
 
-Instead of mindlessly scrolling through job boards, SPrav acts as your personal, highly-coordinated AI workforce:
-- 🌐 **Monitors the internet** for new job postings (Indeed, Hacker News, Y Combinator, Wellfound) using native, credential-free HTTP scrapers.
-- 🎯 **Explicitly targets** your preferred markets (e.g., India, Remote) and mathematically calculates if you are a good fit based on your background.
-- ✍️ **Custom-rewrites** your resume for that specific job to effortlessly bypass ATS keyword filters, while intelligently scanning your GitHub/Portfolio repositories to highlight **only the top 2 best-matching projects**.
-- 📨 **Drops a completely finished application** package and cold-email draft directly into your Human Review queue.
-
-*(Note: LinkedIn automation has been explicitly removed from this project to ensure your personal accounts remain safe from bot detection and ID verification).*
+- 🌐 **Monitors job postings** across multiple sources — Hacker News "Who's Hiring," Y Combinator jobs, Naukri (discovery only), Internshala, Hirist, and several India-specific off-campus drive boards. SPrav uses a mix of terms-aware, credential-free HTTP connectors and browser-based connectors for supported public pages. For platforms like Indeed, it relies on safer approaches such as public employer career pages, official APIs/feeds, ATS job-board endpoints, user-provided job URLs, email job alerts, or manual browser imports.
+- 📬 **Wellfound is handled differently on purpose**: instead of directly scraping the platform, SPrav reads job-alert emails from the user's Gmail account through user-authorized access. This keeps the integration under the user's control and avoids direct platform scraping.
+- 🚫 **LinkedIn is never automated, at all** — no login, no scraping, no auto-sending. Every LinkedIn-related feature generates a manual search URL and a drafted note for you to copy, paste, and send yourself. This is a deliberate, non-negotiable design choice to protect your real account from ban risk.
+- 🎯 **Application Scope Enforcer** — you define target locations and roles (with AI-suggested broad candidates you can accept or dismiss), and every job is checked against your rules *before* any LLM call is made, so nothing outside your actual criteria burns compute or gets considered.
+- 🏢 **Watchlist Management** — track specific companies' career pages with typeahead search, so the daemon prioritizes roles from places you actually want to work.
+- ✍️ **Resume tailoring** that rewrites bullets per job to improve ATS keyword coverage, while a **deterministic (non-LLM) matching step** picks the best 2 projects for each job from your GitHub/portfolio work — project selection was deliberately moved off the LLM after testing showed even capable models could confidently pick the wrong project and invent supporting details for it.
+- 📄 **Local PDF generation** via ReportLab, without requiring Microsoft Word, LaTeX, or an external document-generation service. The renderer can dynamically adjust font sizes and trim selected bullet content to produce a single-page resume.
+- 🛡️ **The system verifies generated claims against the user’s knowledge base:** The application checks generated content against the user's knowledge base and rejects inconsistencies when detected. This reduces hallucinations but does not eliminate them, falling back to your real, original wording when needed.
+- 🤝 **Referral & recruiter outreach** — finds real people at target companies (via GitHub, company team pages, and blog bylines — never LinkedIn scraping) and drafts a personalized note for you to send manually, plus a curated (not scraped) list of recruiters/agencies ranked against your actual skill profile.
+- 🎓 **Prep Center** — turns detected skill gaps into an actionable list with free resources, and generates STAR-format behavioral interview stories tailored to each role you're applying to.
+- 📅 **Gateway Test Tracker** — a reminder/calendar feature for recurring fresher-hiring gateway tests (TCS NQT, Infosys InfyTQ, Wipro Elite NLTH, Capgemini), since a single qualifying test can open doors to hundreds of affiliated companies at once.
 
 ## ⚙️ How it works
 
-When you turn on the engine, this is the exact flow that happens on your machine:
+When the engine is running, this is the real pipeline every job goes through:
 
-1. **Discovery:** Python-based stealth scrapers silently wake up and scan top platforms (Indeed, YC, HN) without requiring any login credentials, bypassing Cloudflare and captchas to pull raw job postings directly into your pipeline.
-2. **Extraction:** The AI extracts the unstructured text of the job description and converts it into clean, structured JSON data.
-3. **Reasoning:** A deep-thinking logic model reads the job, cross-references your profile, and calculates a strict mathematical "Fit Score".
-4. **Tailoring:** If the score is high enough, the local AI drafts a custom resume and a personalized cold email. The orchestrator dynamically optimizes context windows (e.g., automatically truncating huge GitHub READMEs) to ensure flawless local execution without exceeding token limits.
-5. **Execution:** An automation bot navigates to ATS application pages (like Greenhouse or Lever) to auto-apply. For startup roles (YC/Hacker News), the system pushes a tailored email draft to your Dashboard's "Action Required" inbox for 1-click manual sending.
+1. **Discovery** — terms-aware connectors (Python HTTP-based, plus a small number of Node.js browser-based connectors for supported public pages) find new postings.
+2. **Liveness / legitimacy / repost checks** — dead links, likely scam postings, and duplicate reposts are filtered out before anything else runs.
+3. **Scope gate** — the job is checked against your location/role rules *before any LLM call*, so out-of-scope postings never cost compute.
+4. **Extraction** — an LLM converts the unstructured job description into structured data (title, requirements, years of experience).
+5. **Fit evaluation** — a reasoning model scores the job against your actual profile, with explicit leniency for postings labeled Entry-Level/Graduate/Junior/Intern that tend to overstate experience requirements.
+6. **Tailoring** — if the job passes, the system deterministically selects your best-matching 2 projects, rewrites your resume bullets and cover letter for this specific job, and verifies generated claims against the user’s knowledge base before accepting it.
+7. **Human-Approved Dispatch** — SPrav prepares the complete application package (resume, cover letter, and extracted form data) and routes it to your **Application Review queue**. The system performs the repetitive analysis and tailoring, but you remain explicitly responsible for every submitted application. For supported ATS endpoints, the dashboard provides a controlled, guided submission workflow; for everything else, you use the provided direct link to submit the tailored documents yourself.
+
+## 👥 For Teams
+
+SPrav is built as a personal tool, but it's designed so a small group of people (different tracks — AI/ML, backend, cloud, cybersecurity, whatever) can each run it independently:
+
+- Each person runs their **own separate installation** with their **own credentials** (Groq API key, GitHub token, Gmail OAuth) entered through the in-app Settings screen — nothing is shared, pooled, or pre-filled between installs.
+- All personal data (resumes, job history, credentials, logs) lives entirely in that person's own `%LOCALAPPDATA%\SPravJobAI` folder — never synced, never uploaded, never shared across installs.
+- If you're cloning this to share with friends/teammates, make sure your own `.env`, real `config.json`, and populated `me.json` are never committed — only the `.example` templates should ever go into the repo.
 
 ## 🔒 Security & Offline Auth
 
-Because SPrav operates independently of any central cloud, traditional password recovery mechanisms (like an external auth server sending you an email) pose a security risk. We built a zero-trust local authentication system:
+Because SPrav runs independently of any central cloud service, it uses a local-first authentication and credential model:
 
-* **Encrypted Credential Vault:** Your platform credentials are XOR-encrypted in a local SQLite database (`users.db`) using your private `.env` key. They are never stored in plain text.
-* **Master Recovery Key:** Upon sign-up, the system generates a unique `SPRAV-XXXX-XXXX` Master Recovery Key. If you forget your local password, this physical key is your ultimate fallback to regain access to your encrypted vault.
-* **Bring-Your-Own-SMTP (Optional):** If you prefer a modern Web 2.0 experience, you can hook up your own Gmail App Password to the `.env` file. The backend will natively generate and securely email you a 6-digit OTP for password recovery.
-* **SPrav Copilot:** A built-in AI assistant integrated directly into the UI to guide you through your job search, configure settings, and answer questions.
-* **Themed UI:** A sleek, fully responsive React frontend with built-in Light/Dark mode toggles to manage your agents in comfort, served entirely via FastAPI without needing Node.js in production.
+- **AES-GCM Encrypted Credential Vault** — platform credentials are cryptographically secured in a local SQLite database using industry-standard AES-GCM and bcrypt for password hashing.
+- **Local-first recovery** — account recovery does not depend on any third-party auth server.
+- **Bring-your-own API keys** — Groq and GitHub tokens are entered per-install through the Settings screen (or `.env`, if you prefer), never hardcoded or shared.
+- **SPrav Copilot & Guide Tour** — an in-app assistant and walkthrough panel to help you configure the app and understand what each screen does, without needing to read source code.
 
 ---
 
 ## 🧠 Architecture
 
-SPrav utilizes a custom pipeline called the **SPrav MOE Model** (Mixture of Experts in spirit). Rather than relying on a monolithic Large Language Model, it intelligently routes tasks across highly specialized models for data extraction, fit scoring, tailoring, and verification. 
+SPrav routes different tasks to different models rather than relying on one monolithic LLM:
 
-**Fault Tolerant Engine:** The core `daemon.py` orchestrator is heavily hardened. It features automatic database migrations, aggressive zero-token ATS extraction, Null-safe fallback logic for ghost jobs, and forced UTF-8 encoding checks on all native sub-processes to guarantee the daemon never crashes during an overnight discovery run.
+- **Reasoning-heavy tasks** (fit scoring, archetype classification): a dedicated reasoning model.
+- **Structured generation** (JSON extraction, resume/bullet rewriting, STAR stories): a model optimized for reliable structured output.
+- **Verification** (fact-checking, ghost-job/scam detection): a separate model acting as an independent checker, so the model generating content isn't the same one grading its own work.
+- **Cloud-first for heavier workloads, with a local fallback**: resume tailoring uses Groq by default for speed and can fall back to a local Ollama model when the cloud call is unavailable. This allows core extraction, evaluation, and document-generation workflows to continue locally, although online job discovery and external integrations still require internet access.
 
-For Resume Tailoring, the system primarily routes to a high-tier cloud model (like `gpt-oss-120b` via Groq). If the cloud API hits a rate limit or exhausts, the system seamlessly triggers a **Dual Local Fallback**—falling back to `qwen2.5-coder:7b-instruct` for strict JSON outputs, and then `hermes3:8b` as an ultimate failsafe. The entire orchestrator is strictly memory-managed to run on an **8GB VRAM** ceiling without crashing.
+**On reliability, honestly:** the daemon has real safeguards — SQLite concurrency handling with retry logic, a circuit breaker that pauses guided submission after repeated consecutive failures, defensive fallbacks so a single bad job can't take down the whole discovery cycle, and detailed logs (`api.log`, `daemon.log`, `crash.log`) written to your data directory for every run. It is *not* claimed to be crash-proof — like any long-running local automation, occasional issues surface, and checking those logs is the first step if something looks stuck.
 
-For the full details on the orchestrator design, pipeline diagram, and the models used, see [ARCHITECTURE.md](ARCHITECTURE.md).
+For the full orchestrator design and pipeline diagram, see `ARCHITECTURE.md`.
 
 ---
 
 ## 📁 Repository Structure
 
-SPrav is a monolithic repository containing a Python FastAPI backend and a React frontend compiled down and served natively. Node.js is completely eliminated from the production runtime for lower memory usage.
-
 ```text
 SPrav-Job-AI/
-├── engine/              # Python Backend (Core AI Logic)
-│   ├── auth.py          # SQLite auth and credential encryption
-│   ├── daemon.py        # Pipeline orchestrating the scrapers and AI logic
-│   └── llm_provider.py  # Advanced routing for Local Ollama (with optional Cloud API fallback)
-├── frontend/            # React UI (Dashboard & Auth)
-│   ├── src/             # Vite application source code
-│   └── dist/            # Compiled static React assets (Served by FastAPI)
-├── knowledge_base/      # Example configs & templates
-├── discovery/           # Python HTTP Scrapers (HN, YC, Indeed, Wellfound)
-├── api.py               # FastAPI server bridging Frontend, Engine, and Scraper
-├── desktop_app.py       # PyWebview wrapper & PyInstaller main entrypoint
-├── SPravJobAI.spec      # PyInstaller build configuration
-└── installer.iss        # Inno Setup compilation script
-
+├── engine/              # Python backend — core AI logic and daemon orchestration
+│   ├── auth.py          # Local auth and credential encryption
+│   ├── daemon.py         # Pipeline orchestrating scrapers, scoring, tailoring, and dispatch
+│   ├── scope_enforcer.py # Application Scope gate (runs before any LLM call)
+│   ├── tailor.py         # Deterministic project selection + resume/cover-letter tailoring
+│   ├── fact_checker.py   # Metric/technology hallucination detection
+│   └── llm_provider.py   # Routing between cloud (Groq) and local (Ollama) models
+├── frontend/            # React UI
+│   ├── src/              # Vite application source
+│   └── dist/              # Compiled static assets (served by FastAPI)
+├── discovery/            # Python terms-aware HTTP connectors (HN, YC, ATS-direct discovery)
+├── scraper_service/       # Node.js browser-based connectors for supported public pages
+├── apply/                 # Guided submission integrations for supported ATS platforms
+├── knowledge_base/        # Example configs and templates (never commit your real me.json/scope.json)
+├── api.py                # FastAPI server bridging frontend, engine, and scrapers
+├── desktop_app.py         # PyWebView wrapper and PyInstaller entrypoint
+├── SPravJobAI.spec        # PyInstaller build configuration
+└── installer.iss          # Inno Setup installer script
 ```
 
 ---
 
 ## ⚙️ Configuration (`.env`)
 
-To protect your privacy, all API keys and thresholds are stored strictly in a `.env` file within your secure `%LOCALAPPDATA%\SPravJobAI` data directory.
+Application thresholds and non-sensitive runtime settings can be stored in a `.env` file inside `%LOCALAPPDATA%\SPravJobAI`. Secrets entered through the application Settings screen are stored in the encrypted credential vault. The `.env` method remains available as a developer fallback, but values placed there are stored as plaintext and must never be committed to Git.
 
 ```env
 # -----------------------------
 # Security
 # -----------------------------
-# Used to encrypt/decrypt your credentials in the local users.db
-JWT_SECRET=super_secret_jwt_key_12345
+JWT_SECRET=replace_with_a_long_randomly_generated_secret
 
 # -----------------------------
-# AI API Keys (Optional)
+# AI API Keys (optional — falls back to local Ollama if unset)
 # -----------------------------
 GROQ_API_KEY=your_groq_api_key
 
+# GitHub token, used to raise the rate limit on referral/contact discovery lookups
+# (works fine unauthenticated too, just at GitHub's lower 60-requests/hour limit)
+GITHUB_TOKEN=your_github_personal_access_token
+
 # -----------------------------
-# SMTP Email Setup (Optional)
+# SMTP Email Setup (optional)
 # -----------------------------
-# Required if you want OTP Password Resets or daily job summary emails
 EMAIL_SENDER=your-bot-email@gmail.com
 EMAIL_PASSWORD=your_16_char_google_app_password
 EMAIL_RECEIVER=your-personal-email@gmail.com
@@ -130,26 +160,33 @@ EMAIL_RECEIVER=your-personal-email@gmail.com
 # -----------------------------
 # AI Pipeline Tuning
 # -----------------------------
-# Minimum match score required to trigger an Auto-Apply (0.0 to 1.0)
+# Minimum ATS keyword coverage required to mark an application
+# as ready for guided review
 ATS_AUTO_APPLY_THRESHOLD=0.88
 
-# DeepSeek Fit Score required to consider a job a "Fit" (1.0 to 5.0)
+# Minimum fit score required to mark an application
+# as ready for guided review
 FIT_AUTO_APPLY_THRESHOLD=4.0
 
 # Max applications per company per day
-COMPANY_DAILY_CAP=5
+COMPANY_DAILY_CAP=1
 
 # Max applications per job portal per day
-PORTAL_DAILY_CAP=25
+PORTAL_DAILY_CAP=10
 
-# Max applications across the entire internet per day
-TOTAL_DAILY_CAP=150
+# Legacy internal variable name:
+# maximum human-approved guided submissions per day
+AUTO_APPLY_DAILY_CAP=10
 
-# Pause bot if it gets blocked/fails X times in a row
+# Human-assisted applications per day (everything routed to your Review queue)
+HUMAN_ASSIST_DAILY_CAP=20
+
+# Legacy internal variable name:
+# pause guided submission after repeated portal failures
 AUTO_APPLY_CIRCUIT_BREAKER_N=3
 
 # -----------------------------
-# Ollama 8GB VRAM Optimization
+# Local Ollama Optimization
 # -----------------------------
 OLLAMA_MAX_LOADED_MODELS=1
 OLLAMA_NUM_PARALLEL=1
@@ -161,43 +198,60 @@ OLLAMA_FLASH_ATTENTION=1
 
 ## 🚀 Installation
 
-> [!IMPORTANT]
-> Running models entirely locally via Ollama requires a minimum of **8GB VRAM** and **16GB RAM** to prevent Out-of-Memory (OOM) failures. (Cloud APIs like Groq can be configured as an alternative).
+> **Hardware Note:** The local-model configuration was designed and tested around a machine with **8 GB VRAM and 16 GB RAM**. This is the recommended configuration for running the LLM workloads locally. Smaller models or CPU execution may work on lower-specification hardware but will be slower and have not been tested as extensively. The daemon orchestrates small, quantized models strictly one at a time (`OLLAMA_MAX_LOADED_MODELS=1`) so you don't need a massive rig. If your machine doesn't meet these recommendations, you can configure a cloud provider (Groq, free tier) instead.
 
-### 1. Download & Install
-Download the latest `SPravJobAI-Setup.exe` from the Releases page and run the installer. 
-- **Program Binaries** are installed safely to `%LOCALAPPDATA%\Programs\SPrav AI` (no admin rights required).
-- **User Data** (your databases, configuration, and private knowledge base) is stored separately in `%LOCALAPPDATA%\SPravJobAI` so your job history persists seamlessly across updates.
+### Prerequisites (source/dev builds only)
+- Python 3.10+
+- Playwright (`playwright install`)
+- Node.js (v18+) — used by a small number of browser-based connectors for supported public pages; bundled automatically in the packaged Windows installer, so end users don't need to install it separately.
 
-### 2. Model Initialization
-If you plan to use local fallbacks, ensure [Ollama](https://ollama.com/) is installed. 
-*You do not need to manually pull models.* SPrav will automatically wake up Ollama in the background and pull `qwen2.5-coder:7b-instruct`, `hermes3:8b`, `deepseek-r1:7b`, `bespoke-minicheck`, and `nomic-embed-text` for you on first launch!
+### Install
+Download the latest installer from the Releases page and run it.
+- **Program binaries** install to `%LOCALAPPDATA%\Programs\SPrav AI` (no admin rights required).
+- **Your data** (databases, config, resumes, knowledge base) lives separately in `%LOCALAPPDATA%\SPravJobAI`, so it survives app updates and reinstalls.
 
-### 3. Launch
-Just double-click the **SPrav AI** shortcut on your Desktop or in your Start Menu. On your very first launch, the system will automatically seed your `%LOCALAPPDATA%\SPravJobAI` folder with example configurations for you to fill out.
+### First Launch
+On first launch, SPrav seeds your data directory with example configuration files for you to fill in through the Knowledge Base and Application Scope screens. If you're using local models, Ollama will pull the required models automatically in the background the first time it runs.
 
-*Note: For developers looking to build the PyInstaller executable from source or run via Python, refer to the developer sections in `ARCHITECTURE.md`.*
+*For building from source or developer setup, see `ARCHITECTURE.md`.*
 
 ---
-
 
 ## 👤 Author
 **SVSPraveen** ([GitHub](https://github.com/SVSPraveen))
-*Note: I designed and built the orchestration architecture (the SPrav MOE Model) to coordinate these tasks. I did not train or fine-tune any of the underlying LLMs.*
+*I designed and built the orchestration architecture coordinating these tasks. I did not train or fine-tune any of the underlying LLMs.*
 
 ## ⚖️ Responsible Use
-- **Terms of Service:** Users are solely responsible for ensuring their automated submissions comply with the Terms of Service of each respective job portal.
-- **Human Review:** The Verifier Feedback Loop is designed to reduce hallucinated claims, but it does not catch everything. You should periodically review the Human Review queue.
-- **Rate Limits:** The daily caps (`COMPANY_DAILY_CAP`, `PORTAL_DAILY_CAP`, `TOTAL_DAILY_CAP`) exist for a reason—do not remove them. They are designed to avoid overwhelming employers and ATS platforms with spam.
+- **Platform terms** — users are responsible for ensuring that discovery and guided-submission workflows comply with the applicable platform and ATS terms.
+- **Human Review matters** — the fact-checking system substantially reduces hallucinated claims, but it doesn't catch everything. Periodically review your Application Review queue and generated resumes carefully before approving.
+- **Rate limits exist for a reason** — the daily caps are there to avoid spamming employers and ATS platforms. Don't remove them.
+
+## 🛡️ Current Limitations
+Being upfront about where this stands today, rather than overselling it:
+- This is a personal automation tool, actively developed and tested by its author — not a polished commercial product.
+- Resume/cover-letter fact-checking catches invented numbers and invented technologies, but you should still spot-check generated output yourself before it goes out, especially early on.
+- Several discovery connectors depend on public page structures, feeds, or ATS endpoints that may change over time. A connector may temporarily stop returning results until its integration is updated.
+- Contribution and testing on non-Windows platforms is limited; the packaged installer currently targets Windows.
 
 ---
-## 🛡️ Privacy & Data Guarantee
 
-**SPrav operates on a strict single-source-of-truth paradigm.** Every generated bullet point and claim must trace back to a verifiable entry in your canonical Knowledge Base. The system is explicitly engineered to highlight your actual skill gaps rather than hallucinating false proficiencies. 
+## 🤝 Contributing
 
-Your data never leaves your hard drive unless you explicitly configure an optional cloud AI provider. 
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+**Adding a new connector?** Look at the existing templates in `scraper_service/` and `discovery/`. New connectors should be credential-free where possible to be merged into `main`.
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for details.
 
 <br/>
 <div align="center">
-  <p>Engineered for privacy, precision, and performance.</p>
+  <p>Built for one person's real job search — shared in case it helps yours too.</p>
 </div>

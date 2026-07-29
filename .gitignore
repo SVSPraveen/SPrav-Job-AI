@@ -1,19 +1,7 @@
-# Python Cache
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-
-# Virtual Environments
-.venv/
-venv/
+# ===== Legacy Project Specific =====
 env/
 
-# Environment Variables & Secrets
-.env
-
 # Database & Memory
-jobs.db
 jobs.db-journal
 sprav_memory/chroma.sqlite3
 sprav_memory/*
@@ -29,16 +17,12 @@ temp_repos/*
 scratch/*
 !scratch/README.md
 
-# Node/Frontend
+# Node/Frontend (Legacy)
 frontend/node_modules/
-frontend/dist/
+scraper_service/node_modules/
+scraper_service/snapshots/
 
-# OS Files
-.DS_Store
-Thumbs.db
-
-# Logs & History
-*.log
+# Logs & History (Legacy)
 *.txt
 !requirements.txt
 !tests/*.txt
@@ -48,21 +32,70 @@ error.log
 desktop_app.log
 knowledge_base/history/
 logs/
-*.db
-
-scraper_service/node_modules/
-scraper_service/snapshots/
-
-# Personal User Data
-knowledge_base/me.json
-knowledge_base/master_identity.txt
-knowledge_base/scope.json
-config.json
-watchlist.json
-
 uvicorn.log
 
-# PyInstaller
+# PyInstaller (Legacy)
+
+
+# ===== Personal / sensitive data — NEVER commit these =====
+.env
+.env.*
+!.env.example
+config.json
+!config.example.json
+watchlist.json
+!watchlist.example.json
+blacklist.txt
+token.json
+credentials.json
+*.db
+*.sqlite3
+knowledge_base/me.json
+knowledge_base/scope.json
+knowledge_base/master_identity.txt
+knowledge_base/proof_points.md
+knowledge_base/knowledge_graph.sqlite3
+!knowledge_base/*.example.json
+resumes/
+output/
+snapshots/
+*.log
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# ===== PyInstaller build output (rebuildable, don't commit) =====
 build/
 dist/
-*.spec
+*.spec.bak
+
+# ===== Inno Setup output =====
+Output/
+*.exe
+
+# ===== Bundled binaries (large, redistribution/licensing — don't commit) =====
+nodejs/
+playwright_browsers/
+
+# ===== Node / frontend =====
+node_modules/
+frontend/dist/
+frontend/build/
+npm-debug.log*
+
+# ===== Debug/scratch leftovers from development =====
+test_pilot.py
+pilot_test_output.log
+scratch.py
+
+# ===== OS / editor junk =====
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

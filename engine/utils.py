@@ -18,6 +18,11 @@ def get_node_path():
         else:
             base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             
+        # Check PyInstaller Playwright internal bundle path first
+        node_exe_internal = os.path.join(base_path, "_internal", "playwright", "driver", "node.exe")
+        if os.path.exists(node_exe_internal):
+            return node_exe_internal
+            
         node_exe = os.path.join(base_path, "nodejs", "node.exe")
         if os.path.exists(node_exe):
             return node_exe
@@ -57,12 +62,13 @@ def init_data_dir():
     for rel_path in migration_files:
         src = os.path.join(cwd, rel_path)
         dst = os.path.join(data_dir, rel_path)
-        if os.path.exists(src) and not os.path.exists(dst):
-            try:
-                shutil.copy2(src, dst)
-                print(f"[Init] Migrated {rel_path} to data directory.")
-            except Exception as e:
-                pass
+        if os.path.exists(src):
+            if not os.path.exists(dst) or os.path.getmtime(src) > os.path.getmtime(dst):
+                try:
+                    shutil.copy2(src, dst)
+                    print(f"[Init] Migrated/Synced {rel_path} to data directory.")
+                except Exception as e:
+                    pass
 
     cwd_resumes = os.path.join(cwd, "resumes")
     data_resumes = os.path.join(data_dir, "resumes")

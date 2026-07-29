@@ -1,4 +1,4 @@
-from fastapi import FastAPI, BackgroundTasks, UploadFile, File, Body, Depends, HTTPException, status
+from fastapi import FastAPI, BackgroundTasks, UploadFile, File, Form, Body, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -27,6 +27,7 @@ from engine.config import (
     FIT_AUTO_APPLY_THRESHOLD,
     AUTO_APPLY_CIRCUIT_BREAKER_N,
 )
+from engine.contact_discovery import generate_contact_message
 from discovery.db import get_daemon_state, set_daemon_state
 from engine.scope_enforcer import load_scope, save_scope
 import tempfile
@@ -70,12 +71,12 @@ class ConfigData(BaseModel):
     auto_apply_circuit_breaker_n: int = AUTO_APPLY_CIRCUIT_BREAKER_N
 
 def get_default_config():
-    from engine.config import TOTAL_DAILY_CAP, PORTAL_DAILY_CAP, COMPANY_DAILY_CAP
+    from engine.config import AUTO_APPLY_DAILY_CAP, PORTAL_DAILY_CAP, COMPANY_DAILY_CAP
     return {
         "threshold": 4.0,
-        "filter_prompt": "You are a logical filter. Read the Job Requirements and User Context.\nRule: If Job YoE > User YoE, output strictly False. If User skills mismatch core requirements, output False. If {threshold}% match, output True.\nCRITICAL RULE FOR EXPERIENCE: When calculating Years of Experience (YoE) for the user, ONLY count official Internships or Full-Time employment. Strictly ignore Freelancing, Self-Taught, or Personal Projects when evaluating against the Job's required YoE.\nUse <think> tags to reason, then output a final JSON: {\"match\": true} or {\"match\": false}",
+        "filter_prompt": "You are a strict, logical pre-filter deciding whether a job posting is worth deeper evaluation.\n\nRules, in order:\n1. If the posting explicitly requires more years of experience than the candidate has, reject — UNLESS the posting is labeled Entry-Level, Graduate, Associate, Junior, Intern, Trainee, or similar — in that case, evaluate on skill fit instead, since such postings routinely overstate YoE requirements.\n2. If the candidate's core skills clearly do not overlap with the role's core requirements (e.g., a pure hardware/embedded role for a software candidate), reject.\n3. If the role requires a security clearance, citizenship, or work authorization the candidate does not have, reject.\n4. Otherwise, if skill/domain overlap meets or exceeds {threshold}%, accept.\n\nUse <think> tags to reason through these rules explicitly, then output ONLY this JSON on the final line: {\"match\": true} or {\"match\": false}",
         "resume_prompt": "Write a highly dense, ATS-optimized 1-page resume tailored for the job. Do not invent any experience. When calculating Years of Experience (YoE) for the user, ONLY count official Internships or Full-Time employment. Strictly ignore Freelancing, Self-Taught, or Personal Projects.",
-        "max_applications_per_day_total": TOTAL_DAILY_CAP,
+        "max_applications_per_day_total": AUTO_APPLY_DAILY_CAP,
         "max_applications_per_day_per_portal": PORTAL_DAILY_CAP,
         "max_applications_per_day_per_company": COMPANY_DAILY_CAP,
         "target_salary": "",
@@ -190,6 +191,12 @@ def save_creds(data: CredentialData, token_data: dict = Depends(verify_token)):
         # Also write to .env so the Node.js scrapers can read them
         if data.service == "linkedin":
             _write_env_var("LINKEDIN_EMAIL" if key == "email" else "LINKEDIN_PASSWORD", value)
+        elif data.service == "groq" and key == "api_key":
+            _write_env_var("GROQ_API_KEY", value)
+        elif data.service == "github" and key == "token":
+            _write_env_var("GITHUB_TOKEN", value)
+        elif data.service == "openrouter" and key == "api_key":
+            _write_env_var("OPENROUTER_API_KEY", value)
     return {"status": "saved"}
 
 @app.post("/api/copilot", dependencies=[Depends(verify_token)])
@@ -238,6 +245,39 @@ Current page context: {page_context}""".format(page_context=query.page_context o
     save_copilot_message(user_id, "user", query.message)
     save_copilot_message(user_id, "assistant", reply)
     return {"reply": reply}
+
+@app.get("/api/locations/history", dependencies=[Depends(verify_token)])
+def get_location_history():
+    """Returns distinct non-empty locations seen in this user's job match history (jobs.db)."""
+    try:
+        conn = sqlite3.connect(DB_PATH, timeout=10.0)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT DISTINCT location FROM jobs WHERE location IS NOT NULL AND TRIM(location) != '' ORDER BY location"
+        )
+        rows = cursor.fetchall()
+        conn.close()
+        locations = [r[0].strip() for r in rows if r[0] and r[0].strip()]
+        return {"locations": locations}
+    except Exception as e:
+        return {"locations": []}
+
+@app.get("/api/companies/history", dependencies=[Depends(verify_token)])
+def get_company_history():
+    """Returns distinct non-empty companies seen in this user's job match history (jobs.db)."""
+    try:
+        conn = sqlite3.connect(DB_PATH, timeout=10.0)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT DISTINCT company FROM jobs WHERE company IS NOT NULL AND TRIM(company) != '' ORDER BY company"
+        )
+        rows = cursor.fetchall()
+        conn.close()
+        companies = [r[0].strip() for r in rows if r[0] and r[0].strip()]
+        return {"companies": companies}
+    except Exception as e:
+        return {"companies": []}
+
 
 def _write_env_var(key: str, value: str):
     """Updates a key=value line in the local .env file."""
@@ -377,7 +417,7 @@ def get_jobs():
     conn = sqlite3.connect(DB_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, company, fit_score, status, scam_flags, location, url, missing_skills, matched_skills FROM jobs ORDER BY fit_score DESC")
+    cursor.execute("SELECT id, title, company, fit_score, status, scam_flags, location, url, missing_skills, matched_skills, warm_path_score, outcome, contacts FROM jobs ORDER BY warm_path_score DESC, fit_score DESC")
     rows = cursor.fetchall()
     conn.close()
     return [dict(ix) for ix in rows]
@@ -404,6 +444,34 @@ def get_job_details(job_id: str):
     conn.close()
     return job_data
 
+@app.get("/api/recruiters", dependencies=[Depends(verify_token)])
+async def get_recruiters():
+    """Fetch all discovered recruiters/contacts from the jobs table."""
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    # Fetch jobs that have contacts
+    cursor.execute("SELECT id as job_id, company, title as job_title, url as job_url, contacts FROM jobs WHERE contacts IS NOT NULL AND contacts != '[]' AND contacts != ''")
+    rows = cursor.fetchall()
+    conn.close()
+    
+    recruiters = []
+    for r in rows:
+        try:
+            contacts = json.loads(r['contacts'])
+            for c in contacts:
+                c['job_id'] = r['job_id']
+                c['company'] = r['company']
+                c['job_title'] = r['job_title']
+                c['job_url'] = r['job_url']
+                recruiters.append(c)
+        except Exception:
+            pass
+            
+    # Sort by score (3 first, then 2, then 1)
+    recruiters.sort(key=lambda x: x.get('score', 0), reverse=True)
+    return recruiters
+
 @app.get("/api/jobs/manual")
 def get_manual_jobs():
     if not os.path.exists(DB_PATH):
@@ -413,7 +481,7 @@ def get_manual_jobs():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     # Include both manual_review and pending_cover_letter so the Cover Letter Gate is visible in UI
-    cursor.execute("SELECT id, title, company, fit_score, status, scam_flags, location, url, missing_skills, matched_skills, strategy_report FROM jobs WHERE status IN ('manual_review', 'pending_cover_letter')")
+    cursor.execute("SELECT id, title, company, fit_score, status, scam_flags, location, url, missing_skills, matched_skills, strategy_report, warm_path_score, outcome, contacts, evaluation_rubric, contact_message, star_stories FROM jobs WHERE status IN ('manual_review', 'pending_cover_letter') ORDER BY warm_path_score DESC, fit_score DESC")
     rows = cursor.fetchall()
     conn.close()
     return [dict(ix) for ix in rows]
@@ -423,6 +491,40 @@ def mark_job_applied(job_id: str):
     conn = sqlite3.connect(DB_PATH, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("UPDATE jobs SET status = 'applied' WHERE id = ?", (job_id,))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+@app.get("/api/jobs/{job_id}/resume")
+def download_resume(job_id: str):
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT title, company FROM jobs WHERE id = ?", (job_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row: raise HTTPException(status_code=404, detail="Job not found")
+    
+    from engine.utils import load_kb
+    kb = load_kb()
+    safe_name = kb.get("personal", {}).get("name", "User_Name").replace(" ", "_")
+    safe_title = str(row['title']).replace(" ", "_").replace("/", "-")
+    pdf_path = f"output/{safe_name}_{safe_title}.pdf"
+    
+    if os.path.exists(pdf_path):
+        from fastapi.responses import FileResponse
+        return FileResponse(pdf_path, filename=f"{row['company']}_Tailored_Resume.pdf")
+    raise HTTPException(status_code=404, detail="Resume PDF not found")
+
+class OutcomeUpdate(BaseModel):
+    outcome: str
+
+@app.post("/api/jobs/{job_id}/outcome")
+def update_job_outcome(job_id: str, payload: OutcomeUpdate):
+    """Updates the outcome (ghosted, rejected, interview, offer) for a job."""
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE jobs SET outcome = ? WHERE id = ?", (payload.outcome, job_id))
     conn.commit()
     conn.close()
     return {"status": "success"}
@@ -476,23 +578,29 @@ def suggest_scope(req: SuggestScopeRequest):
         exclude_text += f"CRITICAL: Do NOT suggest any of these locations: {', '.join(req.current_locations)}\n"
     
     prompt = f"""
-    Based on the following professional profile, suggest 10 highly relevant job titles (roles) and 5 geographic locations to target for their next job. 
-    If the user has a location, include it as one of the locations, plus other major tech/industry hubs that make sense globally or in their region.
-    {exclude_text}
-    
+    You are a career advisor. Based on the professional profile below, generate a COMPREHENSIVE list of 40+ highly relevant job titles the user could realistically apply for.
+
+    CRITICAL RULES:
+    - Cover EVERY applicable category: AI/ML Engineering, Backend/Systems Engineering, Full-Stack, Frontend, Cloud/DevOps/Infrastructure, Data Engineering, Data Science/Analytics, QA/SDET/Test Automation, Security/AppSec, Mobile (iOS/Android/Cross-platform), Platform/Site Reliability, Developer Relations/Advocacy, Technical Program Management, Solutions Architecture, Support Engineering, and any other categories clearly supported by the profile.
+    - Each role title must be a real, searchable job title (e.g., "Machine Learning Engineer", not "ML Guy").
+    - Include both senior and mid-level variants where the profile supports either (e.g., "Software Engineer" AND "Senior Software Engineer").
+    - Do NOT use vague umbrella titles. Be specific: "Backend Python Engineer", not "Software Developer".
+    - {exclude_text}
+
     Profile:
     {summary}
-    
+
     Return EXACTLY a JSON object with this schema and NO other text:
     {{
-        "roles": ["Role 1", "Role 2", "Role 3", "Role 4", "Role 5", "Role 6", "Role 7", "Role 8", "Role 9", "Role 10"],
+        "roles": ["Role 1", "Role 2", "Role 3", ...40 to 50 roles...],
         "locations": ["Location 1", "Location 2", "Location 3", "Location 4", "Location 5"]
     }}
     """
+
     
     try:
         response = generate(prompt, use_case="pdf_extraction").strip()
-        json_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", response, re.DOTALL)
+        json_match = re.search(r"(\{.*\})", response, re.DOTALL)
         if json_match:
             response = json_match.group(1)
             
@@ -511,6 +619,98 @@ def suggest_scope(req: SuggestScopeRequest):
     except Exception as e:
         print(f"[Scope Suggestion Error] {e}")
         return {"status": "error", "message": "Failed to parse AI suggestions."}
+
+class RecruiterDraftRequest(BaseModel):
+    agency: str
+
+@app.get("/api/recruiters/list", dependencies=[Depends(verify_token)])
+async def get_recruiter_list():
+    from engine.recruiter_dataset import DEFAULT_RECRUITERS
+    from engine.tailor import load_kb
+    
+    kb = load_kb()
+    skills = kb.get("skills", {}).get("frameworks", []) + kb.get("skills", {}).get("languages", []) + kb.get("skills", {}).get("tools", [])
+    skills_text = " ".join(skills).lower()
+    
+    # Infer user domains from skills
+    user_domains = set()
+    if any(k in skills_text for k in ["ai", "ml", "machine learning", "rag", "llama", "deep learning"]):
+        user_domains.add("ai_ml")
+    if any(k in skills_text for k in ["python", "fastapi", "django", "node", "backend"]):
+        user_domains.add("backend")
+    if any(k in skills_text for k in ["react", "javascript", "frontend", "fullstack"]):
+        user_domains.add("fullstack")
+    if any(k in skills_text for k in ["aws", "gcp", "azure", "oci", "docker", "kubernetes", "cloud"]):
+        user_domains.add("cloud")
+    if any(k in skills_text for k in ["security", "cyber", "hacker"]):
+        user_domains.add("cybersecurity")
+    
+    scored_list = []
+    for rec in DEFAULT_RECRUITERS:
+        # Base score
+        score = 50
+        
+        # Region bonus
+        region = rec.get("region", "")
+        if region == "India":
+            score += 10
+        elif region == "Global":
+            score += 5
+            
+        # Domain overlap bonus
+        rec_domains = set(rec.get("domains", []))
+        overlap = len(rec_domains & user_domains)
+        score += (overlap * 10)
+        
+        # Early career bonus (+18 as requested)
+        if rec.get("early_career"):
+            score += 18
+            
+        # Cap score at 99 for realism
+        score = min(score, 99)
+        
+        # Create a copy so we don't mutate the static list permanently
+        rec_copy = dict(rec)
+        rec_copy["match_score"] = score
+        scored_list.append(rec_copy)
+        
+    # Sort by match score descending
+    scored_list.sort(key=lambda x: x["match_score"], reverse=True)
+    return scored_list
+
+@app.post("/api/recruiters/draft", dependencies=[Depends(verify_token)])
+async def draft_recruiter_note(req: RecruiterDraftRequest):
+    master_id_path = os.path.join(get_data_dir(), "knowledge_base", "master_identity.txt")
+    if not os.path.exists(master_id_path):
+        raise HTTPException(status_code=400, detail="Master Identity not found. Complete your Knowledge Base first.")
+    
+    with open(master_id_path, "r", encoding="utf-8") as f:
+        master_identity = f.read()
+
+    # Pass the agency as the mock job requirements to anchor the draft
+    draft = generate_contact_message(
+        master_identity=master_identity,
+        job_requirements={"Target Company/Agency": req.agency, "Goal": "Connecting with specialized tech recruiters for relevant open roles"},
+        contact_name="", 
+        contact_title="Tech Recruiter",
+        intent="agency_outreach"
+    )
+    
+    # Hard truncate-with-warning fallback for LinkedIn limits
+    if len(draft) > 300:
+        print(f"[API] Warning: Agency outreach draft exceeded 300 chars (len {len(draft)}). Truncating.")
+        # Find the last period before 300 chars
+        truncated = draft[:300]
+        last_period = truncated.rfind('.')
+        last_q = truncated.rfind('?')
+        last_ex = truncated.rfind('!')
+        boundary = max(last_period, last_q, last_ex)
+        if boundary > 100:
+            draft = truncated[:boundary+1]
+        else:
+            draft = truncated.rsplit(' ', 1)[0] + '...'
+            
+    return {"reply": draft}
 
 @app.get("/api/watchlist", dependencies=[Depends(verify_token)])
 def get_watchlist():
@@ -597,8 +797,12 @@ async def add_jobs_bulk(jobs: list = Body(...)):
     for job in jobs:
         if is_blacklisted(job.get('company', '')):
             continue
-        if is_repost(job.get('company', ''), job.get('title', '')):
+        if not job.get('company') or not job.get('title'):
             continue
+        cursor.execute("SELECT id FROM jobs WHERE company = ? AND title = ? LIMIT 1", (job['company'], job['title']))
+        if cursor.fetchone():
+            continue
+            
         try:
             cursor.execute('''
                 INSERT OR IGNORE INTO jobs (id, title, company, url, description, location, source, fit_score, scam_flags, status)
@@ -672,9 +876,67 @@ async def extract_pdf(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": str(e)}
 
+@app.post("/api/onboarding/extract", dependencies=[Depends(verify_token)])
+async def onboarding_extract(file: UploadFile = File(None), github: str = Form(None), github_token: str = Form(None)):
+    from engine.onboarding import build_review_payload
+    import tempfile
+    
+    if github_token:
+        print("Warning: github_token passed to /api/onboarding/extract but it should be stored in system credentials.")
+        
+    resume_path = None
+    if file:
+        fd, resume_path = tempfile.mkstemp(suffix=".pdf" if file.filename.endswith(".pdf") else ".docx")
+        with os.fdopen(fd, "wb") as f:
+            f.write(await file.read())
+            
+    try:
+        payload = build_review_payload(resume_path, github)
+        return payload
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if resume_path and os.path.exists(resume_path):
+            os.remove(resume_path)
+
+@app.post("/api/onboarding/merge", dependencies=[Depends(verify_token)])
+def onboarding_merge(payload: dict):
+    kb_path = os.path.join(get_data_dir(), "knowledge_base", "me.json")
+    if not os.path.exists(kb_path):
+        kb = {"personal": {}, "work_history": [], "skills": {}, "projects": []}
+    else:
+        with open(kb_path, "r", encoding="utf-8") as f:
+            kb = json.load(f)
+            
+    for job in payload.get("jobs", []):
+        kb.setdefault("work_history", []).append({
+            "id": job["id"],
+            "company": job["company"],
+            "role": job["role"],
+            "start_date": job["start_date"],
+            "end_date": job["end_date"],
+            "bullets": [{"id": f"{job['id']}_{i}", "text": b["text"].lstrip("- ").strip()} for i, b in enumerate(job["proposed_bullets"])]
+        })
+        
+    for proj in payload.get("projects", []):
+        kb.setdefault("projects", []).append({
+            "id": proj["id"],
+            "name": proj["name"],
+            "tagline": proj.get("description", ""),
+            "bullets": [{"id": f"{proj['id']}_{i}", "text": b["text"].lstrip("- ").strip()} for i, b in enumerate(proj["proposed_bullets"])]
+        })
+        
+    os.makedirs(os.path.dirname(kb_path), exist_ok=True)
+    with open(kb_path, "w", encoding="utf-8") as f:
+        json.dump(kb, f, indent=2)
+        
+    return {"status": "success", "message": "Merged successfully into me.json"}
+
 def run_script(args):
     import sys
-    subprocess.Popen([sys.executable, "--cli"] + args)
+    import subprocess
+    flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+    subprocess.Popen([sys.executable, "--cli"] + args, creationflags=flags, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 @app.post("/api/action/discover", dependencies=[Depends(verify_token)])
 def trigger_discover():
@@ -704,10 +966,65 @@ def trigger_negotiate(req: NegotiateRequest):
     draft = generate_negotiation_script(req.company, req.role, req.offer_salary, req.target_salary, req.competing, req.discount)
     return {"status": "success", "draft": draft}
 
+from engine.upskill_oracle import run_upskill_oracle
+
 @app.get("/api/action/upskill")
 def trigger_upskill():
-    directive = get_upskill_directive()
-    return {"status": "success", "directive": directive}
+    # Run the oracle, which persists gaps to prep_gaps.json
+    run_upskill_oracle()
+    return {"status": "success", "message": "Oracle scan complete"}
+
+@app.get("/api/prep")
+def get_prep_data():
+    from engine.utils import get_data_dir
+    import os, json
+    
+    # Load Gaps
+    gaps_file = os.path.join(get_data_dir(), "prep_gaps.json")
+    gaps = []
+    if os.path.exists(gaps_file):
+        with open(gaps_file, "r", encoding="utf-8") as f:
+            gaps = json.load(f)
+            
+    # Load Resources mapping
+    resources_file = os.path.join(os.path.dirname(__file__), "engine", "resources.json")
+    resources = {}
+    if os.path.exists(resources_file):
+        with open(resources_file, "r", encoding="utf-8") as f:
+            resources = json.load(f)
+            
+    return {"status": "success", "gaps": gaps, "resources": resources}
+
+class PrepStatusUpdate(BaseModel):
+    gap_id: str
+    status: str
+
+@app.post("/api/prep/status")
+def update_prep_status(req: PrepStatusUpdate):
+    from engine.utils import get_data_dir
+    import os, json
+    
+    gaps_file = os.path.join(get_data_dir(), "prep_gaps.json")
+    if not os.path.exists(gaps_file):
+        raise HTTPException(status_code=404, detail="No prep gaps found.")
+        
+    with open(gaps_file, "r", encoding="utf-8") as f:
+        gaps = json.load(f)
+        
+    found = False
+    for g in gaps:
+        if g.get("id") == req.gap_id:
+            g["prep_status"] = req.status
+            found = True
+            break
+            
+    if not found:
+        raise HTTPException(status_code=404, detail="Gap ID not found.")
+        
+    with open(gaps_file, "w", encoding="utf-8") as f:
+        json.dump(gaps, f, indent=2)
+        
+    return {"status": "success"}
 
 @app.post("/api/jobs/{job_id}/approve-cover")
 async def approve_cover_letter(job_id: str):
@@ -744,6 +1061,15 @@ async def get_friction_analytics():
         from engine.friction_tracker import get_all_friction_rates
         rates = get_all_friction_rates()
         return {"status": "success", "data": rates}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/analytics/conversion", dependencies=[Depends(verify_token)])
+def get_conversion_analytics():
+    """Returns exactly computed conversion stats per portal and per keyword."""
+    try:
+        from engine.conversion_stats import get_conversion_stats
+        return {"status": "success", "data": get_conversion_stats()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -859,6 +1185,21 @@ def api_intake_resolve(req: ResolveRequest):
 @app.get("/api/intake/status", dependencies=[Depends(verify_token)])
 def api_intake_status():
     return {"status": "success", "is_ready": kb_is_ready()}
+
+@app.get("/api/gateways", dependencies=[Depends(verify_token)])
+def get_gateway_state():
+    gw_path = os.path.join(get_data_dir(), "gateways.json")
+    if os.path.exists(gw_path):
+        with open(gw_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+@app.post("/api/gateways", dependencies=[Depends(verify_token)])
+def save_gateway_state(req: dict = Body(...)):
+    gw_path = os.path.join(get_data_dir(), "gateways.json")
+    with open(gw_path, "w", encoding="utf-8") as f:
+        json.dump(req, f)
+    return {"status": "success"}
 
 # Serve the pre-compiled Native React Desktop UI directly from the backend
 frontend_dist = os.path.join(os.path.dirname(__file__), "frontend", "dist")

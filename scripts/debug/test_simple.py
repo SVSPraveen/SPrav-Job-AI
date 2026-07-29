@@ -1,0 +1,1 @@
+open(r'C:\My Job APPLYING App\test_simple.log', 'w').write('HELLO')

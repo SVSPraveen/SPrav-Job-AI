@@ -48,8 +48,17 @@ def install_ollama_windows():
     try:
         urllib.request.urlretrieve("https://ollama.com/download/OllamaSetup.exe", installer_path)
         print("[Ollama Manager] Download complete. Launching installer...")
-        # Run installer and wait for it to finish (10 minute max timeout)
-        subprocess.run([installer_path], check=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=600)
+        
+        # In-app message so the user knows why a setup window is appearing
+        try:
+            import ctypes
+            msg = "The AI assistant requires Ollama to run models locally.\n\nThe official installer will now open. Please click through the setup to continue."
+            ctypes.windll.user32.MessageBoxW(0, msg, "Ollama Setup Required", 0x40 | 0x0)
+        except Exception:
+            pass
+            
+        # Run installer visibly so user can click through (silent install is broken)
+        subprocess.run([installer_path], check=True, stdin=subprocess.DEVNULL, timeout=600)
         print("[Ollama Manager] Installation completed.")
         
         # Give the background service a moment to start

@@ -113,35 +113,9 @@ def _generate_groq(model: str, prompt: str, api_key: str, use_case: str = "defau
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.0,
-        "reasoning_effort": "high",
-        "disable_tool_validation": True
+        "temperature": 0.3,
+        "max_tokens": 8000
     }
-    
-    if use_case == "resume_tailoring":
-        payload["response_format"] = {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "resume_tailoring_output",
-                "strict": True,
-                "schema": {
-                    "type": "object",
-                    "properties": {
-                        "tailored_bullets": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "description": "A single resume bullet point strictly following the XYZ formula based on contextual grounding."
-                            }
-                        }
-                    },
-                    "required": ["tailored_bullets"],
-                    "additionalProperties": False
-                }
-            }
-        }
-    else:
-        payload["response_format"] = {"type": "json_object"}
 
     try:
         response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=90)
@@ -149,7 +123,10 @@ def _generate_groq(model: str, prompt: str, api_key: str, use_case: str = "defau
         content = response.json()["choices"][0]["message"]["content"]
         return True, content
     except Exception as e:
-        return False, str(e)
+        err_msg = str(e)
+        if hasattr(e, 'response') and e.response is not None:
+            err_msg += f" | Details: {e.response.text}"
+        return False, err_msg
 
 def _generate_openrouter(model: str, prompt: str, api_key: str) -> tuple[bool, str]:
     print(f"\n[Cloud API] Routing to OpenRouter endpoint: {model} (Bypassing GPU Mutex)")
@@ -261,11 +238,16 @@ def generate(prompt: str, use_case: str = "general") -> str:
             print(f"[Agnostic MoE] Missing Gemini key for '{use_case}'. Falling back to Ollama.")
             
     elif provider == "groq":
-        api_key = get_system_credential("groq", "api_key") or os.getenv("GROQ_API_KEY")
+        # Allow the user to specify a dedicated key for resume tailoring to avoid rate limits
+        if use_case == "resume_tailoring":
+            api_key = os.getenv("GROQ_API_KEY_RESUME") or get_system_credential("groq", "api_key") or os.getenv("GROQ_API_KEY")
+        else:
+            api_key = os.getenv("GROQ_API_KEY") or get_system_credential("groq", "api_key")
+            
         if api_key:
             success, result = _generate_groq(model_name, prompt, api_key, use_case)
         else:
-            print(f"[Agnostic MoE] Missing Groq key for '{use_case}'. Configure it in the UI Settings. Falling back to Ollama.")
+            print(f"[Agnostic MoE] Missing Groq key for '{use_case}'. Configure it in .env or the UI Settings. Falling back to Ollama.")
             
     elif provider == "openrouter":
         api_key = get_system_credential("openrouter", "api_key") or os.getenv("OPENROUTER_API_KEY")

@@ -1,20 +1,19 @@
-# Scraper Service (`/scraper_service`)
+# 🌐 Scraper Service
 
-> [!WARNING]
-> **DEPRECATED:** As part of the transition to a lower-risk profile, the Node.js Puppeteer stealth scrapers have been deprecated and eliminated from the production runtime. SPrav now relies on native, credential-free Python HTTP scrapers.
+This directory houses the stealth web scrapers that power SPrav's "Discovery" phase. Instead of relying on expensive APIs, these scrapers mimic human browser behavior to extract job postings directly from the source.
 
-The Scraper Service was a specialized, headless automation suite designed to navigate complex Applicant Tracking Systems (ATS) and job board frontends that lack public APIs.
+## Supported Integrations
 
-## 🏗️ Architectural Overview
+### Global Markets
+* **`ats_direct.py`**: Generic fallback scraper for parsing ATS links (Greenhouse, Lever, Ashby) directly from raw URLs.
+* **Indeed, YC, HN, Wellfound**: Built-in integrations for major startup and enterprise job boards.
 
-Built on Node.js and Puppeteer Extra, this microservice handles the high-friction aspects of job discovery, including bypassing bot-mitigation platforms (e.g., Cloudflare, DataDome) through stealth plugins and behavioral emulation.
+### Indian Market Specializations
+* **`naukri_scraper.py`**: Native integration for Naukri.com, India's largest job portal.
+* **`internshala_scraper.py`**: Scraper for entry-level and internship roles on Internshala.
+* **`hirist_scraper.py`**: Tech-focused hiring portal scraper.
+* **`freshersnow_bypass.py` & `fresherstech_bypass.py`**: Specialized bypass scrapers for freshers-focused aggregators.
+* **`freshershunt_bypass.py`**: Stealth bypass for FreshersHunt.
 
-## 🧩 Core Capabilities
-
-- **Stealth Browsing**: Utilizes `puppeteer-extra-plugin-stealth` to mask automated signatures, ensuring high-reliability scraping without triggering IP bans.
-- **Dynamic DOM Parsing**: Extracts structured JSON data (job titles, requirements, salary bands) directly from deeply nested, dynamically rendered React/Vue DOM trees.
-- **IPC Communication**: Runs as a localized microservice, communicating with the primary Python orchestration daemon via lightweight inter-process communication (IPC) sockets.
-
-## ⚙️ Configuration
-
-The service can be scaled or adjusted via the local configuration files to manage concurrency limits and rate-limit backoffs, protecting the user's IP integrity.
+## How it works
+These modules are executed asynchronously by `daemon.py`. They extract raw, unstructured job descriptions and yield them to the AI pipeline for structuring into clean JSON. They use headless browser techniques (Playwright) and anti-bot evasions to ensure high uptime.

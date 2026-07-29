@@ -4,6 +4,7 @@ import os
 import uuid
 import json
 import subprocess
+import sys
 from engine.jd_extractor import fetch_jd_text
 
 def load_targeting() -> dict:
@@ -140,29 +141,19 @@ def scrape_remoteok() -> list:
         
     return scraped_jobs
 
+from scraper_service.freshershunt_bypass import scrape_freshershunt as py_scrape_freshershunt
+from scraper_service.fresherstech_bypass import scrape_fresherstech as py_scrape_fresherstech
+from scraper_service.freshersnow_bypass import scrape_freshersnow as py_scrape_freshersnow
+from scraper_service.career_watcher import watch_all as py_watch_all
+from scraper_service.internshala_scraper import scrape_internshala
+from scraper_service.hirist_scraper import scrape_hirist
+
 def scrape_freshershunt() -> list:
-    """Uses Playwright/Puppeteer-extra to bypass ads and extract official links from Freshershunt."""
-    print("Scraping Freshershunt via headless Node.js ad-bypasser...")
-    js_script = os.path.join(os.path.dirname(__file__), "..", "scraper_service", "freshershunt_bypass.js")
+    """Uses Python Playwright stealth to bypass ads and extract official links from Freshershunt."""
+    print("Scraping Freshershunt via headless Python Playwright ad-bypasser...")
     
-    if not os.path.exists(js_script):
-        print("Freshershunt JS scraper not found.")
-        return []
-        
     try:
-        # We pass 10 as the limit
-        result = subprocess.run([get_node_path(), js_script, "10"], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=120, env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()})
-        
-        # The JS script outputs JSON on the very last line
-        output = result.stdout.strip()
-        # Find the last line that looks like an array
-        json_str = "[]"
-        for line in reversed(output.split('\n')):
-            if line.startswith("[") and line.endswith("]"):
-                json_str = line
-                break
-                
-        data = json.loads(json_str)
+        data = py_scrape_freshershunt(10)
     except Exception as e:
         print(f"Failed to execute Freshershunt scraper: {e}")
         return []
@@ -185,42 +176,68 @@ def scrape_freshershunt() -> list:
         
     return scraped_jobs
 
+def scrape_fresherstech() -> list:
+    print("Scraping FreshersTech via headless Playwright...")
+    try:
+        data = py_scrape_fresherstech(10)
+    except Exception as e:
+        print(f"Failed to execute FreshersTech scraper: {e}")
+        return []
+
+    scraped_jobs = []
+    for item in data:
+        job = {
+            "id": f"fresherstech_{uuid.uuid4().hex[:8]}",
+            "title": item.get("title", ""),
+            "company": "FreshersTech Extracted", 
+            "url": item.get("url", ""),
+            "description": f"Extracted from {item.get('original_post')}",
+            "location": "Unspecified",
+            "source": "FreshersTech",
+            "fit_score": 0,
+            "scam_flags": "",
+            "status": "new"
+        }
+        scraped_jobs.append(job)
+    return scraped_jobs
+
+def scrape_freshersnow() -> list:
+    print("Scraping FreshersNow via headless Playwright...")
+    try:
+        data = py_scrape_freshersnow(10)
+    except Exception as e:
+        print(f"Failed to execute FreshersNow scraper: {e}")
+        return []
+
+    scraped_jobs = []
+    for item in data:
+        job = {
+            "id": f"freshersnow_{uuid.uuid4().hex[:8]}",
+            "title": item.get("title", ""),
+            "company": "FreshersNow Extracted", 
+            "url": item.get("url", ""),
+            "description": f"Extracted from {item.get('original_post')}",
+            "location": "Unspecified",
+            "source": "FreshersNow",
+            "fit_score": 0,
+            "scam_flags": "",
+            "status": "new"
+        }
+        scraped_jobs.append(job)
+    return scraped_jobs
+
 def scrape_company_watchlist() -> list:
     """
-    Runs career_watcher.js to detect NEW jobs on watched company career pages.
+    Runs Python career_watcher to detect NEW jobs on watched company career pages.
     Only returns jobs that are new since the last run (diff against stored snapshot).
     On first run for a company it saves the baseline and returns nothing, so the
     pipeline is never flooded on initial setup.
     """
     print("Running Company Career Page Watcher...")
-    js_script = os.path.join(os.path.dirname(__file__), "..", "scraper_service", "career_watcher.js")
-
-    if not os.path.exists(js_script):
-        print("career_watcher.js not found — skipping.")
-        return []
 
     try:
-        result = subprocess.run(
-            [get_node_path(), js_script],
-            capture_output=True,
-            text=True,
-            encoding='utf-8',
-            errors='replace',
-            timeout=300, env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()} # 5 min max — 20 companies × ~15s each
-        )
-
-        # career_watcher.js outputs one JSON array as the LAST line on stdout
-        # All other output is diagnostic (goes to stderr)
-        output = result.stdout.strip()
-        if not output:
-            print("Career watcher returned no output.")
-            return []
-
-        data = json.loads(output)
+        data = py_watch_all()
         print(f"Career watcher found {len(data)} new job(s) across watched companies.")
-    except json.JSONDecodeError as e:
-        print(f"Career watcher JSON parse error: {e}")
-        return []
     except Exception as e:
         print(f"Career watcher execution failed: {e}")
         return []
@@ -266,20 +283,59 @@ def run_all_scrapers() -> list:
     print("Scraping Freshershunt...")
     jobs.extend(scrape_freshershunt())
 
+    print("Scraping FreshersTech...")
+    jobs.extend(scrape_fresherstech())
+
+    print("Scraping FreshersNow...")
+    jobs.extend(scrape_freshersnow())
+
     print("Checking Company Career Page Watchlist...")
     jobs.extend(scrape_company_watchlist())
 
     print("Scraping Naukri.com...")
     jobs.extend(scrape_naukri())
 
-    print("Scraping Indeed India...")
-    jobs.extend(scrape_portal("indeed", "indeed_scraper.js"))
-
     print("Scraping Internshala Jobs...")
-    jobs.extend(scrape_portal("internshala", "internshala_scraper.js"))
+    for kw in DEFAULT_KEYWORDS:
+        try:
+            print(f"  Internshala: '{kw}'...")
+            res = scrape_internshala(kw, 20)
+            for item in res:
+                jobs.append({
+                    "id": f"internshala_{uuid.uuid4().hex[:10]}",
+                    "title": item.get("title", ""),
+                    "company": item.get("company", ""),
+                    "url": item.get("url", ""),
+                    "description": item.get("description", ""),
+                    "location": item.get("location", "Unspecified"),
+                    "source": "Internshala",
+                    "fit_score": 0,
+                    "scam_flags": "",
+                    "status": "new"
+                })
+        except Exception as e:
+            print(f"  Internshala scraper failed for '{kw}': {e}")
 
     print("Scraping Hirist.tech (IT-Only)...")
-    jobs.extend(scrape_portal("hirist", "hirist_scraper.js"))
+    for kw in DEFAULT_KEYWORDS:
+        try:
+            print(f"  Hirist: '{kw}'...")
+            res = scrape_hirist(kw, 25)
+            for item in res:
+                jobs.append({
+                    "id": f"hirist_{uuid.uuid4().hex[:10]}",
+                    "title": item.get("title", ""),
+                    "company": item.get("company", ""),
+                    "url": item.get("url", ""),
+                    "description": item.get("description", ""),
+                    "location": item.get("location", "Unspecified"),
+                    "source": "Hirist",
+                    "fit_score": 0,
+                    "scam_flags": "",
+                    "status": "new"
+                })
+        except Exception as e:
+            print(f"  Hirist scraper failed for '{kw}': {e}")
 
     print("Scraping Wellfound (Startup Ecosystem)...")
     jobs.extend(scrape_portal("wellfound", "wellfound_scraper.js"))
@@ -303,12 +359,15 @@ def scrape_naukri(keywords: list = None, limit_per_keyword: int = 20) -> list:
     for keyword in keywords:
         print(f"  Naukri: '{keyword}'...")
         try:
+            flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
             result = subprocess.run(
                 [get_node_path(), js_script, keyword, str(limit_per_keyword)],
                 capture_output=True,
                 text=True,
                 timeout=120,
-                env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()}
+                env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()},
+                creationflags=flags,
+                stdin=subprocess.DEVNULL
             )
             output = result.stdout.strip()
             if not output:
@@ -386,6 +445,7 @@ def scrape_portal(source_name: str, js_file: str, keywords: list = None, limit_p
     for keyword in keywords:
         print(f"  {source_name}: '{keyword}'...")
         try:
+            flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
             result = subprocess.run(
                 [get_node_path(), js_script, keyword, str(limit_per_keyword)],
                 capture_output=True,
@@ -393,7 +453,9 @@ def scrape_portal(source_name: str, js_file: str, keywords: list = None, limit_p
                 encoding='utf-8',
                 errors='replace',
                 timeout=120,
-                env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()}
+                env={**__import__("os").environ, "SPRAV_DATA_DIR": get_data_dir()},
+                creationflags=flags,
+                stdin=subprocess.DEVNULL
             )
             output = result.stdout.strip()
             if not output:

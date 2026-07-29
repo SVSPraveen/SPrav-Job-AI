@@ -24,8 +24,11 @@ COMPANY_DAILY_CAP: int = int(os.getenv("COMPANY_DAILY_CAP", "5"))
 # Maximum number of auto-applications to the SAME portal in one calendar day.
 PORTAL_DAILY_CAP: int = int(os.getenv("PORTAL_DAILY_CAP", "25"))
 
-# Maximum number of auto-applications across ALL portals combined in one calendar day.
-TOTAL_DAILY_CAP: int = int(os.getenv("TOTAL_DAILY_CAP", "150"))
+# Maximum number of auto-applications across ALL fully-automated portals combined in one calendar day.
+AUTO_APPLY_DAILY_CAP: int = int(os.getenv("AUTO_APPLY_DAILY_CAP", "200"))
+
+# Maximum number of applications across ALL human-assist portals combined in one calendar day.
+HUMAN_ASSIST_DAILY_CAP: int = int(os.getenv("HUMAN_ASSIST_DAILY_CAP", "50"))
 
 # Number of consecutive Playwright submission failures that trips the circuit breaker.
 # When tripped, the auto-apply loop pauses and a dashboard banner is shown.
@@ -38,23 +41,15 @@ AUTO_APPLY_CIRCUIT_BREAKER_N: int = int(os.getenv("AUTO_APPLY_CIRCUIT_BREAKER_N"
 # ─────────────────────────────────────────
 
 SYSTEM_PERSONA = """\
-You are a composite intelligence formed from three simultaneous roles:
+You are tailoring a resume and cover letter for a specific job. You will be given the job description and exactly 2 pre-selected projects (already chosen — do not select or substitute different projects).
 
-ROLE A — SENIOR RECRUITER for the exact company in this job description.
-You know every requirement, the team culture, and exactly what gets a resume to the top of the stack.
-
-ROLE B — ATS ALGORITHM.
-You scan for exact keyword matches between the job description and resume.
-You score based on density, placement, and section headings.
-You reject resumes that don't contain the specific phrases from the JD.
-
-ROLE C — HIRING MANAGER reading your 200th resume in one sitting.
-You are exhausted and skimming. You give each resume 8 seconds.
-If the first bullet under each role does not immediately signal value with a clear number or outcome, you flip to the next resume.
-
-Your sole purpose: make this candidate's resume score a 95+ in all three roles simultaneously.
-
-CRITICAL RULE FOR EXPERIENCE: When calculating Years of Experience (YoE) for the user, ONLY count official Internships or Full-Time employment. Strictly ignore Freelancing, Self-Taught, or Personal Projects when evaluating against the Job's required YoE.
+Hard rules:
+- NEVER invent a number, metric, percentage, or statistic that is not explicitly present in the source material provided.
+- NEVER attribute a technology, tool, or technique to a project unless it is explicitly present in that project's own description/tech stack.
+- Write in first person, natural human voice. Vary sentence length and structure.
+- NEVER use these words/phrases: "passionate," "dynamic," "results-driven," "leverage," "synergy," "detail-oriented," or any generic buzzword opener.
+- Include at least one specific, concrete technical detail per bullet — not a vague claim.
+- Match tone and emphasis to the job's actual domain: lead with backend/infrastructure framing for backend-leaning JDs, ML/data framing for ML-leaning JDs, without fabricating anything.
 """
 
 # ─────────────────────────────────────────
@@ -86,13 +81,12 @@ CRITICAL RULES FOR REWRITING:
     78.3% → 78%, $1.2M → $1.2M (financial figures keep decimals), 12.7x → 13x
 - Do NOT start more than 2 bullets with the same action verb.
 - Every bullet must be one line. No run-on sentences.
-- The rewritten text must not sound like AI wrote it. Be direct, specific, confident.
+- AVOID generic AI-sounding phrasing (buzzword openers, uniform sentence rhythm). Write in the first person, use varied sentence structure, and include at least one concrete detail per answer/bullet.
 - Remove every red flag: gaps, vague responsibilities, passive voice, "helped with", "assisted in", "worked on".
 
-═══ STEP 4: SELECT AND WRITE PROJECTS ═══
-Analyze the user's `github_projects` and `portfolio_projects`.
-Select a MAXIMUM of the 2 BEST projects that match the exact tech stack required by the Job Description.
-For each selected project, write exactly 3 custom bullet points using the Google XYZ formula. Base these bullets on the project's `description` and `readme_summary`, emphasizing the technologies used.
+═══ STEP 4: WRITE PROJECT BULLETS ═══
+You have been provided exactly 2 pre-selected projects. Do NOT select or substitute different projects.
+For each pre-selected project, write exactly 3 custom bullet points using the Google XYZ formula. Base these bullets on the project's `description` and `readme_summary`, emphasizing the technologies used.
 
 ═══ STEP 5: WRITE THE TAILORED SUMMARY ═══
 Write a 2-sentence professional summary.

@@ -78,6 +78,21 @@ def init_db():
     except sqlite3.OperationalError:
         pass
 
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN warm_path_score INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
+        
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN contacts TEXT")
+    except sqlite3.OperationalError:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE jobs ADD COLUMN outcome TEXT DEFAULT 'pending'")
+    except sqlite3.OperationalError:
+        pass
+
     # ── Auto-apply audit log ─────────────────────────────────────────────────
     # Records every Playwright submission attempt for audit and circuit-breaker
     # tracking. Never deleted — provides a full tamper-evident application log.

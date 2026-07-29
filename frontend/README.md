@@ -1,24 +1,24 @@
-# Dashboard Subsystem (`/frontend`)
+# 🖥️ SPrav Frontend
 
-The Frontend module delivers a comprehensive, real-time React dashboard for monitoring, controlling, and interacting with the SPrav autonomous application pipeline.
+This directory contains the sleek, Dark/Light-mode themed React application that serves as your command center for SPrav Job AI.
 
-## 🏗️ Architectural Overview
+## Architecture
+- **Framework**: React 18 + Vite
+- **Styling**: Vanilla CSS (No heavy CSS frameworks to ensure maximum performance and maintainability)
+- **Deployment**: During production builds, Vite compiles this into static assets in `dist/`, which are then natively served by the Python FastAPI backend. This eliminates the need for Node.js in the production runtime, significantly lowering memory usage.
 
-Built with React 18 and Vite, the dashboard interfaces with the primary Python FastAPI backend via RESTful endpoints. It provides observability into the LangGraph state machine, allowing users to approve, reject, or manually intervene in the application flow.
+## Key Modules & Pages
+* **Dashboard / Human Review Queue**: Your main inbox. Review tailored resumes, fit scores, and 1-click apply to jobs.
+* **Prep Center (`PrepCenter.jsx`)**: View dynamically generated STAR behavioral stories tailored to specific roles to prep for upcoming interviews.
+* **Recruiter Outreach (`RecruiterOutreach.jsx`)**: Manage automatically sourced hiring manager contacts and review auto-drafted networking emails.
+* **Watchlist Manager (`WatchlistManager.jsx`)**: Use Typeahead autocomplete to prioritize specific dream companies.
+* **Application Scope (`ApplicationScope.jsx`)**: Configure strict inclusion/exclusion rules (e.g., location, visa, remote vs onsite) to prevent the daemon from wasting API tokens on bad jobs.
+* **Gateway Tracker (`GatewayTracker.jsx`)**: Track external ATS portals like Workday or SuccessFactors.
+* **Copilot & Tour (`Copilot.jsx`, `GuideTour.jsx`)**: Built-in AI assistant and interactive onboarding UI.
 
-## 🧩 Core Features
-
-- **Human-in-the-Loop (HITL) Queue**: An intervention interface for jobs that fall below the auto-apply confidence threshold, requiring manual approval of the tailored resume and cover letter.
-- **Knowledge Base Editor**: A structured JSON UI that allows the user to easily manage their canonical career data (`me.json`), bypassing manual file editing.
-- **Funnel Analytics**: Visualizes the conversion pipeline from discovery to application to interview, driven by data aggregated from the SQLite database.
-- **Secure Authentication**: Implements a localized JWT verification layer to ensure that only the authorized user can trigger ATS dispatch commands.
-
-## 🛠️ Development
-
+## Development
+To run the frontend locally with hot-reloading:
 ```bash
-# Install dependencies
 npm install
-
-# Start the Vite development server
 npm run dev
 ```

@@ -69,11 +69,12 @@ function Copilot({ token, currentTab }) {
     if (!isOpen) {
         return (
             <button 
+                id="copilot"
                 onClick={() => setIsOpen(true)}
                 style={{
                     position: 'fixed',
-                    bottom: '2rem',
-                    right: '2rem',
+                    bottom: '32px',
+                    right: '32px',
                     width: '56px',
                     height: '56px',
                     borderRadius: '50%',
@@ -82,14 +83,12 @@ function Copilot({ token, currentTab }) {
                     border: 'none',
                     boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
                     cursor: 'pointer',
+                    zIndex: 9999,
+                    padding: 0,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 9999,
-                    transition: 'transform 0.2s ease',
+                    justifyContent: 'center'
                 }}
-                onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
-                onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
             >
                 <MessageCircle size={28} />
             </button>

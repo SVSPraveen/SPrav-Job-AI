@@ -59,15 +59,20 @@ class KnowledgeDistiller:
                 continue
                 
             try:
-                # Handle YYYY-MM or YYYY-MM-DD
-                start_fmt = "%Y-%m-%d" if len(start_str) > 7 else "%Y-%m"
-                start_date = datetime.strptime(start_str, start_fmt)
+                def parse_date(d_str):
+                    for fmt in ["%Y-%m-%d", "%Y-%m", "%m/%Y", "%m-%Y", "%d/%m/%Y", "%m/%d/%Y"]:
+                        try:
+                            return datetime.strptime(d_str, fmt)
+                        except ValueError:
+                            pass
+                    raise ValueError(f"time data '{d_str}' does not match any known format")
+                    
+                start_date = parse_date(start_str)
                 
                 if not end_str or str(end_str).lower() == "present":
                     end_date = datetime.now()
                 else:
-                    end_fmt = "%Y-%m-%d" if len(end_str) > 7 else "%Y-%m"
-                    end_date = datetime.strptime(end_str, end_fmt)
+                    end_date = parse_date(end_str)
                     
                 days = (end_date - start_date).days
                 if days > 0:
@@ -111,8 +116,8 @@ Ignore irrelevant noise. Output a dense summary.
 User Profile Chunk:
 {chunk}
 """
-            # Use the extraction model (Qwen2.5) for fast structured fact mapping
-            evidence = generate(map_prompt, use_case="extraction")
+            # Use a general use case so we don't force JSON format, which breaks text distillation
+            evidence = generate(map_prompt, use_case="general")
             extracted_evidence.append(evidence)
                 
         # Aggregate all evidence

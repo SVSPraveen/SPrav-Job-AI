@@ -284,11 +284,27 @@ def _fetch_single_repo(owner: str, repo_name: str, username: str, headers: dict)
 
     last_commit = repo.get("pushed_at", "")[:10] if repo.get("pushed_at") else ""
 
+    file_tree = []
+    default_branch = repo.get("default_branch", "main")
+    try:
+        tree_resp = requests.get(
+            f"https://api.github.com/repos/{owner}/{repo_name}/git/trees/{default_branch}?recursive=1",
+            headers=headers, timeout=10
+        )
+        if tree_resp.status_code == 200:
+            tree_data = tree_resp.json()
+            if tree_data.get("truncated"):
+                print(f"[Intake] Warning: file tree for {owner}/{repo_name} is truncated.")
+            file_tree = [node.get("path", "") for node in tree_data.get("tree", [])]
+    except Exception as e:
+        print(f"[Intake] Warning: failed to fetch tree for {owner}/{repo_name}: {e}")
+
     return {
         "id": _make_id("gh", repo_name),
         "name": repo_name,
         "description": repo.get("description") or "",
         "readme_summary": readme_text.strip(),
+        "file_tree": file_tree,
         "tech_stack": [repo.get("language")] if repo.get("language") else [],
         "topics": repo.get("topics", []),
         "stars": repo.get("stargazers_count", 0),

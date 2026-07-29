@@ -124,17 +124,19 @@ Please answer the question based solely on the retrieved memory context above.
         else:
             print("[SPrav Brain] Warning: No bullets found to ingest. Check me.json structure.")
 
-    def query_kb(self, jd_text: str, n_results: int = 20) -> list:
-        """Retrieves top relevant KB bullet IDs for a given job description."""
+    def query_kb(self, jd_text: str, n_results: int = 20) -> tuple[list, list]:
+        """Retrieves top relevant KB bullet IDs and their distances for a given job description."""
         kb_collection = self.chroma_client.get_or_create_collection(name="sprav_kb", embedding_function=self.embed_fn)
         if kb_collection.count() == 0:
-            return []
+            return [], []
             
         results = kb_collection.query(
             query_texts=[jd_text],
             n_results=min(n_results, kb_collection.count())
         )
-        return results["ids"][0] if results["ids"] else []
+        if results["ids"]:
+            return results["ids"][0], results["distances"][0]
+        return [], []
 
 # Singleton instance of the brain
 brain = SPravBrain()

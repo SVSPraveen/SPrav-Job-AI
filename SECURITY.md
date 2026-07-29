@@ -13,5 +13,5 @@ Instead, report it privately via GitHub:
 All security vulnerabilities will be promptly addressed.
 
 ## Known Security Considerations
-- **Credentials & API Keys:** SPrav Job AI uses local credential storage (XOR-encrypted vault in SQLite) for job portal logins. API keys are loaded via a local `.env` file. Do not commit your `users.db` or `.env` files.
+- **Credentials & API Keys:** SPrav Job AI uses robust local credential storage (AES-GCM encrypted vault in SQLite) for job portal logins. API keys are loaded via a local `.env` file. Passwords are securely hashed using bcrypt. Do not commit your `users.db` or `.env` files.
 - **JWT Auth:** The system uses JWT for frontend-backend authentication. The hardcoded fallback secret vulnerability has been fixed. The application will now fail loudly on startup if `JWT_SECRET` is missing from the `.env` file. Ensure you configure a strong, random secret.

@@ -1,9 +1,13 @@
-# Knowledge Base
+# 🧠 Knowledge Base
 
-This directory acts as the single source of truth for the user's professional identity and application constraints.
+This folder is the "Brain" of your personal job search. It serves as the single source of truth for the entire AI pipeline. 
 
-- **`me.json`**: The canonical schema of the user's personal info, work history, projects, and skills. Generated and merged by the Intake pipeline, and heavily utilized by the Tailoring and Fact-Checking engines.
-- **`scope.json`**: The Application Scope configuration, dictating hard logic gates for roles, locations, job types, and work modes that the pipeline is permitted to apply to.
-- **`master_identity.txt`**: A distilled, dense LLM-generated narrative constructed from `me.json` to be injected into prompts for efficient context sharing.
-- **`proof_points.md`**: Textual evidence of portfolio projects and open-source contributions.
-- **`schema.md`**: Developer documentation describing the exact data shapes expected within `me.json`.
+> **Important:** The AI is strictly programmed to NEVER hallucinate skills or experience. It relies 100% on the data provided in this folder.
+
+## Key Files
+
+* **`me.json`**: The core data structure. Contains your structured Work Experience, Projects, Education, Certifications, and a master list of `resume_bullets`. The LLM reads from this file to tailor your resume for specific jobs.
+* **`custom_instructions`**: Found inside `me.json`, these allow you to provide strict prompting rules to the AI (e.g., "Emphasize my experience with Qdrant when applying to RAG engineering roles").
+
+## Editing your Knowledge Base
+While you can edit `me.json` manually in a text editor, it is highly recommended to use the **Knowledge Base Editor** built directly into the SPrav Frontend UI. The UI ensures that JSON structures remain valid and that parent/child IDs (linking bullets to specific projects) do not break.

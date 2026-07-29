@@ -73,16 +73,19 @@ def fetch_jd_text(url: str, timeout: int = 15) -> Optional[str]:
 
     # ── Slow path: Playwright for SPAs ───────────────────────────────────────
     try:
-        import subprocess, json, os
+        import subprocess, json, os, sys
+        from engine.utils import get_node_path
         extractor_js = os.path.join(
             os.path.dirname(__file__), "..", "scraper_service", "jd_extractor.js"
         )
         if not os.path.exists(extractor_js):
             return None
 
+        flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         result = subprocess.run(
-            ["node", extractor_js, url],
-            capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=30
+            [get_node_path(), extractor_js, url],
+            capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=30,
+            creationflags=flags, stdin=subprocess.DEVNULL
         )
         output = result.stdout.strip()
         if output:

@@ -83,13 +83,16 @@ def main():
         print(json.dumps(tailored_resume, indent=2))
 
         print("\nGenerating DOCX...")
-        output_docx = os.path.join(get_data_dir(), "output", "tailored_resume.docx")
+        personal = kb.get("personal", {})
+        name = personal.get("name", "Tailored_Resume").replace(" ", "_")
+        
+        output_docx = os.path.join(get_data_dir(), "output", f"{name}_Resume.docx")
         generate_docx(tailored_resume, kb, output_docx)
         print(f"Saved: {output_docx}")
 
         print("Generating PDF...")
-        output_pdf = os.path.join(get_data_dir(), "output", "tailored_resume.pdf")
-        if generate_pdf(output_docx, output_pdf):
+        output_pdf = os.path.join(get_data_dir(), "output", f"{name}_Resume.pdf")
+        if generate_pdf(tailored_resume, kb, output_pdf):
             print(f"Saved: {output_pdf}")
         else:
             print("PDF generation failed.")

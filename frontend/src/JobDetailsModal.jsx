@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X, Search } from 'lucide-react';
+import ReferralAssist from './components/ReferralAssist';
+import InterviewPrepAssist from './components/InterviewPrepAssist';
 
 export default function JobDetailsModal({ jobId, onClose, token }) {
     const [jobDetails, setJobDetails] = useState(null);
@@ -131,6 +133,8 @@ export default function JobDetailsModal({ jobId, onClose, token }) {
                     </div>
                 </div>
 
+                <ReferralAssist contactsRaw={jobDetails.contacts} company={jobDetails.company} />
+                <InterviewPrepAssist jobDetails={jobDetails} token={token} />
             </div>
         </div>
     );

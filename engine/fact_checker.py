@@ -6,20 +6,35 @@ from engine.skill_analyzer import load_user_kb_text
 # ─────────────────────────────────────────────────────────────────────────────
 
 def extract_metric_claims(text: str) -> set:
-    """Extracts numbers, percentages, and financial figures from text."""
-    patterns = [
-        r'\b\d+(?:\.\d+)?\s?%',
-        r'\b[$€£]\s?\d[\d,.]*(?:\s?[kKmMbB])?',
-        r'\b\d+(?:\.\d+)?\s?x\b',
-        r'\b\d[\d,.]*\+?\s?(?:users|customers|clients|employees|engineers|teams|companies|hours|days|weeks|months|years|minutes|seconds|requests)\b'
-    ]
-
+    """Extracts and normalizes numbers from text to prevent false positives from formatting."""
+    # Pre-process text: convert 'percent' to '%', remove commas in numbers
+    text = re.sub(r'(?i)\bpercent\b', '%', text)
+    text = re.sub(r'(?<=\d),(?=\d{3})', '', text)
+    
+    # Extract numbers with optional decimals and optional suffixes (K, M, B)
+    # \d+(?:\.\d+)?(?:[kKmMbB])?
+    pattern = r'\b\d+(?:\.\d+)?(?:[kKmMbB]\b)?'
+    
     claims = set()
-    for pattern in patterns:
-        for match in re.finditer(pattern, text, re.IGNORECASE):
-            normalized = match.group(0).lower().replace(" ", "")
-            claims.add(normalized)
-
+    for match in re.finditer(pattern, text):
+        raw = match.group(0).lower()
+        multiplier = 1.0
+        if raw.endswith('k'):
+            multiplier = 1000.0
+            raw = raw[:-1]
+        elif raw.endswith('m'):
+            multiplier = 1000000.0
+            raw = raw[:-1]
+        elif raw.endswith('b'):
+            multiplier = 1000000000.0
+            raw = raw[:-1]
+            
+        try:
+            val = float(raw) * multiplier
+            claims.add(val)
+        except ValueError:
+            pass
+            
     return claims
 
 

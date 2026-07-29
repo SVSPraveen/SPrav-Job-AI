@@ -1,15 +1,18 @@
-# ⚙️ SPrav Engine (`/engine`)
+# ⚙️ SPrav AI Engine (Backend)
 
-The Engine is the central nervous system of SPrav. It is responsible for orchestrating the Mixtrue-of-Experts (MoE) LLM pipeline and enforcing data integrity.
+Welcome to the central nervous system of SPrav Job AI. This folder contains the entire Python backend and the Mixture of Experts (MoE) orchestration logic that powers the autonomous job application process.
 
-## 🧠 Core Philosophy
-Large Language Models hallucinate. To prevent this, the SPrav Engine explicitly forbids generative models from "guessing." Every claim made in a tailored resume is cross-referenced against the local Knowledge Base.
+## Core Modules
 
-## 🏗️ Components
+* **`daemon.py`**: The master orchestrator. Runs in an infinite loop managing background scrapers, evaluating new jobs via the LLM pipeline, tailoring resumes, and auto-applying. Contains the `db_mutex` concurrency logic to prevent SQLite lockouts.
+* **`llm_provider.py`**: The dynamic routing layer. Intelligently routes requests to cloud providers (e.g., Groq) and seamlessly fails over to local Ollama models (`qwen2.5-coder`, `deepseek-r1`) if rate limits are hit.
+* **`evaluator.py`**: Reads unstructured job descriptions and calculates a strict mathematical "Fit Score" to determine if a job is worth applying to.
+* **`tailor.py`**: Re-writes resume bullet points to bypass ATS keyword filters while adhering to strict hallucination guardrails.
+* **`formatter.py`**: The dynamic PDF engine. Uses ReportLab to generate a gorgeous, single-page PDF resume by intelligently shrinking fonts and truncating older bullets if necessary.
+* **`scope_enforcer.py`**: Strict rule engine that instantly rejects jobs that don't match your location, visa, or seniority requirements.
+* **`star_bank.py`**: Extracts behavioral gaps and generates custom STAR-format interview stories tailored to the specific role.
+* **`recruiter_dataset.py` & `contact_discovery.py`**: Modules for sourcing hiring managers and drafting personalized networking emails.
 
-* **`auth.py`**: Handles local SQLite user authentication and credential obfuscation.
-* **`prompts.py`**: Stores the system prompts for Qwen, DeepSeek, and high-tier cloud models, explicitly engineered to force rigid JSON or strict logic outputs.
-* **`llm_provider.py`**: The state machine that routes data between the localized Ollama instances and the lightning-fast Groq API, including strict VRAM management and dual local fallback logic.
-
-## 🚀 Usage (Internal)
-The Engine is not meant to be called directly by the user. It is invoked natively by the FastAPI backend when a new batch of jobs arrives from the Discovery layer.
+## Technical Notes
+- **Memory Ceiling**: The entire pipeline is explicitly designed to run on a machine with an **8GB VRAM** ceiling when using local Ollama fallbacks.
+- **Data Storage**: All state is persisted to a local SQLite database (`jobs.db`) typically stored in your `%LOCALAPPDATA%` directory.

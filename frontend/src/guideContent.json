@@ -1,0 +1,64 @@
+{
+  "onboarding": {
+    "steps": [
+      {
+        "title": "Welcome to SPrav Job AI!",
+        "desc": "This isn't just an auto-filler. It's an autonomous AI agent that discovers roles, tailors your resume dynamically per job using semantic matching, and applies for you. Let's walk through how to unlock its full potential."
+      },
+      {
+        "title": "Step 1: Secure Credentials",
+        "desc": "Head to Settings. This app runs locally. You must provide a Groq or OpenRouter API key for the AI reasoning engine. If you want contact discovery, provide your GitHub PAT. None of your data ever leaves this machine except to the API providers you explicitly configure."
+      },
+      {
+        "title": "Step 2: The Knowledge Base",
+        "desc": "Your Knowledge Base is the brain of the operation. Don't just upload a PDF. Use the editor to break down your experience into highly detailed, granular bullet points. The AI uses vector search to dynamically pick the perfect 4-5 bullet points from your past experience to match every unique Job Description it finds."
+      },
+      {
+        "title": "Step 3: Defining your Scope",
+        "desc": "In the Application Scope tab, you dictate the agent's hunting grounds. Don't just set roles manually—if you leave it blank, the AI will scan your Knowledge Base and suggest the top 3 roles you are uniquely qualified for. Use negative keywords to aggressively filter out junk jobs."
+      },
+      {
+        "title": "Step 4: Auto vs Manual Pipelines",
+        "desc": "The Daemon (background worker) handles Greenhouse, Lever, and Ashby 100% automatically (up to 200 a day). For strict portals like Workday or iCIMS (capped at 50/day), jobs are routed to your Manual Review Pipeline where the built-in Copilot will assist you in filling them out without getting blocked."
+      },
+      {
+        "title": "Step 5: Watchlists & Outreach",
+        "desc": "Want to target a specific company? Use the Watchlist Manager to scrape their exact career page. Once you apply, use the Recruiter Outreach tab—the AI will discover hiring managers on GitHub/LinkedIn and draft hyper-personalized follow-up emails for you."
+      }
+    ]
+  },
+  "troubleshooting": [
+    {
+      "q": "How does the AI actually tailor my resume?",
+      "a": "When a job is found, the AI reads the JD, searches your Knowledge Base for semantically similar experience, and compiles a completely unique LaTeX/PDF resume on the fly. It highlights exactly what that specific recruiter is looking for."
+    },
+    {
+      "q": "What happens if I hit the Daily Cap?",
+      "a": "To protect your API limits and prevent ATS spam filters from flagging you, we strictly enforce 200 Auto-Applies and 50 Manual-Assist applies per day. If you hit this limit, the Daemon pauses until midnight."
+    },
+    {
+      "q": "The Auto-Apply daemon is stuck or erroring out.",
+      "a": "Check the Dashboard for Circuit Breaker alerts. If the app detects 3 consecutive errors (like a bad API key or missing resume), it trips the breaker to prevent wasting your credits. Fix the issue in Settings and click 'Reset Breaker'."
+    },
+    {
+      "q": "I'm not getting enough job matches. How do I fix this?",
+      "a": "Go to Application Scope. The AI strictly obeys your locations and roles. If it's too narrow, expand your locations using the typeahead. Also, ensure your 'Fit Score Threshold' isn't set too high (we recommend 65-75%)."
+    },
+    {
+      "q": "What is the Copilot panel for?",
+      "a": "While the Guide Tour explains HOW to use the app, the Copilot panel is an interactive AI agent. You can ask it to analyze a specific job description, extract keywords, or even rewrite a specific bullet point for you while you are in the Manual Review tab."
+    },
+    {
+      "q": "Why do jobs keep going to the Manual Review Pipeline?",
+      "a": "Portals like Workday and iCIMS use aggressive bot detection. Instead of getting your IP banned, the AI routes them to Manual Review. You can click them, open the real portal, and use our Copilot overlay to instantly inject the right answers."
+    },
+    {
+      "q": "How does Recruiter Outreach discover emails?",
+      "a": "If you provided a GitHub PAT in Settings, the engine cross-references the hiring company on GitHub, finds maintainers, and uses commit logs to infer corporate email patterns (e.g., first.last@company.com), then drafts the email."
+    },
+    {
+      "q": "Can I run this 100% offline with local models?",
+      "a": "Yes! If you have Ollama installed with a capable model (like qwen2.5-coder:7b), you can switch to Local mode in Settings. Note that generation will be slower and depends heavily on your GPU."
+    }
+  ]
+}

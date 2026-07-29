@@ -3,19 +3,22 @@ engine/auth.py
 ==============
 Full authentication layer for SPrav Job AI.
 - SQLite-based user accounts (permanent, local, no cloud)
-- bcrypt password hashing
+- bcrypt password hashing with backward compatibility for legacy hashes
 - JWT access tokens (30-day lifetime)
-- Encrypted credential storage for LinkedIn, Gmail, etc.
+- AES-GCM Encrypted credential storage (with transparent migration for legacy XOR)
 """
 
 import jwt
 import sqlite3
 import hashlib
 import os
-import json
 import base64
-import random
 import smtplib
+import secrets
+import bcrypt
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives import hashes
 from email.message import EmailMessage
 from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, Security, status
@@ -27,11 +30,10 @@ if not SECRET_KEY:
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 30
 from engine.utils import get_data_dir
-import os
+
 USERS_DB = os.path.join(get_data_dir(), "users.db")
 
 security = HTTPBearer()
-
 
 # ─── Database Setup ──────────────────────────────────────────────────────────
 
@@ -70,7 +72,6 @@ def init_users_db():
         );
     """)
     
-    # Simple migration for existing databases
     try:
         cursor.execute("ALTER TABLE users ADD COLUMN recovery_key_hash TEXT")
     except sqlite3.OperationalError:
@@ -79,44 +80,72 @@ def init_users_db():
     conn.commit()
     conn.close()
 
-
 init_users_db()
-
 
 # ─── Password Hashing ────────────────────────────────────────────────────────
 
 def _hash_password(password: str) -> str:
-    """SHA-256 hash with a fixed salt derived from SECRET_KEY. Lightweight, no extra deps."""
-    salt = SECRET_KEY[:16]
-    return hashlib.sha256(f"{salt}{password}".encode()).hexdigest()
-
+    """bcrypt hashing for new passwords."""
+    salt = bcrypt.gensalt(rounds=12)
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
 def _verify_password(password: str, password_hash: str) -> bool:
-    return _hash_password(password) == password_hash
+    """Verifies bcrypt hashes, falls back to legacy SHA-256 for old passwords."""
+    if password_hash.startswith("$2b$") or password_hash.startswith("$2a$"):
+        return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
+    else:
+        # Legacy SHA-256 fallback
+        salt = SECRET_KEY[:16]
+        return hashlib.sha256(f"{salt}{password}".encode()).hexdigest() == password_hash
 
+# ─── Credential Encryption (AES-GCM) ─────────────────────────────────────────
 
-# ─── Credential Encryption ───────────────────────────────────────────────────
+def _get_aes_key() -> bytes:
+    hkdf = HKDF(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=None,
+        info=b'sprav-credential-encryption',
+    )
+    return hkdf.derive(SECRET_KEY.encode('utf-8'))
 
 def _simple_encrypt(value: str) -> str:
-    """XOR-based obfuscation with the secret key. Keeps credentials unreadable in plain DB viewers."""
-    key = (SECRET_KEY * 10)[:len(value)]
-    encrypted = bytes(a ^ b for a, b in zip(value.encode(), key.encode()))
-    return base64.b64encode(encrypted).decode()
-
+    """Robust AES-GCM encryption."""
+    if not value:
+        return ""
+    aesgcm = AESGCM(_get_aes_key())
+    nonce = os.urandom(12)
+    ciphertext = aesgcm.encrypt(nonce, value.encode('utf-8'), None)
+    return base64.b64encode(nonce + ciphertext).decode('utf-8')
 
 def _simple_decrypt(encrypted: str) -> str:
-    try:
-        data = base64.b64decode(encrypted.encode())
-        key = (SECRET_KEY * 10)[:len(data)]
-        return bytes(a ^ b for a, b in zip(data, key.encode())).decode()
-    except Exception:
+    """Decrypts AES-GCM, falls back to legacy XOR if formatted differently."""
+    if not encrypted:
         return ""
-
+    try:
+        data = base64.b64decode(encrypted.encode('utf-8'))
+        is_legacy = False
+        if len(data) >= 28:
+            try:
+                aesgcm = AESGCM(_get_aes_key())
+                nonce = data[:12]
+                ciphertext = data[12:]
+                return aesgcm.decrypt(nonce, ciphertext, None).decode('utf-8')
+            except Exception:
+                is_legacy = True
+        else:
+            is_legacy = True
+            
+        if is_legacy:
+            key = (SECRET_KEY * 10)[:len(data)]
+            return bytes(a ^ b for a, b in zip(data, key.encode('utf-8'))).decode('utf-8')
+    except Exception:
+        pass
+    return ""
 
 # ─── User Account Operations ─────────────────────────────────────────────────
 
 def has_any_account() -> bool:
-    """Returns True if at least one user account exists."""
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM users")
@@ -124,9 +153,7 @@ def has_any_account() -> bool:
     conn.close()
     return count > 0
 
-
 def create_user(name: str, email: str, password: str) -> dict:
-    """Creates a new user. Raises HTTPException if email already taken."""
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     try:
@@ -146,10 +173,25 @@ def create_user(name: str, email: str, password: str) -> dict:
     finally:
         conn.close()
 
+# Store layout: {email: {"code": otp_code, "time": datetime, "attempts": int, "last_attempt": datetime}}
 otp_store = {}
 
 def send_otp(email: str):
     email = email.strip().lower()
+    now = datetime.now()
+    
+    # Rate Limiting
+    if email in otp_store:
+        limits = otp_store[email]
+        if limits.get("attempts", 0) >= 3 and (now - limits.get("last_attempt", now)).total_seconds() < 900:
+            raise HTTPException(status_code=429, detail="Too many attempts. Please wait 15 minutes.")
+        if (now - limits.get("last_attempt", now)).total_seconds() < 60:
+            raise HTTPException(status_code=429, detail="Please wait 60 seconds before requesting another OTP.")
+            
+        limits["attempts"] = limits.get("attempts", 0) + 1
+        limits["last_attempt"] = now
+    else:
+        otp_store[email] = {"attempts": 1, "last_attempt": now}
     
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
@@ -157,8 +199,10 @@ def send_otp(email: str):
     row = cursor.fetchone()
     conn.close()
     
+    # Generic Anti-Enumeration Response
+    success_msg = {"message": "If that email exists in our system, an OTP has been sent."}
     if not row:
-        raise HTTPException(status_code=404, detail="Email not found in local database.")
+        return success_msg
         
     sender_email = os.getenv("EMAIL_SENDER")
     sender_password = os.getenv("EMAIL_PASSWORD")
@@ -166,8 +210,9 @@ def send_otp(email: str):
     if not sender_email or not sender_password:
         raise HTTPException(status_code=400, detail="Email OTP requires EMAIL_SENDER and EMAIL_PASSWORD in .env")
         
-    otp_code = str(random.randint(100000, 999999))
-    otp_store[email] = {"code": otp_code, "time": datetime.now()}
+    otp_code = str(secrets.randbelow(900000) + 100000)
+    otp_store[email]["code"] = otp_code
+    otp_store[email]["time"] = now
     
     msg = EmailMessage()
     msg.set_content(f"Your SPrav Job AI password reset OTP is: {otp_code}")
@@ -184,19 +229,17 @@ def send_otp(email: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
         
-    return {"message": "OTP sent successfully to your email."}
+    return success_msg
 
 def reset_password(email: str, recovery_key: str, new_password: str):
-    """Resets the password using the Master Recovery Key OR an Email OTP."""
     email = email.strip().lower()
-    
     is_otp = recovery_key.strip().isdigit() and len(recovery_key.strip()) == 6
     
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     
     if is_otp:
-        if email not in otp_store:
+        if email not in otp_store or "code" not in otp_store[email]:
             conn.close()
             raise HTTPException(status_code=401, detail="No OTP requested for this email.")
             
@@ -206,11 +249,11 @@ def reset_password(email: str, recovery_key: str, new_password: str):
             raise HTTPException(status_code=401, detail="Invalid OTP code.")
             
         if (datetime.now() - stored["time"]).total_seconds() > 600:
-            del otp_store[email]
+            del otp_store[email]["code"]
             conn.close()
             raise HTTPException(status_code=401, detail="OTP expired. Please request a new one.")
             
-        del otp_store[email]
+        del otp_store[email]["code"]
         
         cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
         row = cursor.fetchone()
@@ -230,6 +273,10 @@ def reset_password(email: str, recovery_key: str, new_password: str):
             )
         user_id = row[0]
         
+        # Transparent migration for recovery_key
+        if not row[1].startswith("$2b$") and not row[1].startswith("$2a$"):
+            cursor.execute("UPDATE users SET recovery_key_hash = ? WHERE id = ?", (_hash_password(recovery_key.strip()), user_id))
+        
     cursor.execute(
         "UPDATE users SET password_hash = ? WHERE id = ?",
         (_hash_password(new_password), user_id)
@@ -238,9 +285,7 @@ def reset_password(email: str, recovery_key: str, new_password: str):
     conn.close()
     return {"status": "success"}
 
-
 def authenticate_user(email: str, password: str) -> dict:
-    """Verifies credentials. Returns user dict or raises 401."""
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
@@ -248,18 +293,25 @@ def authenticate_user(email: str, password: str) -> dict:
         (email.strip().lower(),)
     )
     row = cursor.fetchone()
-    if row:
-        cursor.execute("UPDATE users SET last_login = datetime('now') WHERE id = ?", (row[0],))
-        conn.commit()
-    conn.close()
 
     if not row or not _verify_password(password, row[3]):
+        conn.close()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password."
         )
-    return {"id": row[0], "name": row[1], "email": row[2]}
+        
+    user_id, name, user_email, password_hash = row
+    
+    # Transparent Migration to bcrypt
+    if not password_hash.startswith("$2b$") and not password_hash.startswith("$2a$"):
+        cursor.execute("UPDATE users SET password_hash = ? WHERE id = ?", (_hash_password(password), user_id))
 
+    cursor.execute("UPDATE users SET last_login = datetime('now') WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return {"id": user_id, "name": name, "email": user_email}
 
 # ─── JWT Tokens ──────────────────────────────────────────────────────────────
 
@@ -272,7 +324,6 @@ def create_access_token(user: dict) -> str:
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-
 def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
     token = credentials.credentials
     try:
@@ -282,15 +333,12 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Security(security))
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid session token.")
 
-
 def get_user_id_from_token(payload: dict) -> int:
     return payload.get("user_id", 1)
-
 
 # ─── Credential Store ─────────────────────────────────────────────────────────
 
 def save_credential(user_id: int, service: str, key: str, value: str):
-    """Saves an encrypted credential for a user."""
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     encrypted = _simple_encrypt(value) if value else ""
@@ -304,9 +352,7 @@ def save_credential(user_id: int, service: str, key: str, value: str):
     conn.commit()
     conn.close()
 
-
 def get_credentials(user_id: int, service: str) -> dict:
-    """Returns all decrypted credentials for a service as a dict."""
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
@@ -314,12 +360,19 @@ def get_credentials(user_id: int, service: str) -> dict:
         (user_id, service)
     )
     rows = cursor.fetchall()
+    
+    result = {}
+    
+    for row in rows:
+        cred_key = row[0]
+        enc_value = row[1]
+        decrypted = _simple_decrypt(enc_value)
+        result[cred_key] = decrypted
+        
     conn.close()
-    return {row[0]: _simple_decrypt(row[1]) for row in rows}
-
+    return result
 
 def get_all_credentials(user_id: int) -> dict:
-    """Returns all services and their credentials (values masked for UI display)."""
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute(
@@ -333,13 +386,11 @@ def get_all_credentials(user_id: int) -> dict:
         if service not in result:
             result[service] = {}
         decrypted = _simple_decrypt(enc_value)
-        # Mask value for display — show only whether it's set or not
         result[service][key] = {
             "is_set": bool(decrypted),
             "updated_at": updated_at
         }
     return result
-
 
 # ─── Copilot History ─────────────────────────────────────────────────────────
 
@@ -353,7 +404,6 @@ def save_copilot_message(user_id: int, role: str, content: str):
     conn.commit()
     conn.close()
 
-
 def get_copilot_history(user_id: int, limit: int = 20) -> list:
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
@@ -365,11 +415,9 @@ def get_copilot_history(user_id: int, limit: int = 20) -> list:
     conn.close()
     return [{"role": r[0], "content": r[1]} for r in reversed(rows)]
 
-
 # ─── Legacy compatibility ─────────────────────────────────────────────────────
 
 def get_user_credentials() -> tuple[str, str]:
-    """Legacy shim: returns (email, password) for any old code that calls this."""
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT email, password_hash FROM users LIMIT 1")
@@ -380,7 +428,6 @@ def get_user_credentials() -> tuple[str, str]:
     return "admin@localhost", "admin123"
 
 def get_system_credential(service: str, key: str) -> str | None:
-    """Helper for background tasks (daemons/LLM providers) to fetch credentials for the primary user."""
     conn = sqlite3.connect(USERS_DB, timeout=30.0)
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users LIMIT 1")

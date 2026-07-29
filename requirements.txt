@@ -2,8 +2,7 @@ requests
 python-dotenv
 pytest
 python-docx
-pypandoc
-docx2pdf
+reportlab
 PyPDF2
 pdfplumber
 docxtpl
@@ -24,3 +23,7 @@ pyjwt
 pywebview
 ollama
 PyJWT
+
+playwright-stealth
+bcrypt
+cryptography

@@ -22,7 +22,20 @@ import os
 import re
 from difflib import SequenceMatcher
 
-SCOPE_PATH = "knowledge_base/scope.json"
+# Always read/write scope from the user's mutable data directory, regardless
+# of the CWD at runtime. Using a relative path was the root cause of the
+# 'str' object has no attribute 'get' crash: the daemon subprocess ran with
+# CWD=dist\SPravJobAI and loaded the stale bundled scope.json (which had
+# locations as plain strings) instead of the user's live copy.
+def _get_scope_path() -> str:
+    """Returns the absolute path to scope.json in the user data directory."""
+    try:
+        from engine.utils import get_data_dir
+        return os.path.join(get_data_dir(), "knowledge_base", "scope.json")
+    except ImportError:
+        # Fallback for environments where engine.utils isn't importable
+        local_app_data = os.environ.get("LOCALAPPDATA", os.path.expanduser("~"))
+        return os.path.join(local_app_data, "SPravJobAI", "knowledge_base", "scope.json")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Scope loading
@@ -44,11 +57,12 @@ _DEFAULT_SCOPE = {
 
 
 def load_scope() -> dict:
-    """Loads scope.json, returning defaults if missing or malformed."""
-    if not os.path.exists(SCOPE_PATH):
+    """Loads scope.json from the user data directory, returning defaults if missing or malformed."""
+    scope_path = _get_scope_path()
+    if not os.path.exists(scope_path):
         return dict(_DEFAULT_SCOPE)
     try:
-        with open(SCOPE_PATH, "r", encoding="utf-8") as f:
+        with open(scope_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         # Merge with defaults so missing keys don't crash
         merged = dict(_DEFAULT_SCOPE)
@@ -60,9 +74,10 @@ def load_scope() -> dict:
 
 
 def save_scope(scope: dict) -> None:
-    """Persists scope config to disk."""
-    os.makedirs(os.path.dirname(SCOPE_PATH), exist_ok=True)
-    with open(SCOPE_PATH, "w", encoding="utf-8") as f:
+    """Persists scope config to the user data directory."""
+    scope_path = _get_scope_path()
+    os.makedirs(os.path.dirname(scope_path), exist_ok=True)
+    with open(scope_path, "w", encoding="utf-8") as f:
         json.dump(scope, f, indent=2, ensure_ascii=False)
 
 
@@ -176,6 +191,10 @@ def check_scope(job: dict, scope: dict | None = None) -> tuple[bool, str]:
 
     # ── Gate 2: Per-location rules ────────────────────────────────────────────
     for loc_rule in scope.get("locations", []):
+        # Defensive: legacy scope.json may store plain strings instead of {label, preference} dicts.
+        # Normalize strings so the daemon never crashes on old bundled data.
+        if isinstance(loc_rule, str):
+            loc_rule = {"label": loc_rule, "preference": "no_preference"}
         label = (loc_rule.get("label") or "").lower().strip()
         pref  = loc_rule.get("preference", "no_preference")
         if pref == "exclude" and label and label in job_location:
@@ -183,6 +202,9 @@ def check_scope(job: dict, scope: dict | None = None) -> tuple[bool, str]:
 
     # ── Gate 3: Role/title rules ──────────────────────────────────────────────
     for role_rule in scope.get("roles", []):
+        # Defensive: legacy scope.json may store plain strings instead of {keyword, preference} dicts.
+        if isinstance(role_rule, str):
+            role_rule = {"keyword": role_rule, "preference": "no_preference"}
         keyword = (role_rule.get("keyword") or "").strip()
         pref    = role_rule.get("preference", "no_preference")
         if pref == "exclude" and keyword:

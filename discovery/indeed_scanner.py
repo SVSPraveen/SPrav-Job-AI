@@ -1,5 +1,6 @@
 import subprocess
 import os
+import sys
 from engine.utils import get_node_path, get_data_dir
 
 def run_indeed_scanner() -> list:
@@ -20,6 +21,8 @@ def run_indeed_scanner() -> list:
         # so this Python wrapper simply orchestrates the execution.
         env = os.environ.copy()
         env["SPRAV_DATA_DIR"] = get_data_dir()
+        
+        flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
         subprocess.run(
             [get_node_path(), script_path],
             capture_output=True,
@@ -27,7 +30,9 @@ def run_indeed_scanner() -> list:
             encoding='utf-8',
             errors='replace',
             timeout=300,
-            env=env
+            env=env,
+            creationflags=flags,
+            stdin=subprocess.DEVNULL
         )
         print("[Indeed Scanner] Stealth Crawler finished successfully.")
     except Exception as e:
