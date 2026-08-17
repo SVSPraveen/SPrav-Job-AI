@@ -69,7 +69,7 @@ We highly recommend using free cloud keys. They execute in milliseconds and use 
 
 ## 4. Setting Up Local Offline AI with Ollama (Optional)
 
-If you require 100% offline, air-gapped execution and have a dedicated GPU (NVIDIA RTX 3060+ with 6GB+ VRAM):
+If you require 100% offline, air-gapped execution and have a dedicated GPU (NVIDIA RTX 3070 / 4060+ with 8GB+ VRAM):
 
 1. Download and install [Ollama for Windows](https://ollama.com/download/windows).
 2. Open PowerShell and pull the recommended coding model:
