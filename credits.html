@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Sources, Credits & Engineering Inspirations — SPrav™ Job AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(99, 102, 241, 0.22);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.4);
+      --accent: #a855f7;
+      --success: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-bottom: 60px;
+    }
+    .ambient-glow {
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(168, 85, 247, 0.12) 40%, transparent 70%);
+      filter: blur(100px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    header {
+      padding: 1.25rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 13, 22, 0.88);
+    }
+    .nav-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .brand-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.55rem 1.15rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+    .hero-heading {
+      padding: 3.5rem 0 2.5rem 0;
+      text-align: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 30px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #c084fc;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 740px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+    .section-card h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .grid-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .item-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: all 0.2s;
+    }
+    .item-box:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+    }
+    .item-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #a5b4fc;
+      margin-bottom: 0.35rem;
+    }
+    .item-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .footer-note {
+      text-align: center;
+      padding: 2.5rem 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <header>
+    <div class="container nav-wrapper">
+      <a href="index.html" class="brand">
+        <div class="logo-badge">S</div>
+        <div class="brand-text">SPRAV™ <span style="font-size: 0.85rem; color: #a5b4fc; font-weight: 600;">JOB AI</span></div>
+      </a>
+      <a href="index.html" class="back-btn">
+        ← Back to Main Showcase
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="hero-heading">
+      <div class="badge">🙏 Open-Source Transparency &amp; Attributions</div>
+      <h1>Data Sources, Credits &amp; Inspirations</h1>
+      <p class="hero-subtitle">
+        SPrav™ Job AI is built on the shoulders of giants. We gratefully acknowledge the open-source libraries, AI research, public ATS gateways, and hiring methodologies that make this project possible.
+      </p>
+    </div>
+
+    <!-- 1. Live Job Feeds -->
+    <div class="section-card">
+      <h2>📡 1. Live Job Feeds &amp; 1st-Party ATS Endpoints</h2>
+      <div class="grid-items">
+        <div class="item-box">
+          <div class="item-title">Greenhouse.io</div>
+          <div class="item-desc">Public job board API (<code>boards-api.greenhouse.io</code>) for direct corporate openings.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">Lever.co</div>
+          <div class="item-desc">Public career portal gateway (<code>api.lever.co</code>) with real-time posting webhooks.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">AshbyHQ</div>
+          <div class="item-desc">Direct corporate career board endpoints (<code>jobs.ashbyhq.com</code>).</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">Himalayas Community</div>
+          <div class="item-desc">Verified remote software engineering job feeds (<code>himalayas.app/jobs/api</code>).</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">Arbeitnow</div>
+          <div class="item-desc">European and international tech job streams (<code>arbeitnow.com/api</code>).</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">RemoteOK</div>
+          <div class="item-desc">Global remote developer and AI listings (<code>remoteok.com/api</code>).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. AI Ecosystem -->
+    <div class="section-card">
+      <h2>🤖 2. Artificial Intelligence &amp; NLP Ecosystem</h2>
+      <div class="grid-items">
+        <div class="item-box">
+          <div class="item-title">Google DeepMind (Gemini 2.0 Flash)</div>
+          <div class="item-desc">Sub-second contextual synthesis, STAR achievement rewriting, and rubric scoring.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">Groq Inc. (LPU™ Engine)</div>
+          <div class="item-desc">Ultra-low latency token generation for rapid bulk JD evaluation.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">Ollama Community</div>
+          <div class="item-desc">Local LLM execution runner powering 100% offline air-gapped inference.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">Alibaba Qwen Team (Qwen 2.5 Coder)</div>
+          <div class="item-desc">High-precision local open-weights models (7B/14B) for code and skill graph extraction.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">DeepSeek AI (DeepSeek-R1)</div>
+          <div class="item-desc">Reasoning models for behavioral interview preparation logic.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">PyMuPDF (Artifex Software)</div>
+          <div class="item-desc">High-speed C-based PDF text extraction engine preserving resume layout coordinates.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Core Open-Source Stack -->
+    <div class="section-card">
+      <h2>💻 3. Core Open-Source Software Stack</h2>
+      <div class="grid-items">
+        <div class="item-box">
+          <div class="item-title">FastAPI &amp; Starlette</div>
+          <div class="item-desc">High-throughput asynchronous Python web framework created by Sebastián Ramírez (Tiangolo).</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">SQLite (WAL Mode)</div>
+          <div class="item-desc">Embedded zero-configuration SQL database engine by D. Richard Hipp, delivering 17.7ms query latency.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">React 19 &amp; Vite</div>
+          <div class="item-desc">Reactive user interface framework and next-generation build tool created by Evan You and Meta team.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">Lucide Icons</div>
+          <div class="item-desc">Clean, consistent, and lightweight open-source icon system for developer interfaces.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">PyInstaller Community</div>
+          <div class="item-desc">Standalone Windows binary packaging system ensuring zero-install portability.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">Uvicorn</div>
+          <div class="item-desc">Lightning-fast ASGI web server implementation supporting asynchronous job queues.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Hiring Methodologies -->
+    <div class="section-card">
+      <h2>🎯 4. Hiring Methodologies &amp; Career Frameworks</h2>
+      <div class="grid-items">
+        <div class="item-box">
+          <div class="item-title">The Google XYZ Formula (Laszlo Bock)</div>
+          <div class="item-desc"><em>"Accomplished [X] as measured by [Y], by doing [Z]"</em> — used to structure all resume bullet points.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">The STAR Method</div>
+          <div class="item-desc">Situation, Task, Action, Result framework for structured engineering interview responses.</div>
+        </div>
+        <div class="item-box">
+          <div class="item-title">ATS Heuristic Best Practices</div>
+          <div class="item-desc">Modern parse-rate guidelines from leading technical talent acquisition teams.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <p style="margin-bottom: 8px;">
+        Architected &amp; Engineered by <strong>SVS Praveen</strong> • Free Personal Freeware Project
+      </p>
+      <p style="font-size: 0.85rem;">
+        <a href="index.html" style="color: #38bdf8; text-decoration: none;">← Return to Main Showcase</a> • <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" style="color: #a5b4fc; text-decoration: none;">GitHub Repository</a>
+      </p>
+    </div>
+  </main>
+
+</body>
+</html>
