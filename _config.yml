@@ -1,0 +1,6 @@
+theme: null
+include:
+  - ".nojekyll"
+exclude:
+  - "assets/SPrav Job AI video.mp4"
+  - "README.md"
