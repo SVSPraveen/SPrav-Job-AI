@@ -1,27 +1,24 @@
-# 🗺️ SPrav™ Job AI — Engineering Roadmap
+# 🗺️ SPrav™ Job AI — Production Status & Release Notes
 
-This roadmap outlines current releases, in-progress enhancements, and future planned capabilities for **SPrav™ Job AI**.
+This document details current release capabilities and the community-driven development approach for **SPrav™ Job AI**.
 
 ---
 
-## 🚀 Current Stable Release: v2.4.0 Pro Edition (August 2026)
-* [x] **Autonomous 1st-Party Ingestion**: Greenhouse, Lever, Ashby, Workday, SmartRecruiters.
+## 🚀 Current Production Release: v2.4.0 Pro Edition
+
+* [x] **Autonomous 1st-Party Ingestion**: Greenhouse, Lever, Ashby, Workday, SmartRecruiters, and verified career portals.
 * [x] **Hybrid ATS & Cosine Matcher**: 120+ domain skill dictionaries with cosine embedding similarity.
 * [x] **Guided 1-Click Dispatch Pipeline**: Tailored cover notes, STAR alignment, and recruiter discovery.
 * [x] **100% Local Air-Gapped Storage**: SQLite WAL mode in `%LOCALAPPDATA%\SPravJobAI`.
 * [x] **Multi-Engine AI Support**: Google Gemini 2.0 Flash, Groq, and local Ollama Qwen 2.5 Coder.
 * [x] **Zero-Install Standalone Portable Bundle**: Single `.zip` extraction for Windows 10/11.
+* [x] **Live Telemetry & Clean Descriptions**: Real-time synchronized job metrics and clean structured formatting.
 
 ---
 
-## 🔮 Upcoming Milestones
+## 💡 Future Updates & Feedback
 
-### Milestone v2.5 (Q4 2026)
-* [ ] **Automated PDF Resume Formatter**: In-app tool to export tailored PDF versions matching specific job descriptions.
-* [ ] **Email Client IMAP Integration**: Automatic detection of recruiter interview invitations and status updates.
-* [ ] **Expanded Regional Job Portals**: Direct ingestion for top Indian (Naukri/Hirist) and European tech startup boards.
-
-### Milestone v3.0 (2027)
-* [ ] **macOS & Linux Standalone Binaries**: Native cross-platform desktop builds.
-* [ ] **Collaborative Job Hub (P2P)**: Encrypted peer-to-peer job sharing between trusted developer circles.
-* [ ] **Live Mock Interview Voice Agent**: Local audio AI conducting realistic mock technical screenings.
+Future capabilities and version updates are prioritized dynamically based on real-world candidate feedback:
+* **Community-Driven**: Feature enhancements are shaped directly by suggestions from job seekers and developers.
+* **Continuous Improvements**: New releases and patches are announced directly through the [GitHub Repository](https://github.com/SVSPraveen/SPrav-Job-AI).
+* **Feature Requests**: Have an idea or need support for a specific ATS portal? Open an issue on GitHub!

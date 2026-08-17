@@ -59,7 +59,7 @@
 | 📊 **Engineering Case Study**| [`docs/CASE_STUDY.md`](docs/CASE_STUDY.md) | Technical benchmarks: 72ms SQLite queries, <120MB RAM, and architecture trade-offs. |
 | 🙏 **Credits & Data Sources** | [`docs/CREDITS_AND_INSPIRATIONS.md`](docs/CREDITS_AND_INSPIRATIONS.md) | Full attribution of ATS platforms (Greenhouse, Lever), AI foundations, and OSS stack. |
 | ❓ **Frequently Asked Questions** | [`docs/FAQ.md`](docs/FAQ.md) | 13-point FAQ covering privacy, air-gapped storage, zero fees, and multi-PC sync. |
-| 🗺️ **Product Roadmap** | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Release milestones, planned macOS/Linux support, and feature roadmap. |
+| 🗺️ **Release Notes & Status** | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Release milestones, v2.4 Pro capabilities, and community feedback. |
 | 🐍 **ATS Benchmark Script** | [`examples/quickstart_ats_benchmark.py`](examples/quickstart_ats_benchmark.py) | Standalone Python script demonstrating cosine skill extraction. |
 | 🛠️ **Hardware Diagnostics** | [`examples/diagnose_system.py`](examples/diagnose_system.py) | Standalone script to test local hardware, memory, and network connectivity. |
 
