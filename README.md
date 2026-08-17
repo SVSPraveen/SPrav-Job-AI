@@ -123,6 +123,13 @@
   <img src="assets/screenshots/Settings%20&%20Cloud%20AI%20Authentication.png" width="850" alt="Settings & Cloud AI Engine Configuration" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
 </a>
 
+### 9. About, System Architecture & Developer Attribution
+*Version manifests, engine telemetry, MIT license, and architectural credits.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/about.png" target="_blank">
+  <img src="assets/screenshots/about.png" width="850" alt="About & System Architecture" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+</a>
+
 </div>
 
 ---
