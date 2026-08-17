@@ -1,0 +1,119 @@
+{
+  "personal": {
+    "name": "",
+    "email": "",
+    "phone": "",
+    "linkedin": "",
+    "github": "",
+    "portfolio": "",
+    "location": "",
+    "summary": ""
+  },
+  "work_history": [],
+  "education": [],
+  "projects": [],
+  "github_projects": [],
+  "portfolio_projects": [],
+  "certifications": [],
+  "resume_bullets": [],
+  "skills": {
+    "ai_agentic_systems": [
+      "LangGraph",
+      "LangChain",
+      "Multi-Agent Systems",
+      "Agentic RAG",
+      "Self-RAG",
+      "CRAG",
+      "Autonomous Workflows",
+      "Agent Tool Calling"
+    ],
+    "retrieval_search": [
+      "Hybrid Search (BM25 + Dense)",
+      "Semantic Caching",
+      "Sentence-Transformers",
+      "Cross-Encoder Re-ranking",
+      "HuggingFace Transformers",
+      "Vector Embeddings"
+    ],
+    "llms_vector_databases": [
+      "Qdrant",
+      "ChromaDB",
+      "vLLM",
+      "Ollama",
+      "Groq API",
+      "LoRA Fine-tuning",
+      "OpenAI / Gemini APIs",
+      "Prompt Optimization"
+    ],
+    "ml_evaluation": [
+      "Scikit-learn",
+      "PyTorch",
+      "MLflow",
+      "RAGAS",
+      "Pytest",
+      "Cosine Similarity",
+      "Precision / Recall",
+      "Model Benchmarking"
+    ],
+    "full_stack_backend": [
+      "Python",
+      "FastAPI",
+      "React 18",
+      "JavaScript",
+      "TypeScript",
+      "SQLAlchemy",
+      "Alembic",
+      "Pydantic",
+      "REST APIs",
+      "Redis"
+    ],
+    "cloud_security": [
+      "Docker",
+      "Git",
+      "AWS",
+      "JWT Authentication",
+      "OAuth2",
+      "Linux / Bash",
+      "CI/CD Pipelines"
+    ],
+    "languages": [
+      "Python",
+      "JavaScript",
+      "TypeScript",
+      "SQL",
+      "Bash"
+    ],
+    "frameworks": [
+      "FastAPI",
+      "React 18",
+      "LangChain",
+      "LangGraph",
+      "PyTorch"
+    ],
+    "ai_ml": [
+      "LangGraph",
+      "Agentic RAG",
+      "Qdrant",
+      "vLLM",
+      "LoRA Fine-tuning",
+      "Self-RAG",
+      "CRAG",
+      "Hybrid Search (BM25 + Dense)",
+      "Cross-Encoder Re-ranking",
+      "Semantic Caching",
+      "Sentence-Transformers",
+      "HuggingFace Transformers"
+    ],
+    "tools": [
+      "Git",
+      "Docker",
+      "PyWebView",
+      "Redis",
+      "SQLAlchemy",
+      "Alembic",
+      "Pydantic",
+      "Qdrant",
+      "ChromaDB"
+    ]
+  }
+}
