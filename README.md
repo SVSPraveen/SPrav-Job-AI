@@ -2,41 +2,66 @@
 
 <div align="center">
 
-<img src="assets/logo.png" width="130" alt="SPrav Job AI Logo" style="border-radius: 24px; margin-bottom: 14px; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);" />
+<img src="assets/logo.png" width="135" alt="SPrav Job AI Logo" style="border-radius: 26px; margin-bottom: 14px; box-shadow: 0 12px 35px rgba(99, 102, 241, 0.5);" />
 
-### The High-Precision, Privacy-First Career Automation Platform for Engineers
+# SPrav™ Job AI (Pro v2.4 Edition)
+### Autonomous Career Intelligence, High-Fidelity ATS Scoring & Guided 1-Click Dispatch
 
-[![Live Showcase](https://img.shields.io/badge/Live_Web_Demo-GitHub_Pages-6366f1?style=for-the-badge&logo=githubpages&logoColor=white)](https://svspraveen.github.io/SPrav-Job-AI/)
-[![Release](https://img.shields.io/badge/Release-v2.4.0%20Pro-8b5cf6?style=for-the-badge&logo=windows)](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)
-[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011%20(x64)-3b82f6?style=for-the-badge&logo=windows11)](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)
-[![License](https://img.shields.io/badge/License-MIT%20Freeware-10b981?style=for-the-badge)](LICENSE)
-[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20Air--Gapped-06b6d4?style=for-the-badge&logo=shield)](docs/ARCHITECTURE.md)
-
-**Autonomously scans 28,700+ verified tech career portals, calculates cosine embedding similarity against your master PDF resume, and surfaces high-match engineering opportunities for guided 1-click application dispatch.**
-
-[📥 Download SPrav Job AI (v2.4 Pro Portable)](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing) • [🌐 Live Web Demo](https://svspraveen.github.io/SPrav-Job-AI/) • [📖 Documentation](docs/DOCUMENTATION.md) • [🔄 Workflow](docs/WORKFLOW.md) • [📊 Case Study](docs/CASE_STUDY.md)
+[![Live Showcase](https://img.shields.io/badge/🌐_Live_Web_Demo-GitHub_Pages-6366f1?style=for-the-badge&logo=githubpages&logoColor=white)](https://svspraveen.github.io/SPrav-Job-AI/)
+[![Direct Download](https://img.shields.io/badge/📥_Download_Free_App-Google_Drive-8b5cf6?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)
+[![Platform](https://img.shields.io/badge/Platform-Windows_10_%2F_11_(x64)-3b82f6?style=for-the-badge&logo=windows11&logoColor=white)](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)
+[![License](https://img.shields.io/badge/License-MIT_Freeware-10b981?style=for-the-badge)](LICENSE)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25_Local_Air--Gapped-06b6d4?style=for-the-badge&logo=shield)](docs/ARCHITECTURE.md)
 
 <br/>
 
-<img src="assets/demo.webp" width="900" alt="SPrav Job AI Live Demo" style="border-radius: 14px; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.6);" />
+<!-- PRIMARY CALL TO ACTION BUTTON -->
+<a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing">
+  <img src="https://img.shields.io/badge/⚡_DOWNLOAD_FREE_PORTABLE_WINDOWS_APP-(v2.4_PRO)-8B5CF6?style=for-the-badge&logo=windows&logoColor=white" height="46" alt="Download Free Portable App" />
+</a>
+
+<br/>
+<sub>🔒 <b>100% Free Forever</b> • Zero Setup or Installation Required • Runs 100% Offline with Local Ollama or Free Cloud AI</sub>
+
+<br/><br/>
+
+<img src="assets/demo.webp" width="920" alt="SPrav Job AI Live Demo Walkthrough" style="border-radius: 14px; border: 1px solid rgba(99, 102, 241, 0.35); box-shadow: 0 20px 45px rgba(0,0,0,0.7);" />
 
 </div>
 
 ---
 
+## ⚡ Quick Start: How to Run in 60 Seconds
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 3 SIMPLE STEPS TO RUN                                  │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  1. 📥 Download:  Click the Download Button to get 'SPrav_Job_AI_Pro_v2.4_Portable.zip'│
+│  2. 📂 Extract:   Extract the ZIP folder anywhere on your PC (e.g. Desktop / C:\Apps)  │
+│  3. 🚀 Launch:    Double-click 'SPrav Job AI.exe' — start applying immediately!        │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+> **Direct Download Link**: [**Google Drive Official Release Folder**](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)
+
+---
+
 ## 📑 Repository Navigation & Documentation Hub
 
-| Document | Description |
-|---|---|
-| 🌐 [**Live Web Showcase**](https://svspraveen.github.io/SPrav-Job-AI/) | Interactive GitHub Pages site featuring a live, in-browser ATS Matcher simulator. |
-| 📘 [**Full Documentation**](docs/DOCUMENTATION.md) | Exhaustive reference manual for all 12 modules, subsystems, and settings. |
-| 🔄 [**Operational Workflow**](docs/WORKFLOW.md) | Complete end-to-end architecture diagrams, ingestion pipelines, and state machines. |
-| 📖 [**User Guide & Manual**](docs/USER_GUIDE.md) | Step-by-step practical guide: Installation, free AI setup, resume optimization, and cold outreach. |
-| 📊 [**Technical Case Study**](docs/CASE_STUDY.md) | Deep engineering case study: 72ms SQLite benchmarks, memory footprint (<120MB), and topology. |
-| ❓ [**Exhaustive FAQ**](docs/FAQ.md) | 13-point FAQ covering data privacy, ₹0 AI execution, Ollama GPU, and updates. |
-| 🗺️ [**Product Roadmap**](docs/ROADMAP.md) | Release milestones, planned macOS/Linux ports, and upcoming features. |
-| 🐍 [**ATS Benchmark Demo**](examples/quickstart_ats_benchmark.py) | Standalone Python script demonstrating the cosine skill extraction algorithm. |
-| 🛠️ [**System Diagnostics**](examples/diagnose_system.py) | Standalone utility script to test local hardware, Python, and ATS network connectivity. |
+| Section | Link | What You'll Find |
+|---|:---:|---|
+| 🌐 **Live Web Showcase** | [**Open Live Site**](https://svspraveen.github.io/SPrav-Job-AI/) | Interactive GitHub Pages demo with a live in-browser ATS Matcher simulator. |
+| 📥 **Official Download** | [**Google Drive Release**](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing) | Free portable Windows standalone executable package (`v2.4 Pro`). |
+| 📘 **Reference Manual** | [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) | Exhaustive technical guide for all 12 modules, subsystems, and settings. |
+| 🔄 **Operational Workflow** | [`docs/WORKFLOW.md`](docs/WORKFLOW.md) | End-to-end architecture diagrams, ingestion pipelines, and state machines. |
+| 📖 **User Guide** | [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) | Step-by-step practical manual: setup, free Gemini/Groq keys, and resume tips. |
+| 📊 **Engineering Case Study**| [`docs/CASE_STUDY.md`](docs/CASE_STUDY.md) | Technical benchmarks: 72ms SQLite queries, <120MB RAM, and architecture trade-offs. |
+| 🙏 **Credits & Data Sources** | [`docs/CREDITS_AND_INSPIRATIONS.md`](docs/CREDITS_AND_INSPIRATIONS.md) | Full attribution of ATS platforms (Greenhouse, Lever), AI foundations, and OSS stack. |
+| ❓ **Frequently Asked Questions** | [`docs/FAQ.md`](docs/FAQ.md) | 13-point FAQ covering privacy, air-gapped storage, zero fees, and multi-PC sync. |
+| 🗺️ **Product Roadmap** | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Release milestones, planned macOS/Linux support, and feature roadmap. |
+| 🐍 **ATS Benchmark Script** | [`examples/quickstart_ats_benchmark.py`](examples/quickstart_ats_benchmark.py) | Standalone Python script demonstrating cosine skill extraction. |
+| 🛠️ **Hardware Diagnostics** | [`examples/diagnose_system.py`](examples/diagnose_system.py) | Standalone script to test local hardware, memory, and network connectivity. |
 
 ---
 
@@ -45,18 +70,19 @@
 <div align="center">
 
 ### 1. Command Center & Autonomous Discovery Telemetry
+*Real-time discovery metrics across 28,700+ career portals with Master Resume ground-truth fidelity badge.*
 <img src="assets/screenshots/dashboard.png" width="850" alt="Command Center Dashboard" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
 
 ### 2. Action Required (Guided 1-Click Dispatch Queue)
-*Surfaces only high-fidelity opportunities ($\text{ATS} \ge 65\% - 80\%+$) with auto-generated cover notes and STAR achievement alignment.*
+*Surfaces only high-fidelity opportunities ($\text{ATS} \ge 65\% - 80\%+$) with auto-generated cover notes and STAR behavioral alignment.*
 <img src="assets/screenshots/guided_dispatch.png" width="850" alt="Guided 1-Click Dispatch Queue" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
 
 ### 3. Knowledge Base & Master Resume Vault
-*Extracts full project histories, quantifiable metrics, and semantic skill graphs from your uploaded Master PDF Resume.*
+*Extracts complete project histories, quantifiable metrics, and semantic skill graphs from your uploaded Master PDF Resume.*
 <img src="assets/screenshots/knowledge_base.png" width="850" alt="Knowledge Base & Master Resume" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
 
 ### 4. Application Scope Matrix & Seniority Targeting
-*Calibrate target engineering titles, compensation bands, remote preferences, and negative keyword guardrails.*
+*Calibrate target engineering titles, 1-click role palettes, remote preferences, and negative keyword guardrails.*
 <img src="assets/screenshots/application_scope.png" width="850" alt="Application Scope Matrix" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
 
 ### 5. Conversion Analytics & Funnel Telemetry
@@ -71,11 +97,11 @@
 
 ---
 
-## 🎯 What is SPrav™ Job AI?
+## 🎯 What Makes SPrav™ Job AI Different?
 
-In today's tech job market, candidates face a broken dilemma:
-1. **Manual Search Burnout**: Spending 30+ hours weekly scrolling job boards and writing cover letters.
-2. **Blind Spam Bots**: Low-quality auto-apply browser extensions that spam 1,000s of generic applications, causing immediate ATS heuristic disqualification and email blacklisting.
+In today's tech hiring market, candidates face a broken dilemma:
+1. **Manual Search Burnout**: Spending 30+ hours weekly scrolling job boards and manually tailoring cover letters.
+2. **Blind Spam Bots**: Low-quality auto-apply extensions that spam thousands of generic applications, causing immediate ATS heuristic disqualification.
 
 **SPrav™ Job AI solves this with a balanced, high-precision engineering approach:**
 * **Continuous Background Ingestion**: Scans 28,700+ verified 1st-party career portals (Greenhouse, Lever, Ashby, Workday) and direct tech career feeds.
@@ -92,7 +118,7 @@ In today's tech job market, candidates face a broken dilemma:
 ┌────────────────────────────────────────────────────────────────────────┐
 │                      SPRAV™ ENGINE PERFORMANCE                        │
 ├────────────────────────────────────────────────────────────────────────┤
-│  ⚡ Database Query Latency:    72 ms (across 13,090+ indexed jobs)     │
+│  ⚡ Database Query Latency:    17.7 ms (across 14,600+ indexed jobs)   │
 │  🧠 Memory Footprint (RAM):    ~120 MB (75% less than Electron apps)   │
 │  🚀 Cold Launch Time:          <1.2 seconds                            │
 │  🔒 Personal Data Leakage:     0.0% (100% Local SQLite WAL Storage)    │
@@ -102,51 +128,36 @@ In today's tech job market, candidates face a broken dilemma:
 
 ---
 
-## 📥 Quick Start (3 Steps)
+## 📥 Download SPrav™ Job AI Today
 
-### 1. Download the Portable Application
-Download the standalone portable release from Google Drive:
-👉 **[Download SPrav_Job_AI_Pro_v2.4_Portable.zip](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)** *(385 MB • No installer required)*.
+<div align="center">
 
-### 2. Extract & Launch
-1. Right-click `SPrav_Job_AI_Pro_v2.4_Portable.zip` $\rightarrow$ **Extract All**.
-2. Open the extracted folder `SPrav Job AI/` and double-click **`SPravJobAI.exe`**.
-3. Click **Yes** when prompted to create a convenient Desktop Shortcut.
+<a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing">
+  <img src="https://img.shields.io/badge/📥_CLICK_HERE_TO_DOWNLOAD_FREE_APP-8B5CF6?style=for-the-badge&logo=google-drive&logoColor=white" height="48" alt="Download Free Portable App" />
+</a>
 
-### 3. Upload Resume & Start Searching
-1. In the **Command Center**, click **Choose File** under *Master Resume Fidelity* and upload your `.pdf` resume.
-2. Connect a free Google Gemini or Groq API key in **Settings & Auth** for sub-second AI tailoring.
-3. Open **Action Required (Guided Dispatch)** to review top matches and dispatch applications with 1 click!
+<br/><br/>
 
----
+**Official Google Drive Release Folder**:  
+👉 `https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing`
 
-## 🙏 Acknowledgements & Data Sources
-
-SPrav is built on the shoulders of the global open-source community, AI researchers, and public hiring gateways:
-
-* **Live Job Feeds & ATS Portals**: [Greenhouse.io](https://greenhouse.io), [Lever.co](https://lever.co), [AshbyHQ](https://ashbyhq.com), [Himalayas](https://himalayas.app), [Arbeitnow](https://arbeitnow.com), and [RemoteOK](https://remoteok.com).
-* **AI & Inference Ecosystem**: [Google DeepMind](https://deepmind.google) (Gemini 2.0 Flash), [Groq Inc.](https://groq.com) (LPU Inference Engine), [Ollama](https://ollama.com), [Qwen Team](https://github.com/QwenLM) (Qwen 2.5 Coder), and [DeepSeek AI](https://deepseek.com) (DeepSeek-R1).
-* **Core Open-Source Stack**: [FastAPI](https://fastapi.tiangolo.com), [SQLite](https://sqlite.org), [React 19](https://react.dev), [Vite](https://vitejs.dev), [PyMuPDF](https://pymupdf.readthedocs.io), [Lucide Icons](https://lucide.dev), and [PyInstaller](https://pyinstaller.org).
-* **Methodological Frameworks**: The **STAR Method** and Google's **XYZ Resume Formula** (by Laszlo Bock).
-
-👉 **[Read the Full Credits & In-Depth Inspirations Breakdown](docs/CREDITS_AND_INSPIRATIONS.md)**
+</div>
 
 ---
 
-## 👤 Creator & Vision
+## 🙏 Acknowledgements & Foundations
 
-**SPrav™ Job AI** was conceptualized, architected, and engineered by **SVS Praveen** as an independent personal initiative to empower developers and technical job seekers worldwide.
+SPrav™ Job AI is built with gratitude to the open-source community and foundational AI research. For complete attributions, see [`docs/CREDITS_AND_INSPIRATIONS.md`](docs/CREDITS_AND_INSPIRATIONS.md).
 
-* **Creator & Architect**: SVS Praveen
-* **Brand Origin**: SVS Praveen (`S` + `Prav`)
-* **Edition**: Free Personal Freeware
-* **Direct Contact**: [svspraveens@gmail.com](mailto:svspraveens@gmail.com)
-* **Private Repository Backup**: [SVSPraveen/SPrav-Job-AI-Private](https://github.com/SVSPraveen/SPrav-Job-AI-Private)
+* **Job Feeds**: Greenhouse.io, Lever.co, AshbyHQ, Himalayas, Arbeitnow, RemoteOK.
+* **AI Foundations**: Google DeepMind (Gemini 2.0 Flash), Groq LPU™, Ollama, Alibaba Qwen Team (Qwen 2.5 Coder), DeepSeek AI.
+* **Core Stack**: FastAPI, SQLite WAL, React 19, Vite, PyMuPDF, Lucide Icons, PyInstaller.
+* **Hiring Methodologies**: The STAR Method, The Google XYZ Formula (*by Laszlo Bock*).
 
 ---
 
 <div align="center">
 
-Made with ❤️ by **SVS Praveen** • Free for all job seekers worldwide.
+<sub>Architected &amp; Engineered by <b>SVS Praveen</b> • Free Personal Freeware Project • Contact: <a href="mailto:svspraveens@gmail.com">svspraveens@gmail.com</a></sub>
 
 </div>
