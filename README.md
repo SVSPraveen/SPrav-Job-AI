@@ -102,9 +102,21 @@
 <sub>*(Click image to view in high-resolution)*</sub><br/>
 <a href="assets/screenshots/application_scope.png" target="_blank">
   <img src="assets/screenshots/application_scope.png" width="850" alt="Application Scope Matrix" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+### 6. Dynamic Knowledge Base & Skills Arsenal
+*Categorized skills tags, verified impact bullets, and Master Resume ground-truth profile.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/knowledge_base.png" target="_blank">
+  <img src="assets/screenshots/knowledge_base.png" width="850" alt="Knowledge Base Editor & Skills Arsenal" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
 </a>
 
-### 6. Settings, Hardware Engine & Cloud AI Configuration
+### 7. Recruiter Outreach & Executive Note Drafting
+*Identify technical recruiters and generate personalized cold outreach notes in seconds.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/recruiter_outreach.png" target="_blank">
+  <img src="assets/screenshots/recruiter_outreach.png" width="850" alt="Recruiter Outreach Engine" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+</a>
+
+### 8. Settings, Hardware Engine & Cloud AI Configuration
 *Configure local air-gapped Ollama execution or 1-click free Cloud AI (Gemini 2.0 Flash / Groq) with secure zero-cost inference.*  
 <sub>*(Click image to view in high-resolution)*</sub><br/>
 <a href="assets/screenshots/Settings%20&%20Cloud%20AI%20Authentication.png" target="_blank">
