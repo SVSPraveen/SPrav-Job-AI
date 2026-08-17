@@ -46,7 +46,7 @@
     }
 
     .container {
-      max-width: 1140px;
+      max-width: 1260px;
       margin: 0 auto;
       padding: 0 1.5rem;
       position: relative;
@@ -55,70 +55,106 @@
 
     /* Header */
     header {
-      padding: 1.1rem 0;
+      padding: 0.95rem 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(14px);
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(9, 13, 22, 0.88);
+      background: rgba(9, 13, 22, 0.92);
     }
     .nav-wrapper {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1.5rem;
     }
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
       color: #fff;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
     .logo-badge {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
       background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       box-shadow: 0 4px 14px var(--primary-glow);
+      flex-shrink: 0;
     }
     .brand-text {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.3rem;
+      font-size: 1.22rem;
       font-weight: 800;
       letter-spacing: -0.02em;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
+      gap: 0.9rem;
+      flex-wrap: nowrap;
     }
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      transition: color 0.2s;
+      white-space: nowrap;
+      transition: color 0.2s, background 0.2s;
     }
     .nav-links a:hover { color: #fff; }
+
+    .nav-icon-link {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1 !important;
+      transition: all 0.2s ease !important;
+      flex-shrink: 0;
+    }
+    .nav-icon-link:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+      color: #fff !important;
+      transform: translateY(-1px);
+    }
+    .nav-icon-link.linkedin-icon:hover {
+      background: rgba(56, 189, 248, 0.2) !important;
+      color: #38bdf8 !important;
+      border-color: rgba(56, 189, 248, 0.4);
+    }
 
     .nav-download-btn {
       background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       color: #fff !important;
-      padding: 0.55rem 1.15rem;
+      padding: 0.48rem 1rem;
       border-radius: 10px;
       font-weight: 700 !important;
-      font-size: 0.88rem !important;
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+      font-size: 0.84rem !important;
+      box-shadow: 0 0 16px rgba(139, 92, 246, 0.4);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      white-space: nowrap;
       border: 1px solid rgba(255, 255, 255, 0.25);
+      flex-shrink: 0;
       animation: pulseGlow 2.5s infinite;
     }
     @keyframes pulseGlow {
@@ -591,10 +627,14 @@
       font-size: 0.9rem;
     }
 
+    @media (max-width: 1024px) {
+      .nav-links a:not(.nav-download-btn):not(.nav-icon-link) { display: none; }
+    }
+
     @media (max-width: 768px) {
-      .hero h1 { font-size: 2.6rem; }
-      .nav-links a:not(.nav-download-btn) { display: none; }
-      .floating-download-bar { left: 20px; right: 20px; justify-content: space-between; }
+      .hero h1 { font-size: 2.3rem; }
+      .floating-download-bar { left: 16px; right: 16px; bottom: 16px; }
+      .gallery-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -618,26 +658,23 @@
     <div class="container nav-wrapper">
       <a href="#" class="brand">
         <div class="logo-badge">S</div>
-        <div class="brand-text">SPRAV™ <span style="font-size: 0.85rem; color: #a5b4fc; font-weight: 600;">JOB AI</span></div>
+        <div class="brand-text">SPRAV™ <span style="font-size: 0.82rem; color: #a5b4fc; font-weight: 600; background: rgba(99, 102, 241, 0.2); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.35);">JOB AI</span></div>
       </a>
       <nav class="nav-links">
-        <a href="#quickstart">Quick Start</a>
         <a href="#features">Features</a>
         <a href="#simulator">ATS Matcher</a>
         <a href="#screenshots">Screenshots</a>
         <a href="#requirements">Specs</a>
-        <a href="docs.html">Docs Hub</a>
+        <a href="docs.html">Docs</a>
         <a href="credits.html">Credits</a>
-        <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; color: #fff; font-weight: 700;">
+        <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" class="nav-icon-link" title="GitHub Repository">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
         </a>
-        <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; color: #38bdf8; font-weight: 700;">
+        <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" class="nav-icon-link linkedin-icon" title="LinkedIn Profile">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-          LinkedIn
         </a>
         <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="nav-download-btn">
-          📥 Download Free (v2.4)
+          📥 Download (v2.4)
         </a>
       </nav>
     </div>
