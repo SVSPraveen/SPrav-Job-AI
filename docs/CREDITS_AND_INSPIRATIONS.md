@@ -8,13 +8,15 @@
 
 SPrav aggregates and ingests live public job openings from verified 1st-party ATS gateways and open developer feeds:
 
-* **Greenhouse.io**: Public job board API (`boards-api.greenhouse.io`).
-* **Lever.co**: Public career portal gateway (`api.lever.co`).
-* **AshbyHQ**: Direct career pages (`jobs.ashbyhq.com`).
-* **Himalayas Community**: Remote tech job feeds (`himalayas.app/jobs/api`).
-* **Arbeitnow**: European and international tech job streams (`arbeitnow.com/api`).
-* **RemoteOK**: Global remote developer listings (`remoteok.com/api`).
-* **Workday & SmartRecruiters**: Direct company career endpoints.
+* **Greenhouse.io**: Direct 1st-party job board REST API (`boards-api.greenhouse.io`).
+* **Lever.co**: Public corporate career portal gateway (`api.lever.co`).
+* **AshbyHQ**: Direct corporate career board API (`api.ashbyhq.com/posting-api`).
+* **Workday Enterprise (CXS)**: Direct enterprise career gateway endpoints (`{tenant}.myworkdayjobs.com`).
+* **SmartRecruiters**: Public job board API (`api.smartrecruiters.com`) for global employers.
+* **Wellfound (AngelList Talent)**: Automated email alert ingestion and DOM extraction for venture-backed startup roles.
+* **Custom Career Page Watcher**: Playwright Stealth headless browser DOM scanning for target company watchlists.
+* **Himalayas Community**: Verified remote software engineering job feeds (`himalayas.app/jobs/api`).
+* **Arbeitnow & RemoteOK**: European, international, and remote tech job listings (`arbeitnow.com` & `remoteok.com`).
 
 ---
 
