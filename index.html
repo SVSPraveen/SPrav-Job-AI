@@ -403,14 +403,52 @@
       border: 1px solid var(--card-border);
       border-radius: 14px;
       overflow: hidden;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .gallery-card:hover { transform: translateY(-4px); }
-    .gallery-card img {
+    .gallery-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    .gallery-img-wrapper {
+      position: relative;
+      cursor: zoom-in;
+      overflow: hidden;
+      background: #000;
+    }
+    .gallery-img-wrapper img {
       width: 100%;
       height: auto;
       display: block;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .gallery-img-wrapper:hover img {
+      transform: scale(1.03);
+      filter: brightness(1.06);
+    }
+    .gallery-img-wrapper .expand-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .gallery-img-wrapper:hover .expand-badge {
+      opacity: 1;
+      transform: translateY(0);
     }
     .gallery-card-body {
       padding: 1.25rem;
@@ -424,6 +462,81 @@
     .gallery-card-body p {
       font-size: 0.85rem;
       color: var(--text-muted);
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 15, 0.92);
+      backdrop-filter: blur(16px);
+      z-index: 100000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .lightbox-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+    .lightbox-content {
+      position: relative;
+      max-width: 95vw;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: modalScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalScale {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 82vh;
+      border-radius: 12px;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95);
+      object-fit: contain;
+    }
+    .lightbox-caption {
+      margin-top: 14px;
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 6px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(30, 41, 59, 0.9);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .lightbox-close:hover {
+      background: #ef4444;
+      transform: scale(1.1);
     }
 
     /* Sticky Floating Download Pill */
@@ -551,6 +664,16 @@
         <span>•</span>
         <span>✓ <strong>100% Private</strong></span>
       </div>
+
+      <!-- Hero Live Animated Showcase Walkthrough -->
+      <div style="text-align: center; margin: 2.75rem 0 1rem 0; position: relative;">
+        <div style="position: relative; display: inline-block; width: 100%; max-width: 980px;">
+          <img src="assets/SPrav%20Job%20AI%20gif.gif" alt="SPrav Job AI Live Autonomous Ingestion and Dispatch Workflow" style="width: 100%; border-radius: 18px; border: 1px solid rgba(139, 92, 246, 0.4); box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85); display: block;" loading="eager" />
+          <div style="position: absolute; bottom: 16px; right: 16px; background: rgba(9, 13, 22, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; color: #a5b4fc; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; animation: pulseGlow 1.5s infinite;"></span> Live Pro v2.4 Walkthrough
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- 60-Second Quick Start Section -->
@@ -584,34 +707,50 @@
           ⚡ Interactive In-Browser ATS Match Simulator
         </h2>
         <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
-          Test the exact keyword cosine scoring algorithm that powers SPrav™ Job AI. Edit candidate and job skills below:
+          Test the exact semantic skill scoring algorithm that powers SPrav™ Job AI. Edit candidate and job skills in real time:
         </p>
 
         <div class="sim-grid">
           <div class="sim-col">
             <label>Candidate Master Skills (Extracted from PDF)</label>
-            <textarea id="candSkills">Python, FastAPI, React, PyTorch, RAG, LangChain, Agentic Systems, Docker, SQLite, AWS, TypeScript</textarea>
+            <textarea id="candSkills" oninput="calculateMatch()" placeholder="e.g. Python, FastAPI, PyTorch, RAG, LangChain, Docker, AWS, SQL">Python, FastAPI, React, PyTorch, RAG, LangChain, Vector Databases, Docker, AWS, PostgreSQL, TypeScript</textarea>
           </div>
           <div class="sim-col">
             <label>Job Description Requirements (Parsed from ATS Feed)</label>
-            <textarea id="jobSkills">Python, FastAPI, RAG, LangChain, Vector Databases, Docker, Kubernetes, AWS, SQL</textarea>
+            <textarea id="jobSkills" oninput="calculateMatch()" placeholder="e.g. Python, FastAPI, RAG, Docker, AWS, SQL">Python, FastAPI, RAG, LangChain, Vector Databases, Docker, Kubernetes, AWS, Redis</textarea>
+          </div>
+        </div>
+
+        <!-- Live Skill Gap Breakdown Matrix -->
+        <div id="simMatrix" style="background: rgba(0,0,0,0.3); padding: 1rem 1.25rem; border-radius: 12px; margin: 1.25rem 0; border: 1px solid rgba(255,255,255,0.08); display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: #34d399; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>✓ Matched Skills:</span>
+            </div>
+            <div id="matchedChips" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+          </div>
+          <div>
+            <div id="missingHeader" style="font-size: 0.82rem; font-weight: 700; color: #f87171; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>⚠️ Missing Requirements:</span>
+            </div>
+            <div id="missingChips" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
           </div>
         </div>
 
         <div class="sim-result">
           <div class="sim-score-box">
-            <div class="score-circle" id="scoreValue">88%</div>
+            <div class="score-circle" id="scoreValue">100%</div>
             <div>
-              <div style="font-weight: 700; font-size: 1.05rem; color: #fff;" id="matchStatus">High-Fidelity Match</div>
-              <div style="font-size: 0.85rem; color: var(--text-muted);" id="matchAction">Queued for Guided 1-Click Dispatch</div>
+              <div style="font-weight: 700; font-size: 1.05rem; color: #fff;" id="matchStatus">High-Fidelity Match (100%)</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);" id="matchAction">Queued for Guided 1-Click Dispatch • Candidate Fit: 5.0 / 5.0</div>
             </div>
           </div>
-          <div style="display: flex; gap: 0.75rem;">
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <button class="btn btn-secondary" onclick="calculateMatch()" style="padding: 0.6rem 1.1rem; font-size: 0.88rem;">
-              🔄 Recalculate Score
+              🔄 Recalculate
             </button>
             <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="btn btn-primary" style="padding: 0.6rem 1.1rem; font-size: 0.88rem;">
-              📥 Download Full App
+              📥 Download Free App
             </a>
           </div>
         </div>
@@ -665,11 +804,14 @@
     <!-- Screenshots Showcase -->
     <section id="screenshots" class="screenshots-section">
       <h2 class="section-title">Production Interface Showcase</h2>
-      <p class="section-subtitle">Explore the high-fidelity user interface built with React 19 and modern glassmorphism design.</p>
+      <p class="section-subtitle">Click any screenshot to expand and inspect the high-fidelity user interface in full detail.</p>
 
       <div class="gallery-grid">
         <div class="gallery-card">
-          <img src="assets/screenshots/dashboard.png" alt="Command Center Dashboard" loading="lazy" />
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/dashboard.png', 'Command Center Dashboard — Real-time discovery telemetry &amp; ingestion controls')">
+            <img src="assets/screenshots/dashboard.png" alt="Command Center Dashboard" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
           <div class="gallery-card-body">
             <h4>Command Center Dashboard</h4>
             <p>Real-time telemetry, master resume fidelity badge, and ingestion controls.</p>
@@ -677,7 +819,10 @@
         </div>
 
         <div class="gallery-card">
-          <img src="assets/screenshots/guided_dispatch.png" alt="Guided 1-Click Dispatch" loading="lazy" />
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/guided_dispatch.png', 'Guided 1-Click Dispatch Queue — High-match opportunities with tailored pitches')">
+            <img src="assets/screenshots/guided_dispatch.png" alt="Guided 1-Click Dispatch" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
           <div class="gallery-card-body">
             <h4>Guided 1-Click Dispatch Queue</h4>
             <p>High-match opportunities with auto-tailored cover notes and STAR behavioral alignment.</p>
@@ -685,23 +830,21 @@
         </div>
 
         <div class="gallery-card">
-          <img src="assets/screenshots/knowledge_base.png" alt="Knowledge Base & Resume Vault" loading="lazy" />
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/Job%20Portal.png', 'Master Job Portal &amp; Telemetry — Unified registry of 18,980+ live postings')">
+            <img src="assets/screenshots/Job%20Portal.png" alt="Master Job Portal" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
           <div class="gallery-card-body">
-            <h4>Knowledge Base &amp; Resume Vault</h4>
-            <p>Interactive 6-category skill graphs and verified project metric history.</p>
+            <h4>Master Job Portal &amp; Telemetry</h4>
+            <p>Unified registry of 18,980+ scanned job board postings with live skill chips and deep audits.</p>
           </div>
         </div>
 
         <div class="gallery-card">
-          <img src="assets/screenshots/application_scope.png" alt="Application Scope Matrix" loading="lazy" />
-          <div class="gallery-card-body">
-            <h4>Application Scope Matrix</h4>
-            <p>1-Click Quick-Add role palettes, remote switches, and location targeting.</p>
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/analytics.png', 'Conversion Analytics &amp; Yields — Screening yields and salary benchmark insights')">
+            <img src="assets/screenshots/analytics.png" alt="Conversion Analytics" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
           </div>
-        </div>
-
-        <div class="gallery-card">
-          <img src="assets/screenshots/analytics.png" alt="Conversion Analytics" loading="lazy" />
           <div class="gallery-card-body">
             <h4>Conversion Analytics &amp; Yields</h4>
             <p>Funnel conversion yields, salary benchmarks, and company response rates.</p>
@@ -709,10 +852,24 @@
         </div>
 
         <div class="gallery-card">
-          <img src="assets/screenshots/recruiter_outreach.png" alt="Recruiter Outreach" loading="lazy" />
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/application_scope.png', 'Application Scope Matrix — Role palettes, remote toggles &amp; location filters')">
+            <img src="assets/screenshots/application_scope.png" alt="Application Scope Matrix" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
           <div class="gallery-card-body">
-            <h4>Recruiter Outreach Engine</h4>
-            <p>Automated technical recruiter discovery and personalized outreach message generator.</p>
+            <h4>Application Scope Matrix</h4>
+            <p>1-Click Quick-Add role palettes, remote switches, and location targeting.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/Settings%20&%20Cloud%20AI%20Authentication.png', 'Settings &amp; Cloud AI Authentication — Local Ollama &amp; Free Cloud AI configuration')">
+            <img src="assets/screenshots/Settings%20&%20Cloud%20AI%20Authentication.png" alt="Settings & Cloud AI Authentication" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
+          <div class="gallery-card-body">
+            <h4>Settings &amp; Cloud AI Authentication</h4>
+            <p>Configure local air-gapped Ollama execution or free Cloud AI (Gemini 2.0 Flash / Groq).</p>
           </div>
         </div>
       </div>
@@ -762,26 +919,124 @@
     </div>
   </footer>
 
+  <!-- Fullscreen Lightbox Modal -->
+  <div id="lightboxModal" class="lightbox-modal" onclick="closeLightbox(event)">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <button class="lightbox-close" onclick="closeLightbox(event)" title="Close (Esc)">✕</button>
+      <img id="lightboxImg" class="lightbox-img" src="" alt="Expanded Preview" />
+      <div id="lightboxCaption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
   <script>
+    function openLightbox(src, caption) {
+      const modal = document.getElementById('lightboxModal');
+      const img = document.getElementById('lightboxImg');
+      const cap = document.getElementById('lightboxCaption');
+      
+      img.src = src;
+      cap.innerHTML = caption || '';
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(event) {
+      if (event) event.stopPropagation();
+      const modal = document.getElementById('lightboxModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+
     function calculateMatch() {
       const candRaw = document.getElementById('candSkills').value;
       const jobRaw = document.getElementById('jobSkills').value;
 
-      const candSet = new Set(candRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean));
-      const jobList = jobRaw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+      const candList = candRaw.split(',').map(s => s.trim()).filter(Boolean);
+      const jobList = jobRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+      const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      // Normalize candidate list with synonyms/sub-words
+      const candMap = new Map();
+      candList.forEach(s => {
+        const norm = normalize(s);
+        candMap.set(norm, s);
+        // Common aliases
+        if (norm === 'sqlite' || norm === 'postgresql' || norm === 'postgres' || norm === 'mysql') candMap.set('sql', s);
+        if (norm === 'agenticsystems' || norm === 'aiagents') candMap.set('agenticai', s);
+        if (norm === 'vectordb') candMap.set('vectordatabases', s);
+        if (norm === 'reactjs') candMap.set('react', s);
+        if (norm === 'nodejs') candMap.set('node', s);
+      });
 
       if (jobList.length === 0) {
         document.getElementById('scoreValue').innerText = '0%';
+        document.getElementById('matchedChips').innerHTML = '<span style="font-size: 0.8rem; color: var(--text-muted);">None detected</span>';
+        document.getElementById('missingChips').innerHTML = '<span style="font-size: 0.8rem; color: #34d399;">None (0 requirements)</span>';
         return;
       }
 
-      let matches = 0;
-      jobList.forEach(skill => {
-        if (candSet.has(skill)) matches++;
+      const matched = [];
+      const missing = [];
+
+      jobList.forEach(jobSkill => {
+        const norm = normalize(jobSkill);
+        let found = false;
+        
+        if (candMap.has(norm)) {
+          found = true;
+        } else {
+          // Check substring containment
+          for (const [candNorm, orig] of candMap.entries()) {
+            if (candNorm.includes(norm) || norm.includes(candNorm)) {
+              found = true;
+              break;
+            }
+          }
+        }
+
+        if (found) {
+          matched.push(jobSkill);
+        } else {
+          missing.push(jobSkill);
+        }
       });
 
-      const score = Math.round((matches / jobList.length) * 100);
+      const score = Math.min(100, Math.round((matched.length / jobList.length) * 100));
+      const fitRating = (Math.min(5.0, (score / 20.0))).toFixed(1);
+
       document.getElementById('scoreValue').innerText = score + '%';
+
+      // Render Matched Chips
+      const matchedContainer = document.getElementById('matchedChips');
+      if (matched.length > 0) {
+        matchedContainer.innerHTML = matched.map(s => 
+          `<span style="background: rgba(52, 211, 153, 0.15); color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; border: 1px solid rgba(52, 211, 153, 0.3); font-weight: 600;">${s}</span>`
+        ).join('');
+      } else {
+        matchedContainer.innerHTML = '<span style="font-size: 0.8rem; color: var(--text-muted);">None detected</span>';
+      }
+
+      // Render Missing Chips
+      const missingContainer = document.getElementById('missingChips');
+      const missingHeader = document.getElementById('missingHeader');
+      if (missing.length > 0) {
+        missingHeader.style.color = '#f87171';
+        missingHeader.innerHTML = '<span>⚠️ Missing Requirements (' + missing.length + '):</span>';
+        missingContainer.innerHTML = missing.map(s => 
+          `<span style="background: rgba(248, 113, 113, 0.15); color: #fca5a5; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; border: 1px solid rgba(248, 113, 113, 0.3);">${s}</span>`
+        ).join('');
+      } else {
+        missingHeader.style.color = '#34d399';
+        missingHeader.innerHTML = '<span>✓ Skill Gap Analysis:</span>';
+        missingContainer.innerHTML = '<span style="font-size: 0.82rem; color: #34d399; font-weight: 600;">None (100% Core Match)</span>';
+      }
 
       const statusEl = document.getElementById('matchStatus');
       const actionEl = document.getElementById('matchAction');
@@ -789,27 +1044,30 @@
 
       if (score >= 80) {
         statusEl.innerText = 'High-Fidelity Match (' + score + '%)';
-        actionEl.innerText = 'Queued for Guided 1-Click Dispatch';
+        actionEl.innerText = 'Queued for Guided 1-Click Dispatch • Candidate Fit: ' + fitRating + ' / 5.0';
         statusEl.style.color = '#10b981';
         circleEl.style.borderColor = '#10b981';
         circleEl.style.color = '#10b981';
         circleEl.style.background = 'rgba(16, 185, 129, 0.15)';
       } else if (score >= 65) {
         statusEl.innerText = 'Strong Candidate Fit (' + score + '%)';
-        actionEl.innerText = 'Queued in Action Required';
+        actionEl.innerText = 'Queued in Action Required • Candidate Fit: ' + fitRating + ' / 5.0';
         statusEl.style.color = '#38bdf8';
         circleEl.style.borderColor = '#38bdf8';
         circleEl.style.color = '#38bdf8';
         circleEl.style.background = 'rgba(56, 189, 248, 0.15)';
       } else {
         statusEl.innerText = 'Near-Miss / Low ATS Alignment (' + score + '%)';
-        actionEl.innerText = 'Quarantined in Backlog';
+        actionEl.innerText = 'Quarantined in Backlog • Candidate Fit: ' + fitRating + ' / 5.0';
         statusEl.style.color = '#fbbf24';
         circleEl.style.borderColor = '#fbbf24';
         circleEl.style.color = '#fbbf24';
         circleEl.style.background = 'rgba(251, 191, 36, 0.15)';
       }
     }
+
+    // Auto-calculate on initial page load
+    document.addEventListener('DOMContentLoaded', calculateMatch);
   </script>
 </body>
 </html>

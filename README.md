@@ -21,11 +21,11 @@
 </a>
 
 <br/>
-<sub>🔒 <b>100% Free Forever</b> • Zero Setup or Installation Required • Runs 100% Offline with Local Ollama or Free Cloud AI</sub>
+<sub>🔒 <b>100% Free Forever</b> • Zero Setup or Installation Required • 100% Private Local Storage with Local Ollama or Free Cloud AI</sub>
 
 <br/><br/>
 
-<img src="assets/demo.webp" width="920" alt="SPrav Job AI Live Demo Walkthrough" style="border-radius: 14px; border: 1px solid rgba(99, 102, 241, 0.35); box-shadow: 0 20px 45px rgba(0,0,0,0.7);" />
+<img src="assets/SPrav%20Job%20AI%20gif.gif" width="920" alt="SPrav Job AI Live Autonomous Workflow Demo" style="border-radius: 14px; border: 1px solid rgba(99, 102, 241, 0.35); box-shadow: 0 20px 45px rgba(0,0,0,0.7);" />
 
 </div>
 
@@ -70,28 +70,46 @@
 <div align="center">
 
 ### 1. Command Center & Autonomous Discovery Telemetry
-*Real-time discovery metrics across 28,700+ career portals with Master Resume ground-truth fidelity badge.*
-<img src="assets/screenshots/dashboard.png" width="850" alt="Command Center Dashboard" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+*Real-time discovery metrics across 28,700+ career portals with Master Resume ground-truth fidelity badge.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/dashboard.png" target="_blank">
+  <img src="assets/screenshots/dashboard.png" width="850" alt="Command Center Dashboard" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+</a>
 
 ### 2. Action Required (Guided 1-Click Dispatch Queue)
-*Surfaces only high-fidelity opportunities ($\text{ATS} \ge 65\% - 80\%+$) with auto-generated cover notes and STAR behavioral alignment.*
-<img src="assets/screenshots/guided_dispatch.png" width="850" alt="Guided 1-Click Dispatch Queue" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+*Surfaces only high-fidelity opportunities ($\text{ATS} \ge 65\% - 80\%+$) with auto-generated cover notes and STAR behavioral alignment.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/guided_dispatch.png" target="_blank">
+  <img src="assets/screenshots/guided_dispatch.png" width="850" alt="Guided 1-Click Dispatch Queue" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+</a>
 
-### 3. Knowledge Base & Master Resume Vault
-*Extracts complete project histories, quantifiable metrics, and semantic skill graphs from your uploaded Master PDF Resume.*
-<img src="assets/screenshots/knowledge_base.png" width="850" alt="Knowledge Base & Master Resume" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+### 3. Master Job Portal & Live Telemetry Registry
+*Unified live registry of 18,980+ scanned job board postings, ATS match scores, skill match chips, and deep rubric audits.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/Job%20Portal.png" target="_blank">
+  <img src="assets/screenshots/Job%20Portal.png" width="850" alt="Master Job Portal" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+</a>
 
-### 4. Application Scope Matrix & Seniority Targeting
-*Calibrate target engineering titles, 1-click role palettes, remote preferences, and negative keyword guardrails.*
-<img src="assets/screenshots/application_scope.png" width="850" alt="Application Scope Matrix" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+### 4. Conversion Analytics & Funnel Telemetry
+*Track screening conversion yields, match score correlation graphs, salary benchmarks, and application cadence.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/analytics.png" target="_blank">
+  <img src="assets/screenshots/analytics.png" width="850" alt="Conversion Analytics Telemetry" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+</a>
 
-### 5. Conversion Analytics & Funnel Telemetry
-*Track screening conversion yields, match score correlation graphs, and application cadence.*
-<img src="assets/screenshots/analytics.png" width="850" alt="Conversion Analytics Telemetry" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+### 5. Application Scope Matrix & Seniority Targeting
+*Calibrate target engineering titles, 1-click role palettes, remote preferences, and negative keyword guardrails.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/application_scope.png" target="_blank">
+  <img src="assets/screenshots/application_scope.png" width="850" alt="Application Scope Matrix" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+</a>
 
-### 6. Recruiter Outreach Engine & Direct Contact Discovery
-*Identifies technical recruiters and engineering managers with tailored LinkedIn connection notes and cold emails.*
-<img src="assets/screenshots/recruiter_outreach.png" width="850" alt="Recruiter Outreach Engine" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+### 6. Settings, Hardware Engine & Cloud AI Configuration
+*Configure local air-gapped Ollama execution or 1-click free Cloud AI (Gemini 2.0 Flash / Groq) with secure zero-cost inference.*  
+<sub>*(Click image to view in high-resolution)*</sub><br/>
+<a href="assets/screenshots/Settings%20&%20Cloud%20AI%20Authentication.png" target="_blank">
+  <img src="assets/screenshots/Settings%20&%20Cloud%20AI%20Authentication.png" width="850" alt="Settings & Cloud AI Engine Configuration" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem;" />
+</a>
 
 </div>
 

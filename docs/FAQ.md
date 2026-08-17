@@ -23,8 +23,10 @@
 ### Q5: How much do the AI API keys cost?
 **₹0 / $0.** Both Google AI Studio and Groq offer generous free tiers that easily support hundreds of job evaluations and cover note generations daily without requiring a credit card.
 
-### Q6: Can I run SPrav completely offline without any internet connection?
-**Yes.** If you install Ollama locally with `qwen2.5-coder:7b`, SPrav will perform all skill parsing, ATS matching, and cover note drafting 100% offline on your local GPU.
+### Q6: Do I need an internet connection to run SPrav?
+**Yes, for discovering and submitting jobs.** An active internet connection is required to scan online company career portals, ingest live ATS feeds (Greenhouse, Lever, Ashby, Workday), and submit job applications.
+
+However, for **AI inference and scoring**, you can run 100% locally and privately using **Local Ollama (`qwen2.5-coder:7b`)** on your local GPU with zero data sent to external AI servers. All resumes, credentials, and application histories remain strictly stored on your local disk.
 
 ---
 
