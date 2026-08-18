@@ -8,6 +8,7 @@
 ### Autonomous Career Intelligence, High-Fidelity ATS Scoring & Guided 1-Click Dispatch
 
 [![Live Showcase](https://img.shields.io/badge/🌐_Live_Web_Demo-GitHub_Pages-6366f1?style=for-the-badge&logo=githubpages&logoColor=white)](https://svspraveen.github.io/SPrav-Job-AI/)
+[![Personal Portfolio](https://img.shields.io/badge/👤_Portfolio-svspraveen.vercel.app-8b5cf6?style=for-the-badge&logo=vercel&logoColor=white)](https://svspraveen.vercel.app/)
 [![Direct Download](https://img.shields.io/badge/📥_Download_Free_App-Google_Drive-8b5cf6?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)
 [![Platform](https://img.shields.io/badge/Platform-Windows_10_%2F_11_(x64)-3b82f6?style=for-the-badge&logo=windows11&logoColor=white)](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)
 [![License](https://img.shields.io/badge/License-MIT_Freeware-10b981?style=for-the-badge)](LICENSE)
