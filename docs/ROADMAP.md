@@ -10,13 +10,22 @@ This document details current release capabilities and the community-driven deve
 * [x] **Hybrid ATS & Cosine Matcher**: 120+ domain skill dictionaries with cosine embedding similarity.
 * [x] **Guided 1-Click Dispatch Pipeline**: Tailored cover notes, STAR alignment, and recruiter discovery.
 * [x] **100% Local Air-Gapped Storage**: SQLite WAL mode in `%LOCALAPPDATA%\SPravJobAI`.
-* [x] **Multi-Engine AI Support**: Google Gemini 2.0 Flash, Groq, and local Ollama Qwen 2.5 Coder.
+* [x] **Dual-Engine AI Router**: Google Gemini 2.0 Flash, Groq, and local Ollama Qwen 2.5 Coder.
 * [x] **Zero-Install Standalone Portable Bundle**: Single `.zip` extraction for Windows 10/11.
 * [x] **Live Telemetry & Clean Descriptions**: Real-time synchronized job metrics and clean structured formatting.
 
 ---
 
-## 💡 Future Updates & Feedback
+## 🔮 Planned Future Milestones (v3.0+ Roadmap)
+
+* [ ] **Autonomous PDF / LaTeX Resume Generator**: Dynamic per-application reformatting and multi-template compilation.
+* [ ] **MoE Multi-Agent Resume Optimization Pipeline**: Specialized multi-agent consensus for automated whole-resume rewriting.
+* [ ] **Direct ATS Connector Submissions**: Headless browser automation and direct API submission webhooks.
+* [ ] **Cross-Platform Support**: Native macOS (Apple Silicon) and Linux portable binaries.
+
+---
+
+## 💡 Community-Driven Feedback & Feature Requests
 
 Future capabilities and version updates are prioritized dynamically based on real-world candidate feedback:
 * **Community-Driven**: Feature enhancements are shaped directly by suggestions from job seekers and developers.

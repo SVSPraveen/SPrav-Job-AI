@@ -24,7 +24,7 @@ In the modern tech hiring landscape, software engineers spend an average of **20
 │  Frontend UI Layer:  React 19 + Vite (Dark Glassmorphism Design System)│
 │  API Backend Layer:  FastAPI + Uvicorn Async HTTP Gateway              │
 │  Data Layer:         SQLite (WAL Mode, Parameterized & Indexed)        │
-│  Inference Layer:    Hybrid Cosine Embeddings + Multi-Cloud AI MoE     │
+│  Inference Layer:    Hybrid Cosine Embeddings + Dual-Engine AI Router   │
 │  Packaging:          PyInstaller Standalone x64 Binary (Zero Install)  │
 └────────────────────────────────────────────────────────────────────────┘
 ```
@@ -65,7 +65,7 @@ In the modern tech hiring landscape, software engineers spend an average of **20
 * **Decision**: Require explicit 1-click candidate approval for all dispatches.
 * **Rationale**: Preserves candidate ATS reputation, eliminates spam flags, and ensures candidate awareness during recruiter screenings.
 
-### C. Hybrid MoE Cloud / Local AI Switching
+### C. Dual-Engine Cloud / Local AI Router Switching
 * **Decision**: Provide instantaneous 1-click switching between free Cloud APIs (Google Gemini 2.0 / Groq) and local Ollama (Qwen 2.5 Coder).
 * **Rationale**: Allows users on low-spec laptops (integrated graphics) to experience sub-second AI tailoring without purchasing dedicated GPU hardware.
 
