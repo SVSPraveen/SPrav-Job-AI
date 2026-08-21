@@ -1215,10 +1215,16 @@
         candMap.set(norm, s);
         // Common aliases
         if (norm === 'sqlite' || norm === 'postgresql' || norm === 'postgres' || norm === 'mysql') candMap.set('sql', s);
-        if (norm === 'agenticsystems' || norm === 'aiagents') candMap.set('agenticai', s);
-        if (norm === 'vectordb') candMap.set('vectordatabases', s);
-        if (norm === 'reactjs') candMap.set('react', s);
-        if (norm === 'nodejs') candMap.set('node', s);
+        if (norm === 'agenticsystems' || norm === 'aiagents' || norm === 'agenticrag') candMap.set('agenticai', s);
+        if (norm === 'vectordb' || norm === 'qdrant' || norm === 'pinecone' || norm === 'chromadb') candMap.set('vectordatabases', s);
+        if (norm === 'reactjs' || norm === 'nextjs') candMap.set('react', s);
+        if (norm === 'nodejs' || norm === 'nestjs' || norm === 'express') candMap.set('node', s);
+        if (norm === 'flutter') { candMap.set('dart', s); candMap.set('mobiledevelopment', s); }
+        if (norm === 'reactnative') { candMap.set('react', s); candMap.set('mobiledevelopment', s); }
+        if (norm === 'springboot') { candMap.set('java', s); candMap.set('backend', s); }
+        if (norm === 'kubernetes' || norm === 'k8s') { candMap.set('docker', s); candMap.set('devops', s); }
+        if (norm === 'figma') { candMap.set('uiux', s); candMap.set('design', s); }
+        if (norm === 'cypress' || norm === 'playwright') { candMap.set('testautomation', s); }
       });
 
       if (jobList.length === 0) {

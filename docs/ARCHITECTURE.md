@@ -15,7 +15,7 @@ Many modern browser extensions promise *"Apply to 500 jobs while you sleep"*. In
 ### The SPrav Solution: Human-in-the-Loop 1-Click Dispatch
 * SPrav does **99% of the computational heavy lifting**:
   - Scans 28,700+ verified career boards continuously.
-  - Scores job descriptions against candidate skills with cosine similarity.
+  - Calibrated hybrid scoring: 60% hard skill matching (549+ technologies), 25% semantic cosine alignment, 15% dynamic role title relevance.
   - Generates tailored cover notes and STAR project bullet suggestions.
 * However, **the final application trigger requires your 1-click permission**.
 * This preserves candidate integrity, maximizes interview conversion, and keeps you fully aware of every submission.

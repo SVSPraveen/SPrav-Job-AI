@@ -76,7 +76,7 @@ The "Ground Truth" candidate profile that powers all semantic matching and cover
 
 ### Capabilities:
 * **Master PDF Resume Upload**: Parses `.pdf` resumes locally using PyMuPDF and regex heuristic tokenizers.
-* **Semantic Skill Graph**: Groups candidate skills into 6 domain categories:
+* **Semantic Skill Graph**: Groups candidate skills into 10 universal domain categories (AI & Agentic, Retrieval/Search, LLMs/Vector DBs, ML/Evaluation, Full Stack/Backend, Cloud/Security, Design/Product, Business/Operations, Marketing/Sales, and Domain Expertise):
   * AI & Agentic Systems
   * Retrieval & Search Systems
   * LLMs & Vector Databases

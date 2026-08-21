@@ -1,119 +1,426 @@
 {
   "personal": {
-    "name": "",
-    "email": "",
-    "phone": "",
-    "linkedin": "https://linkedin.com/in/svs-praveen-s",
-    "github": "https://github.com/SVSPraveen",
-    "portfolio": "https://svspraveen.vercel.app/",
-    "location": "",
-    "summary": ""
+    "name": "SESHANAGOTTU VENKATA SUJITH PRAVEEN",
+    "email": "svspraveens@gmail.com",
+    "phone": "+91 8332816876",
+    "linkedin": "linkedin.com/in/svs-praveen-s",
+    "github": "github.com/SVSPraveen",
+    "portfolio": "svspraveen.vercel.app",
+    "location": "Mumbai, India",
+    "summary": "AI/ML Engineer specializing in production AI systems, Agentic AI, and Retrieval-Augmented Generation (RAG). Experienced in designing end-to-end LLM applications, multi-agent orchestration, hybrid search, workflow automation, and scalable backend services using Python, FastAPI, React, and modern AI infrastructure. Built and shipped production-oriented AI solutions spanning healthcare (RespiRAG) and autonomous job-search automation (SPrav\u2122 Job AI) \u2014 including a publicly deployed, downloadable AI product with 28,700+ tracked job sources."
   },
-  "work_history": [],
-  "education": [],
-  "projects": [],
-  "github_projects": [],
-  "portfolio_projects": [],
-  "certifications": [],
+  "work_history": [
+    {
+      "id": "work_1",
+      "company": "MobcoderAI",
+      "role": "AI/ML Engineer Intern",
+      "employment_type": "internship",
+      "start_date": "2026-04-01",
+      "end_date": "2026-07-31",
+      "in_progress": false,
+      "last_reviewed": "2025-01-01",
+      "bullets": [
+        {
+          "id": "bullet_1",
+          "text": "Built a hybrid BM25 + dense-vector retrieval pipeline with Reciprocal Rank Fusion and Cross-Encoder re-ranking on Qdrant Cloud for SEC 10-K/10-Q filing search across 4 companies, adding a semantic cache (cosine similarity \u2265 0.92) that served repeat queries with zero added LLM latency.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "BM25",
+            "Reciprocal Rank Fusion",
+            "Cross-Encoder re-ranking",
+            "Qdrant Cloud"
+          ],
+          "themes": [
+            "retrieval_search",
+            "llms_vector_databases"
+          ]
+        },
+        {
+          "id": "bullet_2",
+          "text": "Designed a multi-agent orchestration system \u2014 6 specialized agents plus a router for intent decomposition, comparison, risk analysis, and trend queries \u2014 that dynamically routed work between Llama 3.1 8B and Llama 3.3 70B on Groq to balance cost, latency, and accuracy.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "Multi-Agent Systems",
+            "Llama 3.1",
+            "Llama 3.3",
+            "Groq"
+          ],
+          "themes": [
+            "ai_agentic_systems",
+            "llms_vector_databases"
+          ]
+        },
+        {
+          "id": "bullet_3",
+          "text": "Built a deterministic, LLM-free evaluation harness (RapidFuzz) scoring Faithfulness, Groundness, Hallucination Rate, and Citation Accuracy, gating numerical claims to a 1% tolerance against source filings, tracked end-to-end in MLflow.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "RapidFuzz",
+            "MLflow"
+          ],
+          "themes": [
+            "ml_evaluation"
+          ]
+        }
+      ]
+    }
+  ],
   "resume_bullets": [],
   "skills": {
     "ai_agentic_systems": [
       "LangGraph",
       "LangChain",
-      "Multi-Agent Systems",
       "Agentic RAG",
+      "Multi-Agent Systems (Mixture-of-Experts routing)",
+      "Model Context Protocol (MCP)",
+      "Tool-Calling",
+      "LLMs (Llama 3.3, Qwen 2.5, DeepSeek-R1, GPT-OSS-120B)",
+      "LoRA Fine-tuning",
+      "LlamaIndex",
       "Self-RAG",
-      "CRAG",
-      "Autonomous Workflows",
-      "Agent Tool Calling"
+      "CRAG"
     ],
     "retrieval_search": [
       "Hybrid Search (BM25 + Dense)",
-      "Semantic Caching",
-      "Sentence-Transformers",
+      "Reciprocal Rank Fusion",
       "Cross-Encoder Re-ranking",
-      "HuggingFace Transformers",
-      "Vector Embeddings"
-    ],
-    "llms_vector_databases": [
-      "Qdrant",
-      "ChromaDB",
-      "vLLM",
-      "Ollama",
-      "Groq API",
-      "LoRA Fine-tuning",
-      "OpenAI / Gemini APIs",
-      "Prompt Optimization"
-    ],
-    "ml_evaluation": [
-      "Scikit-learn",
-      "PyTorch",
-      "MLflow",
-      "RAGAS",
-      "Pytest",
-      "Cosine Similarity",
-      "Precision / Recall",
-      "Model Benchmarking"
-    ],
-    "full_stack_backend": [
-      "Python",
-      "FastAPI",
-      "React 18",
-      "JavaScript",
-      "TypeScript",
-      "SQLAlchemy",
-      "Alembic",
-      "Pydantic",
-      "REST APIs",
-      "Redis"
-    ],
-    "cloud_security": [
-      "Docker",
-      "Git",
-      "AWS",
-      "JWT Authentication",
-      "OAuth2",
-      "Linux / Bash",
-      "CI/CD Pipelines"
-    ],
-    "languages": [
-      "Python",
-      "JavaScript",
-      "TypeScript",
-      "SQL",
-      "Bash"
-    ],
-    "frameworks": [
-      "FastAPI",
-      "React 18",
-      "LangChain",
-      "LangGraph",
-      "PyTorch"
-    ],
-    "ai_ml": [
-      "LangGraph",
-      "Agentic RAG",
-      "Qdrant",
-      "vLLM",
-      "LoRA Fine-tuning",
-      "Self-RAG",
-      "CRAG",
-      "Hybrid Search (BM25 + Dense)",
-      "Cross-Encoder Re-ranking",
+      "Cosine Similarity Scoring",
       "Semantic Caching",
       "Sentence-Transformers",
       "HuggingFace Transformers"
     ],
-    "tools": [
-      "Git",
-      "Docker",
-      "PyWebView",
+    "llms_vector_databases": [
+      "Groq",
+      "Ollama",
+      "vLLM",
+      "OpenAI API",
+      "AWS Bedrock",
+      "Qdrant",
+      "pgvector",
+      "Pinecone",
+      "MedCPT",
+      "DeepSeek-R1/R2",
+      "Qwen 2.5/3",
+      "Llama 3.x"
+    ],
+    "ml_evaluation": [
+      "Scikit-learn",
+      "LightGBM",
+      "XGBoost",
+      "TensorFlow/Keras",
+      "MLflow",
+      "RAGAS",
+      "RapidFuzz",
+      "NDCG",
+      "Hallucination Detection",
+      "Drift Detection",
+      "Citation Accuracy",
+      "pytest"
+    ],
+    "full_stack_backend": [
+      "FastAPI",
+      "REST APIs",
+      "React 18",
+      "JavaScript",
+      "TypeScript",
+      "Python",
+      "Playwright",
+      "PostgreSQL",
+      "MongoDB",
+      "SQLite",
+      "DuckDB",
       "Redis",
       "SQLAlchemy",
       "Alembic",
       "Pydantic",
-      "Qdrant",
-      "ChromaDB"
+      "Docker",
+      "PyWebView"
+    ],
+    "cloud_security": [
+      "AWS",
+      "Oracle OCI",
+      "GCP",
+      "Cloudflare Pages",
+      "Kubernetes",
+      "HIPAA",
+      "GDPR",
+      "FDA 21 CFR Part 11",
+      "OAuth2",
+      "JWT",
+      "AES-GCM",
+      "Prometheus",
+      "Linux",
+      "Git"
+    ],
+    "design_product": [],
+    "business_operations": [],
+    "marketing_sales": [],
+    "domain_expertise": [
+      "Healthcare",
+      "AI",
+      "Machine Learning",
+      "Data Science",
+      "Cloud Computing",
+      "Security",
+      "Networking",
+      "Multi-Agent Systems",
+      "Retrieval-Augmented Generation"
     ]
-  }
+  },
+  "master_resume_path": "knowledge_base/master_resume.pdf",
+  "master_resume_original_filename": "SVS_Praveen_Resume.pdf",
+  "projects": [
+    {
+      "id": "proj_1",
+      "name": "SPrav\u2122 Job AI",
+      "tagline": "Autonomous Career Intelligence & Agentic Job-Application Platform",
+      "tech_stack": [
+        "Python",
+        "FastAPI",
+        "React 18",
+        "SQLite",
+        "Ollama",
+        "Groq",
+        "Playwright",
+        "PyWebView",
+        "Redis",
+        "ReportLab",
+        "Cloudflare Pages"
+      ],
+      "start_date": "2022",
+      "end_date": "2026",
+      "in_progress": false,
+      "last_reviewed": "2025-01-01",
+      "bullets": [
+        {
+          "id": "proj_bullet_1",
+          "text": "Designed and shipped a local-first, multi-agent pipeline (Discovery \u2192 Extraction \u2192 Fit Scoring \u2192 Tailoring \u2192 Verification \u2192 Apply) that routes tasks across specialized models (Qwen 2.5, DeepSeek-R1, GPT-OSS-120B via Groq with a local Qwen 2.5-Coder fallback, bespoke-minicheck, nomic-embed-text) and cuts hallucinated resume claims via an automated verifier feedback loop.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "multi-agent pipeline",
+            "Qwen 2.5",
+            "DeepSeek-R1",
+            "GPT-OSS-120B",
+            "Groq"
+          ],
+          "themes": [
+            "ai_agentic_systems",
+            "llms_vector_databases"
+          ]
+        },
+        {
+          "id": "proj_bullet_2",
+          "text": "Built a Playwright-based auto-apply engine that submits tailored applications directly to Greenhouse, Lever, Ashby, Workday, and SmartRecruiters, enforcing 3-tier circuit breakers (per-company/per-portal/global daily caps) to keep automation within safe rate limits.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "Playwright",
+            "auto-apply engine",
+            "Greenhouse",
+            "Lever",
+            "Ashby",
+            "Workday",
+            "SmartRecruiters"
+          ],
+          "themes": [
+            "full_stack_backend",
+            "automation"
+          ]
+        },
+        {
+          "id": "proj_bullet_3",
+          "text": "Engineered deterministic project selection, AI-generated content verification against a personal knowledge base, encrypted local credential storage (AES-GCM/XOR with a master recovery key), and hybrid Groq/Ollama inference tuned to run within an 8GB VRAM ceiling via sequential GPU thread-locking.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "project selection",
+            "AI-generated content verification",
+            "AES-GCM",
+            "Groq",
+            "Ollama"
+          ],
+          "themes": [
+            "full_stack_backend",
+            "llms_vector_databases"
+          ]
+        },
+        {
+          "id": "proj_bullet_4",
+          "text": "Packaged and deployed the app as a portable Windows release (v2.4, ~385MB) and shipped a public landing page on Cloudflare Pages with an interactive in-browser ATS match simulator, product screenshots, and a walkthrough demo, scoring candidates against 28,700+ tracked job sources.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "portable Windows release",
+            "Cloudflare Pages",
+            "ATS match simulator"
+          ],
+          "themes": [
+            "full_stack_backend",
+            "deployment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "proj_2",
+      "name": "RespiRAG",
+      "tagline": "Clinical Precision AI for Oncology (NSCLC)",
+      "tech_stack": [
+        "Python",
+        "FastAPI",
+        "React 18",
+        "Qdrant",
+        "MedCPT",
+        "PostgreSQL",
+        "Redis",
+        "Groq",
+        "Docker",
+        "JWT"
+      ],
+      "start_date": "2022",
+      "end_date": "2026",
+      "in_progress": false,
+      "last_reviewed": "2025-01-01",
+      "bullets": [
+        {
+          "id": "proj_bullet_5",
+          "text": "Built a governed RAG pipeline over 600+ FDA drug labels and 3,900+ pages of NCCN clinical guidelines, combining HyDE query expansion, MedCPT biomedical embeddings, Cross-Encoder re-ranking, score gating (rejecting chunks below a 0.15 relevance threshold), and an LLM-as-judge verifier to reduce hallucinations.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "RAG pipeline",
+            "HyDE query expansion",
+            "MedCPT",
+            "Cross-Encoder re-ranking",
+            "LLM-as-judge verifier"
+          ],
+          "themes": [
+            "retrieval_search",
+            "llms_vector_databases"
+          ]
+        },
+        {
+          "id": "proj_bullet_6",
+          "text": "Implemented JWT-based RBAC across Patient/HCP/Admin roles with refresh-token rotation and Redis session revocation, guarded by a governance layer that blocks jailbreak and prompt-injection attempts.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "JWT-based RBAC",
+            "refresh-token rotation",
+            "Redis session revocation"
+          ],
+          "themes": [
+            "cloud_security"
+          ]
+        },
+        {
+          "id": "proj_bullet_7",
+          "text": "Reduced redundant vector-DB and LLM calls with a Redis citation cache and multi-key Groq rotation with Ollama fallback for graceful rate limiting.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "Redis citation cache",
+            "Groq rotation",
+            "Ollama fallback"
+          ],
+          "themes": [
+            "llms_vector_databases"
+          ]
+        },
+        {
+          "id": "proj_bullet_8",
+          "text": "Built a CI/CD-compatible offline evaluation harness and a document version-control system that flags superseded clinical literature.",
+          "metric_verified": "self_reported",
+          "ats_keywords": [
+            "CI/CD",
+            "offline evaluation harness",
+            "document version-control system"
+          ],
+          "themes": [
+            "ml_evaluation"
+          ]
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "edu_1",
+      "institution": "Amity University",
+      "degree": "B.Tech, Computer Science & Engineering",
+      "year": "2022",
+      "cgpa": "7.4"
+    }
+  ],
+  "certifications": [
+    {
+      "id": "cert_1",
+      "name": "Oracle OCI Multicloud Architect Professional",
+      "issuer": "Oracle",
+      "date_earned": "",
+      "credential_url": ""
+    },
+    {
+      "id": "cert_2",
+      "name": "OCI Networking Professional",
+      "issuer": "Oracle",
+      "date_earned": "",
+      "credential_url": ""
+    },
+    {
+      "id": "cert_3",
+      "name": "OCI Foundation Associate",
+      "issuer": "Oracle",
+      "date_earned": "",
+      "credential_url": ""
+    },
+    {
+      "id": "cert_4",
+      "name": "Google Cloud Computing Foundations",
+      "issuer": "Google Cloud",
+      "date_earned": "",
+      "credential_url": ""
+    },
+    {
+      "id": "cert_5",
+      "name": "Cisco Ethical Hacker",
+      "issuer": "Cisco",
+      "date_earned": "",
+      "credential_url": ""
+    },
+    {
+      "id": "cert_6",
+      "name": "IBM Cybersecurity Analyst",
+      "issuer": "IBM",
+      "date_earned": "",
+      "credential_url": ""
+    },
+    {
+      "id": "cert_7",
+      "name": "Saviynt Identity Security for AI Age",
+      "issuer": "Saviynt",
+      "date_earned": "",
+      "credential_url": ""
+    }
+  ],
+  "github_projects": [
+    {
+      "id": "github_proj_1",
+      "name": "SPrav-Job-AI",
+      "url": "github.com/SVSPraveen/SPrav-Job-AI"
+    },
+    {
+      "id": "github_proj_2",
+      "name": "RespiRAG",
+      "url": "github.com/SVSPraveen/RespiRAG"
+    }
+  ],
+  "portfolio_projects": [
+    {
+      "id": "portfolio_proj_1",
+      "name": "SPrav\u2122 Job AI",
+      "url": "sprav-job-ai.pages.dev"
+    },
+    {
+      "id": "portfolio_proj_2",
+      "name": "RespiRAG",
+      "url": "pharma-spine-ai.vercel.app"
+    }
+  ],
+  "needs_detail": [],
+  "pending_conflicts": []
 }
