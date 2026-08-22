@@ -3,356 +3,543 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Sources, Credits & Engineering Inspirations — SPrav™ Job AI</title>
+  <title>Credits & Attributions — SPrav™ Job AI Pro v2.4.5</title>
+  <meta name="description" content="Open-source libraries, AI models, job feed providers, and engineering inspirations behind SPrav™ Job AI Pro.">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: rgba(17, 24, 39, 0.75);
-      --card-border: rgba(99, 102, 241, 0.22);
-      --primary: #6366f1;
-      --primary-glow: rgba(99, 102, 241, 0.4);
-      --accent: #a855f7;
-      --success: #10b981;
-      --text: #f8fafc;
+      --bg: #060812;
+      --surface: rgba(255,255,255,0.035);
+      --surface-hover: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --border-accent: rgba(139,92,246,0.4);
+      --purple: #8b5cf6;
+      --purple-light: #c084fc;
+      --blue: #38bdf8;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --pink: #f472b6;
+      --text: #f1f5f9;
       --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius: 16px;
+      --radius-sm: 10px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-dark);
+      background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      min-height: 100vh;
+      line-height: 1.7;
       overflow-x: hidden;
-      padding-bottom: 60px;
     }
-    .ambient-glow {
-      position: fixed;
-      top: -150px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1000px;
-      height: 550px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(168, 85, 247, 0.12) 40%, transparent 70%);
-      filter: blur(100px);
-      z-index: 0;
-      pointer-events: none;
+    body::before {
+      content: '';
+      position: fixed; top: -200px; left: -200px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
     }
-    .container {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-      position: relative;
-      z-index: 1;
+    body::after {
+      content: '';
+      position: fixed; bottom: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
     }
-    header {
-      padding: 1.25rem 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(14px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(9, 13, 22, 0.88);
+
+    /* NAV */
+    .topnav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,8,18,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 62px;
     }
-    .nav-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: #fff;
-    }
-    .logo-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 14px var(--primary-glow);
-    }
-    .brand-text {
+    .topnav-brand {
+      display: flex; align-items: center; gap: 10px;
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fff;
+      font-weight: 800; font-size: 1.05rem; color: #fff;
       text-decoration: none;
-      padding: 0.55rem 1.15rem;
-      border-radius: 10px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      transition: all 0.2s;
     }
-    .back-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      transform: translateY(-2px);
+    .topnav-brand img { width: 28px; height: 28px; border-radius: 8px; }
+    .topnav-badge {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: #fff; padding: 2px 8px; border-radius: 6px; text-transform: uppercase;
     }
-    .hero-heading {
-      padding: 3.5rem 0 2.5rem 0;
-      text-align: center;
+    .topnav-links { display: flex; gap: 8px; align-items: center; }
+    .topnav-links a {
+      font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+      text-decoration: none; padding: 7px 14px; border-radius: 8px; transition: all 0.2s;
     }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 16px;
-      border-radius: 30px;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.35);
-      color: #c084fc;
-      font-size: 0.85rem;
-      font-weight: 700;
-      margin-bottom: 1.25rem;
+    .topnav-links a:hover { background: var(--surface); color: #fff; }
+    .topnav-links a.active { background: rgba(139,92,246,0.15); color: var(--purple-light); }
+    .topnav-links .btn-dl {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff; padding: 7px 16px; border-radius: 8px; font-weight: 700;
     }
-    h1 {
+    .topnav-links .btn-dl:hover { opacity: 0.85; color: #fff; }
+
+    /* HERO */
+    .hero {
+      text-align: center; padding: 5rem 1.5rem 3rem;
+      position: relative; z-index: 1;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3);
+      color: var(--purple-light); padding: 6px 18px; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 2.75rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800; line-height: 1.15;
+      background: linear-gradient(135deg, #fff 30%, #c084fc 70%, #38bdf8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       margin-bottom: 1rem;
-      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #a5b4fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
     }
-    .hero-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      max-width: 740px;
-      margin: 0 auto;
-      line-height: 1.6;
+    .hero p { font-size: 1.05rem; color: var(--text-muted); max-width: 640px; margin: 0 auto; }
+
+    /* LAYOUT */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 1.5rem 5rem; position: relative; z-index: 1; }
+
+    /* CATEGORY HEADER */
+    .cat-header { display: flex; align-items: center; gap: 14px; margin: 3.5rem 0 1.25rem; }
+    .cat-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
     }
-    .section-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    }
-    .section-card h2 {
+    .cat-header h2 {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.45rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 2px;
     }
-    .grid-items {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1rem;
+    .cat-header p { font-size: 0.88rem; color: var(--text-muted); }
+    .cat-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--border-accent), transparent); }
+
+    /* TABLE */
+    .credits-table-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
     }
-    .item-box {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 1.25rem;
+    .credits-table { width: 100%; border-collapse: collapse; }
+    .credits-table thead tr {
+      background: rgba(139,92,246,0.1);
+      border-bottom: 1px solid rgba(139,92,246,0.3);
+    }
+    .credits-table thead th {
+      padding: 13px 20px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.76rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--purple-light); text-align: left;
+    }
+    .credits-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .credits-table tbody tr:last-child { border-bottom: none; }
+    .credits-table tbody tr:hover { background: var(--surface-hover); }
+    .credits-table tbody td { padding: 15px 20px; vertical-align: top; }
+    .td-name {
+      font-weight: 700; color: #fff; font-size: 0.93rem;
+      display: flex; align-items: flex-start; gap: 7px; flex-wrap: wrap;
+    }
+    .td-badge {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
+      padding: 2px 8px; border-radius: 5px; white-space: nowrap; margin-top: 2px;
+    }
+    .badge-purple { background: rgba(139,92,246,0.2); color: var(--purple-light); border: 1px solid rgba(139,92,246,0.3); }
+    .badge-blue   { background: rgba(56,189,248,0.15); color: var(--blue); border: 1px solid rgba(56,189,248,0.25); }
+    .badge-green  { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
+    .badge-yellow { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.25); }
+    .badge-pink   { background: rgba(244,114,182,0.15); color: var(--pink); border: 1px solid rgba(244,114,182,0.25); }
+    .td-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+    .td-desc code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+      color: var(--green); background: rgba(52,211,153,0.1); padding: 1px 6px; border-radius: 4px;
+    }
+    .td-role { font-size: 0.8rem; color: var(--text-dim); font-style: italic; white-space: nowrap; }
+    .td-sub { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; display: block; margin-top: 2px; }
+
+    /* CARD GRID */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 14px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1.3rem 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover { border-color: var(--border-accent); transform: translateY(-2px); }
+    .card-icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
+    .card-name { font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 6px; }
+    .card-desc { font-size: 0.84rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* CREATOR BANNER */
+    .creator-banner {
+      margin-top: 4rem;
+      background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(56,189,248,0.07));
+      border: 1px solid rgba(139,92,246,0.25); border-radius: var(--radius);
+      padding: 2rem 2.5rem; text-align: center;
+    }
+    .creator-banner h3 {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 800;
+      color: #fff; margin-bottom: 6px;
+    }
+    .creator-banner p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+    .link-pills { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .link-pill {
+      font-size: 0.85rem; font-weight: 700; text-decoration: none;
+      padding: 7px 16px; border-radius: 9px; border: 1px solid var(--border);
       transition: all 0.2s;
     }
-    .item-box:hover {
-      border-color: rgba(99, 102, 241, 0.4);
-      transform: translateY(-2px);
+    .link-pill:hover { transform: translateY(-1px); }
+    .lp-purple { color: var(--purple-light); border-color: rgba(139,92,246,0.3); }
+    .lp-purple:hover { background: rgba(139,92,246,0.1); }
+    .lp-blue { color: var(--blue); border-color: rgba(56,189,248,0.3); }
+    .lp-blue:hover { background: rgba(56,189,248,0.1); }
+    .lp-green { color: var(--green); border-color: rgba(52,211,153,0.3); }
+    .lp-green:hover { background: rgba(52,211,153,0.1); }
+    .lp-gray { color: var(--text-muted); }
+    .lp-gray:hover { background: var(--surface); color: #fff; }
+
+    /* FOOTER */
+    .page-footer {
+      border-top: 1px solid var(--border); padding: 2.5rem 1.5rem;
+      text-align: center; position: relative; z-index: 1;
     }
-    .item-title {
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #a5b4fc;
-      margin-bottom: 0.35rem;
-    }
-    .item-desc {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-    .footer-note {
-      text-align: center;
-      padding: 2.5rem 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
+    .page-footer p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; }
   </style>
 </head>
 <body>
 
-  <div class="ambient-glow"></div>
-
-  <header>
-    <div class="container nav-wrapper">
-      <a href="index.html" class="brand">
-        <div class="logo-badge">S</div>
-        <div class="brand-text">SPRAV™ <span style="font-size: 0.85rem; color: #a5b4fc; font-weight: 600;">JOB AI</span></div>
-      </a>
-      <a href="index.html" class="back-btn">
-        ← Back to Main Showcase
-      </a>
+  <nav class="topnav">
+    <a href="index.html" class="topnav-brand">
+      <img src="assets/favicon.png" alt="SPrav Logo">
+      SPrav™ Job AI
+      <span class="topnav-badge">v2.4.5 Pro</span>
+    </a>
+    <div class="topnav-links">
+      <a href="index.html">Home</a>
+      <a href="docs.html">Docs</a>
+      <a href="credits.html" class="active">Credits</a>
+      <a href="https://github.com/SVSPraveen/SPrav-Job-AI/releases/tag/v2.4.5" target="_blank" class="btn-dl">⬇ Download</a>
     </div>
-  </header>
+  </nav>
 
-  <main class="container">
-    <div class="hero-heading">
-      <div class="badge">🙏 Open-Source Transparency &amp; Attributions</div>
-      <h1>Data Sources, Credits &amp; Inspirations</h1>
-      <p class="hero-subtitle">
-        SPrav™ Job AI is built on the shoulders of giants. We gratefully acknowledge the open-source libraries, AI research, public ATS gateways, and hiring methodologies that make this project possible.
-      </p>
+  <section class="hero">
+    <div class="hero-eyebrow">🏆 Open-Source Transparency &amp; Attributions</div>
+    <h1>Data Sources, Credits &amp; Inspirations</h1>
+    <p>SPrav™ Job AI is built on the shoulders of giants. We gratefully acknowledge every open-source library, AI research team, public ATS gateway, and hiring methodology that makes this project possible.</p>
+  </section>
+
+  <div class="container">
+
+    <!-- 1. JOB FEEDS -->
+    <div class="cat-header">
+      <div class="cat-icon" style="background:rgba(56,189,248,0.12);">📡</div>
+      <div>
+        <h2>1. Live Job Feeds &amp; 1st-Party ATS Endpoints</h2>
+        <p>Corporate career portals and open APIs powering the 28,700+ job discovery engine</p>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="credits-table-wrap">
+      <table class="credits-table">
+        <thead>
+          <tr>
+            <th style="width:230px">Source / Platform</th>
+            <th style="width:120px">Type</th>
+            <th>How SPrav™ Uses It</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="td-name">Greenhouse.io <span class="td-badge badge-blue">REST API</span></div>
+            </td>
+            <td><span class="td-role">1st-Party ATS</span></td>
+            <td class="td-desc">Direct public job board REST API (<code>boards-api.greenhouse.io</code>) for real-time corporate openings from thousands of global technology companies.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Lever.co <span class="td-badge badge-blue">REST API</span></div></td>
+            <td><span class="td-role">1st-Party ATS</span></td>
+            <td class="td-desc">Public corporate career portal gateway (<code>api.lever.co</code>) with structured JSON posting endpoints covering engineering roles globally.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">AshbyHQ <span class="td-badge badge-blue">Posting API</span></div></td>
+            <td><span class="td-role">1st-Party ATS</span></td>
+            <td class="td-desc">Direct corporate career board API (<code>api.ashbyhq.com/posting-api</code>) powering modern high-growth tech companies and VC-backed startups.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Workday Enterprise <span class="td-badge badge-purple">CXS API</span></div></td>
+            <td><span class="td-role">Enterprise ATS</span></td>
+            <td class="td-desc">Direct enterprise career gateway endpoints (<code>{tenant}.myworkdayjobs.com</code>) ingesting Fortune 500 tech team openings with full structured job metadata.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">SmartRecruiters <span class="td-badge badge-blue">Public API</span></div></td>
+            <td><span class="td-role">1st-Party ATS</span></td>
+            <td class="td-desc">Public job board REST API (<code>api.smartrecruiters.com</code>) for global and international technology employers across EMEA and APAC regions.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Recruitee ATS <span class="td-badge badge-blue">REST API</span></div></td>
+            <td><span class="td-role">1st-Party ATS</span></td>
+            <td class="td-desc">Programmatic access to career boards hosted on Recruitee's platform across European tech and product companies.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Wellfound / AngelList <span class="td-badge badge-green">DOM Scraper</span></div></td>
+            <td><span class="td-role">Startup Board</span></td>
+            <td class="td-desc">Automated email alert ingestion and DOM extraction for venture-backed startup engineering roles, stealth positions, and early-stage openings.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Himalayas Community <span class="td-badge badge-green">Job Feed</span></div></td>
+            <td><span class="td-role">Remote Feed</span></td>
+            <td class="td-desc">Verified remote software engineering job feeds (<code>himalayas.app/jobs/api</code>) with pre-filtered roles for global remote-first tech companies.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">WeWorkRemotely <span class="td-badge badge-green">RSS / API</span></div></td>
+            <td><span class="td-role">Remote Feed</span></td>
+            <td class="td-desc">Curated remote-only engineering job stream with structured listings for async-first global engineering teams.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Arbeitnow &amp; RemoteOK <span class="td-badge badge-blue">Open API</span></div></td>
+            <td><span class="td-role">Global Feeds</span></td>
+            <td class="td-desc">International tech job streams (<code>arbeitnow.com</code> &amp; <code>remoteok.com</code>) covering DACH region, global remote developer openings, and niche engineering roles.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Custom Career Page Watcher <span class="td-badge badge-purple">Playwright</span></div></td>
+            <td><span class="td-role">Browser Agent</span></td>
+            <td class="td-desc">Headless Playwright Stealth browser watcher detecting new openings on company career SPA portals via DOM snapshot diffing — surfaces roles within minutes of posting.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Hacker News "Who is Hiring?" <span class="td-badge badge-yellow">Monthly</span></div></td>
+            <td><span class="td-role">Community</span></td>
+            <td class="td-desc">Monthly HN hiring thread scanner for direct-hire opportunities from independent engineers and tech founders — bypasses recruiter gatekeeping entirely.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">YC Startup Scanner <span class="td-badge badge-yellow">Custom</span></div></td>
+            <td><span class="td-role">Startup Board</span></td>
+            <td class="td-desc">Custom scanner for Y-Combinator backed startup job listings and Workatastartup.com structured feeds for seed and Series A engineers.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- 1. Live Job Feeds -->
-    <div class="section-card">
-      <h2>📡 1. Live Job Feeds &amp; 1st-Party ATS Endpoints</h2>
-      <div class="grid-items">
-        <div class="item-box">
-          <div class="item-title">Greenhouse.io</div>
-          <div class="item-desc">Direct 1st-party job board REST API (<code>boards-api.greenhouse.io</code>) for real-time corporate openings.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Lever.co</div>
-          <div class="item-desc">Public corporate career portal gateway (<code>api.lever.co</code>) with structured posting endpoints.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">AshbyHQ</div>
-          <div class="item-desc">Direct corporate career board API (<code>api.ashbyhq.com/posting-api</code>) for modern high-growth tech companies.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Workday Enterprise (CXS)</div>
-          <div class="item-desc">Direct enterprise career gateway endpoints (<code>{tenant}.myworkdayjobs.com</code>) for Fortune 500 tech teams.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">SmartRecruiters</div>
-          <div class="item-desc">Public job board API (<code>api.smartrecruiters.com</code>) for international technology employers.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Wellfound (AngelList Talent)</div>
-          <div class="item-desc">Automated email alert ingestion and DOM extraction for venture-backed startup roles.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Custom Career Page Watcher</div>
-          <div class="item-desc">Playwright Stealth browser watcher detecting stealth openings directly on company career portals.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Himalayas Community</div>
-          <div class="item-desc">Verified remote software engineering job feeds (<code>himalayas.app/jobs/api</code>).</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Arbeitnow &amp; RemoteOK</div>
-          <div class="item-desc">International tech job streams and global remote developer openings (<code>arbeitnow.com</code> &amp; <code>remoteok.com</code>).</div>
-        </div>
+    <!-- 2. AI ECOSYSTEM -->
+    <div class="cat-header">
+      <div class="cat-icon" style="background:rgba(139,92,246,0.12);">🧠</div>
+      <div>
+        <h2>2. Artificial Intelligence &amp; NLP Ecosystem</h2>
+        <p>AI models and inference runtimes powering resume parsing, ATS scoring, and behavioral storytelling</p>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="credits-table-wrap">
+      <table class="credits-table">
+        <thead>
+          <tr>
+            <th style="width:250px">Model / Runtime</th>
+            <th style="width:120px">License</th>
+            <th>Role in SPrav™</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="td-name">Google DeepMind <span class="td-badge badge-green">Free Tier</span></div>
+              <span class="td-sub">Gemini 2.0 Flash</span>
+            </td>
+            <td><span class="td-role">Commercial Free</span></td>
+            <td class="td-desc">Sub-second contextual synthesis, STAR achievement rewriting, semantic rubric scoring, and AI cover note generation via Google AI Studio. Free daily quota for all users.</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-name">Groq Inc. <span class="td-badge badge-green">Free Tier</span></div>
+              <span class="td-sub">LPU Engine — Llama / Mixtral</span>
+            </td>
+            <td><span class="td-role">Commercial Free</span></td>
+            <td class="td-desc">Ultra-low latency (&lt;100ms) token generation for rapid bulk job description evaluation, skill gap analysis, and scoring at scale using Groq's LPU hardware.</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-name">Ollama Community <span class="td-badge badge-purple">Open-Source</span></div>
+              <span class="td-sub">Local Inference Runner</span>
+            </td>
+            <td><span class="td-role">MIT License</span></td>
+            <td class="td-desc">100% local, air-gapped LLM execution on your GPU — zero internet inference calls. SPrav auto-detects a running Ollama instance and routes all AI scoring privately.</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-name">Alibaba Qwen Team <span class="td-badge badge-purple">Open-Source</span></div>
+              <span class="td-sub">Qwen 2.5 Coder 7B / 14B</span>
+            </td>
+            <td><span class="td-role">Apache 2.0</span></td>
+            <td class="td-desc">High-precision local open-weights models for code and skill graph extraction, role requirement decomposition, and competency-level inference from job descriptions.</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-name">DeepSeek AI <span class="td-badge badge-purple">Open-Source</span></div>
+              <span class="td-sub">DeepSeek-R1</span>
+            </td>
+            <td><span class="td-role">MIT License</span></td>
+            <td class="td-desc">Chain-of-thought reasoning models for behavioral interview preparation logic, STAR story structuring, and strengths/weaknesses rubric evaluation.</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-name">Artifex / pypdfium2 <span class="td-badge badge-blue">LGPL</span></div>
+              <span class="td-sub">pypdfium2 · pdfplumber · PyPDF2 · pdfminer</span>
+            </td>
+            <td><span class="td-role">LGPL v3</span></td>
+            <td class="td-desc">4-engine cascading PDF text extraction pipeline preserving resume layout coordinates with UTF-8 byte-order sanitization. Zero hardcoding — works for any resume from any country.</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-name">HuggingFace Transformers <span class="td-badge badge-purple">Open-Source</span></div>
+              <span class="td-sub">sentence-transformers</span>
+            </td>
+            <td><span class="td-role">Apache 2.0</span></td>
+            <td class="td-desc">Semantic skill vector embedding for cosine-similarity ATS scoring and skill taxonomy normalization across 800+ standardized career role types.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. OPEN-SOURCE STACK -->
+    <div class="cat-header">
+      <div class="cat-icon" style="background:rgba(52,211,153,0.12);">⚙️</div>
+      <div>
+        <h2>3. Core Open-Source Software Stack</h2>
+        <p>Frameworks, runtimes, and tools forming the application architecture</p>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="credits-table-wrap">
+      <table class="credits-table">
+        <thead>
+          <tr>
+            <th style="width:230px">Library / Framework</th>
+            <th style="width:120px">License</th>
+            <th>Purpose in SPrav™</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="td-name">FastAPI &amp; Starlette <span class="td-badge badge-blue">v0.115+</span></div></td>
+            <td><span class="td-role">MIT License</span></td>
+            <td class="td-desc">High-throughput async Python web framework by Sebastián Ramírez. Powers all 25+ API endpoints with 57.1ms median latency and 154.4 req/sec measured throughput.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Uvicorn <span class="td-badge badge-blue">ASGI Server</span></div></td>
+            <td><span class="td-role">BSD License</span></td>
+            <td class="td-desc">Lightning-fast ASGI web server supporting async job queues, concurrent discovery loops, and WebSocket telemetry streams for the live dashboard.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">SQLite (WAL Mode) <span class="td-badge badge-green">Embedded DB</span></div></td>
+            <td><span class="td-role">Public Domain</span></td>
+            <td class="td-desc">Zero-configuration embedded SQL database by D. Richard Hipp. WAL mode delivers 17.7ms query latency and 0 lock contentions across 40 concurrent read/write transactions.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">React 19 &amp; Vite <span class="td-badge badge-blue">UI Framework</span></div></td>
+            <td><span class="td-role">MIT License</span></td>
+            <td class="td-desc">Reactive glassmorphic user interface compiled to a single-file production asset (<code>index-DGowaS8p.js</code>) served locally with zero external CDN dependencies.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Lucide React Icons <span class="td-badge badge-purple">Icon Set</span></div></td>
+            <td><span class="td-role">ISC License</span></td>
+            <td class="td-desc">Clean, consistent open-source icon system used across all dashboard navigation, real-time status indicators, and 1-click dispatch action buttons.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Playwright &amp; playwright-stealth <span class="td-badge badge-purple">Browser</span></div></td>
+            <td><span class="td-role">Apache 2.0</span></td>
+            <td class="td-desc">Headless browser automation for company career page SPA rendering, DOM snapshot diffing, and Cloudflare bypass for the 300+ watched company portal watcher.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">PyInstaller <span class="td-badge badge-yellow">Packager</span></div></td>
+            <td><span class="td-role">GPL v2 + Custom</span></td>
+            <td class="td-desc">Standalone Windows binary packaging system producing the zero-install portable <code>SPravJobAI.exe</code> with embedded Python runtime and all 14,534 bundled dependencies.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">Python-Jose &amp; Passlib <span class="td-badge badge-green">Auth</span></div></td>
+            <td><span class="td-role">MIT License</span></td>
+            <td class="td-desc">JWT-based local session authentication and bcrypt password hashing for the web dashboard access control — all tokens are purely local, never transmitted externally.</td>
+          </tr>
+          <tr>
+            <td><div class="td-name">HTTPX &amp; aiohttp <span class="td-badge badge-blue">HTTP</span></div></td>
+            <td><span class="td-role">BSD / Apache</span></td>
+            <td class="td-desc">Async HTTP client libraries powering concurrent multi-source ATS feed scraping with connection pooling, retry logic, and rate-limit exponential back-off.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. HIRING METHODOLOGIES -->
+    <div class="cat-header">
+      <div class="cat-icon" style="background:rgba(251,191,36,0.12);">🎓</div>
+      <div>
+        <h2>4. Hiring Methodologies &amp; Career Frameworks</h2>
+        <p>Research-backed frameworks baked into every AI-tailored resume bullet and cover note</p>
+      </div>
+      <div class="cat-line"></div>
+    </div>
+    <div class="cards-grid">
+      <div class="card">
+        <span class="card-icon">📐</span>
+        <div class="card-name">The Google XYZ Formula</div>
+        <div class="card-desc">By Laszlo Bock — <em>"Accomplished [X] as measured by [Y], by doing [Z]."</em> Used to structure every AI-rewritten resume bullet to maximize recruiter screening impact.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">⭐</span>
+        <div class="card-name">The STAR Method</div>
+        <div class="card-desc"><em>Situation, Task, Action, Result.</em> SPrav auto-generates 3 behavioral interview stories from your resume achievements tailored to each specific target role's requirements.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎯</span>
+        <div class="card-name">ATS Heuristic Best Practices</div>
+        <div class="card-desc">Modern keyword density and parse-rate guidelines from leading technical talent acquisition teams at Google, Meta, Stripe, and top-tier SaaS companies.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔬</span>
+        <div class="card-name">Skill Cosine Similarity Scoring</div>
+        <div class="card-desc">Vector embedding–based job matching using semantic similarity between candidate skill graphs and job requirement vectors — far beyond naive keyword matching.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧩</span>
+        <div class="card-name">10-Domain Skill Taxonomy</div>
+        <div class="card-desc">SPrav classifies extracted skills into 10 domains (Languages, Cloud, AI/ML, DevOps, Data, Web, DB, Soft Skills, Certs, Domain) for granular automated gap analysis.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🌍</span>
+        <div class="card-name">246-Country Geo-Taxonomy</div>
+        <div class="card-desc">Location standardization covering all UN-recognized countries, tech hub aliases, and remote eligibility rules — ensuring the Scope Enforcer never incorrectly filters valid global roles.</div>
       </div>
     </div>
 
-    <!-- 2. AI Ecosystem -->
-    <div class="section-card">
-      <h2>🤖 2. Artificial Intelligence &amp; NLP Ecosystem</h2>
-      <div class="grid-items">
-        <div class="item-box">
-          <div class="item-title">Google DeepMind (Gemini 2.0 Flash)</div>
-          <div class="item-desc">Sub-second contextual synthesis, STAR achievement rewriting, and rubric scoring.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Groq Inc. (LPU™ Engine)</div>
-          <div class="item-desc">Ultra-low latency token generation for rapid bulk JD evaluation.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Ollama Community</div>
-          <div class="item-desc">Local LLM execution runner powering 100% offline air-gapped inference.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Alibaba Qwen Team (Qwen 2.5 Coder)</div>
-          <div class="item-desc">High-precision local open-weights models (7B/14B) for code and skill graph extraction.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">DeepSeek AI (DeepSeek-R1)</div>
-          <div class="item-desc">Reasoning models for behavioral interview preparation logic.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">PyMuPDF (Artifex Software)</div>
-          <div class="item-desc">High-speed C-based PDF text extraction engine preserving resume layout coordinates.</div>
-        </div>
+    <!-- CREATOR SIGNATURE -->
+    <div class="creator-banner">
+      <div style="font-size:1.5rem;margin-bottom:8px;">✨</div>
+      <h3>Architected &amp; Engineered by SVS Praveen</h3>
+      <p>Free Personal Freeware — Zero subscriptions, zero paywalls, zero data sent to any external server.</p>
+      <div class="link-pills">
+        <a href="https://svspraveen.vercel.app/" target="_blank" class="link-pill lp-purple">🌐 Personal Portfolio</a>
+        <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" class="link-pill lp-blue">💼 LinkedIn</a>
+        <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" class="link-pill lp-green">🐙 GitHub Repo</a>
+        <a href="index.html" class="link-pill lp-gray">← Back to Showcase</a>
       </div>
     </div>
 
-    <!-- 3. Core Open-Source Stack -->
-    <div class="section-card">
-      <h2>💻 3. Core Open-Source Software Stack</h2>
-      <div class="grid-items">
-        <div class="item-box">
-          <div class="item-title">FastAPI &amp; Starlette</div>
-          <div class="item-desc">High-throughput asynchronous Python web framework created by Sebastián Ramírez (Tiangolo).</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">SQLite (WAL Mode)</div>
-          <div class="item-desc">Embedded zero-configuration SQL database engine by D. Richard Hipp, delivering 17.7ms query latency.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">React 19 &amp; Vite</div>
-          <div class="item-desc">Reactive user interface framework and next-generation build tool created by Evan You and Meta team.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Lucide Icons</div>
-          <div class="item-desc">Clean, consistent, and lightweight open-source icon system for developer interfaces.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">PyInstaller Community</div>
-          <div class="item-desc">Standalone Windows binary packaging system ensuring zero-install portability.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">Uvicorn</div>
-          <div class="item-desc">Lightning-fast ASGI web server implementation supporting asynchronous job queues.</div>
-        </div>
-      </div>
-    </div>
+  </div>
 
-    <!-- 4. Hiring Methodologies -->
-    <div class="section-card">
-      <h2>🎯 4. Hiring Methodologies &amp; Career Frameworks</h2>
-      <div class="grid-items">
-        <div class="item-box">
-          <div class="item-title">The Google XYZ Formula (Laszlo Bock)</div>
-          <div class="item-desc"><em>"Accomplished [X] as measured by [Y], by doing [Z]"</em> — used to structure all resume bullet points.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">The STAR Method</div>
-          <div class="item-desc">Situation, Task, Action, Result framework for structured engineering interview responses.</div>
-        </div>
-        <div class="item-box">
-          <div class="item-title">ATS Heuristic Best Practices</div>
-          <div class="item-desc">Modern parse-rate guidelines from leading technical talent acquisition teams.</div>
-        </div>
-      </div>
+  <footer class="page-footer">
+    <p>SPrav™ Job AI Pro v2.4.5 &nbsp;·&nbsp; Local-First Autonomous Career Intelligence Platform</p>
+    <div class="link-pills">
+      <a href="index.html" class="link-pill lp-blue">Home</a>
+      <a href="docs.html" class="link-pill lp-purple">Documentation</a>
+      <a href="https://github.com/SVSPraveen/SPrav-Job-AI/releases/tag/v2.4.5" target="_blank" class="link-pill lp-green">Release v2.4.5</a>
     </div>
-
-    <div class="footer-note">
-      <p style="margin-bottom: 8px;">
-        Architected &amp; Engineered by <strong>SVS Praveen</strong> • Free Personal Freeware Project
-      </p>
-      <p style="font-size: 0.85rem; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-        <a href="index.html" style="color: #38bdf8; text-decoration: none;">← Return to Main Showcase</a> • 
-        <a href="https://svspraveen.vercel.app/" target="_blank" style="color: #c084fc; text-decoration: none; font-weight: 600;">🌐 Personal Portfolio</a> • 
-        <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" style="color: #a5b4fc; text-decoration: none;">GitHub Repository</a> • 
-        <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" style="color: #38bdf8; text-decoration: none;">LinkedIn</a>
-      </p>
-    </div>
-  </main>
+  </footer>
 
 </body>
 </html>

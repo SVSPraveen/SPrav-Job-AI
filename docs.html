@@ -3,411 +3,778 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Documentation Hub — SPrav™ Job AI</title>
+  <title>Documentation Hub — SPrav™ Job AI Pro v2.4.5</title>
+  <meta name="description" content="Complete technical documentation, user guide, API reference, workflow diagram, and FAQ for SPrav™ Job AI Pro.">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: rgba(17, 24, 39, 0.75);
-      --card-border: rgba(99, 102, 241, 0.22);
-      --primary: #6366f1;
-      --primary-glow: rgba(99, 102, 241, 0.4);
-      --accent: #a855f7;
-      --success: #10b981;
-      --text: #f8fafc;
+      --bg: #060812;
+      --surface: rgba(255,255,255,0.035);
+      --surface-hover: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --border-accent: rgba(139,92,246,0.4);
+      --purple: #8b5cf6;
+      --purple-light: #c084fc;
+      --blue: #38bdf8;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --pink: #f472b6;
+      --text: #f1f5f9;
       --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius: 16px;
+      --radius-sm: 10px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-      padding-bottom: 60px;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; line-height: 1.7; overflow-x: hidden;
     }
-    .ambient-glow {
-      position: fixed;
-      top: -150px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1000px;
-      height: 550px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(168, 85, 247, 0.12) 40%, transparent 70%);
-      filter: blur(100px);
-      z-index: 0;
-      pointer-events: none;
+    body::before {
+      content: ''; position: fixed; top: -200px; left: -200px;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
     }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-      position: relative;
-      z-index: 1;
+    body::after {
+      content: ''; position: fixed; bottom: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
     }
-    header {
-      padding: 1.25rem 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(14px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(9, 13, 22, 0.88);
-    }
-    .nav-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: #fff;
-    }
-    .logo-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 14px var(--primary-glow);
-    }
-    .brand-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fff;
-      text-decoration: none;
-      padding: 0.55rem 1.15rem;
-      border-radius: 10px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-    .back-btn:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-2px); }
 
-    .hero-heading {
-      padding: 3.5rem 0 2rem 0;
-      text-align: center;
+    /* NAV */
+    .topnav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,8,18,0.88); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 62px;
     }
+    .topnav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.05rem;
+      color: #fff; text-decoration: none;
+    }
+    .topnav-brand img { width: 28px; height: 28px; border-radius: 8px; }
+    .topnav-badge {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: #fff; padding: 2px 8px; border-radius: 6px; text-transform: uppercase;
+    }
+    .topnav-links { display: flex; gap: 8px; align-items: center; }
+    .topnav-links a {
+      font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+      text-decoration: none; padding: 7px 14px; border-radius: 8px; transition: all 0.2s;
+    }
+    .topnav-links a:hover { background: var(--surface); color: #fff; }
+    .topnav-links a.active { background: rgba(139,92,246,0.15); color: var(--purple-light); }
+    .topnav-links .btn-dl { background: linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; padding:7px 16px; border-radius:8px; font-weight:700; }
+    .topnav-links .btn-dl:hover { opacity:.85; color:#fff; }
+
+    /* HERO */
+    .hero { text-align: center; padding: 5rem 1.5rem 3rem; position: relative; z-index: 1; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3);
+      color: var(--purple-light); padding: 6px 18px; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; line-height: 1.15;
+      background: linear-gradient(135deg, #fff 30%, #c084fc 70%, #38bdf8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem;
+    }
+    .hero p { font-size: 1.05rem; color: var(--text-muted); max-width: 640px; margin: 0 auto; }
+
+    /* LAYOUT */
+    .layout { display: flex; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 5rem; gap: 2rem; position: relative; z-index: 1; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 230px; flex-shrink: 0;
+      position: sticky; top: 80px; height: fit-content;
+    }
+    .sidebar-title {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; padding: 0 8px;
+    }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-btn {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.87rem; font-weight: 600; color: var(--text-muted);
+      padding: 9px 12px; border-radius: 9px; border: none;
+      background: transparent; cursor: pointer; text-align: left; width: 100%;
+      transition: all 0.18s;
+    }
+    .sidebar-btn:hover { background: var(--surface); color: #fff; }
+    .sidebar-btn.active { background: rgba(139,92,246,0.15); color: var(--purple-light); }
+    .sidebar-btn .btn-icon { font-size: 1rem; flex-shrink: 0; }
+
+    /* MAIN CONTENT */
+    .main-content { flex: 1; min-width: 0; }
+
+    /* DOC SECTION */
+    .doc-section { display: none; }
+    .doc-section.active { display: block; }
+
+    .section-hero {
+      background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(56,189,248,0.06));
+      border: 1px solid rgba(139,92,246,0.2); border-radius: var(--radius);
+      padding: 1.75rem 2rem; margin-bottom: 1.75rem;
+    }
+    .section-hero h2 {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 800;
+      color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-hero p { font-size: 0.92rem; color: var(--text-muted); }
+
+    /* STEP CARDS */
+    .steps { display: flex; flex-direction: column; gap: 14px; margin: 1.25rem 0; }
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1.25rem 1.4rem;
+      transition: border-color 0.2s;
+    }
+    .step:hover { border-color: var(--border-accent); }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 0.9rem; color: #fff;
+    }
+    .step h4 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .step p { font-size: 0.87rem; color: var(--text-muted); line-height: 1.55; }
+    .step code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.83rem;
+      color: var(--green); background: rgba(52,211,153,0.1); padding: 1px 7px; border-radius: 4px;
+    }
+
+    /* INFO CARDS GRID */
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 12px; margin: 1rem 0; }
+    .info-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1.2rem 1.4rem; transition: border-color 0.2s;
+    }
+    .info-card:hover { border-color: var(--border-accent); }
+    .info-card h4 { font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+    .info-card p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* REFERENCE TABLE */
+    .ref-table-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin: 1.25rem 0;
+    }
+    .ref-table { width: 100%; border-collapse: collapse; }
+    .ref-table thead tr { background: rgba(139,92,246,0.1); border-bottom: 1px solid rgba(139,92,246,0.3); }
+    .ref-table thead th {
+      padding: 12px 18px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.74rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--purple-light); text-align: left;
+    }
+    .ref-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .ref-table tbody tr:last-child { border-bottom: none; }
+    .ref-table tbody tr:hover { background: var(--surface-hover); }
+    .ref-table tbody td { padding: 13px 18px; font-size: 0.87rem; vertical-align: top; }
+    .ref-table .td-name { font-weight: 700; color: #fff; }
+    .ref-table .td-muted { color: var(--text-muted); line-height: 1.55; }
+    .ref-table code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+      color: var(--green); background: rgba(52,211,153,0.1); padding: 1px 6px; border-radius: 4px;
+    }
+    .method-badge {
+      display: inline-block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.04em;
+      padding: 2px 8px; border-radius: 5px; margin-right: 6px;
+    }
+    .get  { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+    .post { background: rgba(56,189,248,0.15); color: var(--blue); border: 1px solid rgba(56,189,248,0.3); }
+    .del  { background: rgba(244,114,182,0.15); color: var(--pink); border: 1px solid rgba(244,114,182,0.3); }
+
+    /* WORKFLOW DIAGRAM */
+    .workflow {
+      display: flex; flex-direction: column; gap: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin: 1.25rem 0;
+    }
+    .wf-step {
+      display: flex; align-items: center; gap: 16px;
+      padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .wf-step:last-child { border-bottom: none; }
+    .wf-step:hover { background: var(--surface-hover); }
+    .wf-icon {
+      width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .wf-body h4 { font-size: 0.92rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .wf-body p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; }
+    .wf-arrow { color: var(--text-dim); font-size: 1rem; margin-left: auto; flex-shrink: 0; }
+
+    /* BENCHMARK TABLE */
+    .bench-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 12px; margin: 1rem 0; }
+    .bench-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 1.25rem; text-align: center;
+    }
+    .bench-val {
+      font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 800;
+      line-height: 1.1; margin-bottom: 4px;
+    }
+    .bench-label { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); }
+    .bench-sub { font-size: 0.75rem; color: var(--text-dim); margin-top: 3px; }
+
+    /* FAQ */
+    .faq-list { display: flex; flex-direction: column; gap: 10px; margin: 1rem 0; }
+    .faq-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); overflow: hidden;
+    }
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.4rem; cursor: pointer; font-weight: 700; font-size: 0.92rem;
+      color: #fff; transition: background 0.15s; user-select: none;
+    }
+    .faq-q:hover { background: var(--surface-hover); }
+    .faq-q .chevron { font-size: 0.8rem; color: var(--text-muted); transition: transform 0.25s; }
+    .faq-a {
+      max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease;
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.65;
+      padding: 0 1.4rem; border-top: 0 solid var(--border);
+    }
+    .faq-item.open .faq-a { max-height: 400px; padding: 0.85rem 1.4rem; border-top: 1px solid var(--border); }
+    .faq-item.open .chevron { transform: rotate(180deg); }
+    .faq-a code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.83rem;
+      color: var(--green); background: rgba(52,211,153,0.1); padding: 1px 6px; border-radius: 4px;
+    }
+    .faq-a strong { color: #fff; }
+
+    /* ROADMAP */
+    .roadmap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 1rem 0; }
+    @media (max-width: 640px) { .roadmap-grid { grid-template-columns: 1fr; } }
+    .roadmap-col { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1.4rem; }
+    .roadmap-col h4 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .roadmap-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .roadmap-col li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.87rem; color: var(--text-muted); line-height: 1.5; }
+    .roadmap-col li::before { content: ''; flex-shrink: 0; }
+
+    /* INLINE BADGE */
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 16px;
-      border-radius: 30px;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.35);
-      color: #c084fc;
-      font-size: 0.85rem;
-      font-weight: 700;
-      margin-bottom: 1.25rem;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em;
+      padding: 2px 8px; border-radius: 5px; margin-left: 6px;
     }
-    h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 2.75rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #a5b4fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero-subtitle {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      max-width: 740px;
-      margin: 0 auto;
-      line-height: 1.6;
-    }
+    .b-green { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+    .b-yellow { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+    .b-blue { background: rgba(56,189,248,0.15); color: var(--blue); border: 1px solid rgba(56,189,248,0.3); }
 
-    /* Tabs Layout */
-    .docs-layout {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 2rem;
-      margin-top: 2rem;
+    /* LINK PILLS */
+    .link-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.25rem; }
+    .link-pill {
+      font-size: 0.85rem; font-weight: 700; text-decoration: none;
+      padding: 7px 16px; border-radius: 9px; border: 1px solid var(--border); transition: all 0.2s;
     }
-    .sidebar-nav {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 1.25rem;
-      height: fit-content;
-      position: sticky;
-      top: 90px;
-    }
-    .tab-btn {
-      display: block;
-      width: 100%;
-      text-align: left;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-bottom: 0.35rem;
-    }
-    .tab-btn:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-    }
-    .tab-btn.active {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.2) 100%);
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      color: #fff;
-      font-weight: 700;
-    }
+    .link-pill:hover { transform: translateY(-1px); }
+    .lp-purple { color: var(--purple-light); border-color: rgba(139,92,246,0.3); }
+    .lp-purple:hover { background: rgba(139,92,246,0.1); }
+    .lp-blue { color: var(--blue); border-color: rgba(56,189,248,0.3); }
+    .lp-blue:hover { background: rgba(56,189,248,0.1); }
+    .lp-green { color: var(--green); border-color: rgba(52,211,153,0.3); }
+    .lp-green:hover { background: rgba(52,211,153,0.1); }
+    .lp-gray { color: var(--text-muted); }
+    .lp-gray:hover { background: var(--surface); color: #fff; }
 
-    .doc-content {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 2.25rem;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    }
-    .doc-content h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 1rem;
-    }
-    .doc-content h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #a5b4fc;
-      margin: 1.5rem 0 0.5rem 0;
-    }
-    .doc-content p, .doc-content li {
-      font-size: 0.95rem;
-      color: #cbd5e1;
-      line-height: 1.65;
-      margin-bottom: 0.75rem;
-    }
-    .doc-content code {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      color: #38bdf8;
-    }
-    .doc-content pre {
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 1.2rem;
-      border-radius: 12px;
-      overflow-x: auto;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.88rem;
-      color: #f8fafc;
-      margin: 1rem 0;
-    }
+    /* FOOTER */
+    .page-footer { border-top: 1px solid var(--border); padding: 2.5rem 1.5rem; text-align: center; position: relative; z-index: 1; }
+    .page-footer p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; }
 
-    @media (max-width: 800px) {
-      .docs-layout { grid-template-columns: 1fr; }
-      .sidebar-nav { position: static; }
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; position: static; }
+      .sidebar-nav { flex-direction: row; flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
 
-  <div class="ambient-glow"></div>
+  <nav class="topnav">
+    <a href="index.html" class="topnav-brand">
+      <img src="assets/favicon.png" alt="SPrav Logo">
+      SPrav™ Job AI
+      <span class="topnav-badge">v2.4.5 Pro</span>
+    </a>
+    <div class="topnav-links">
+      <a href="index.html">Home</a>
+      <a href="docs.html" class="active">Docs</a>
+      <a href="credits.html">Credits</a>
+      <a href="https://github.com/SVSPraveen/SPrav-Job-AI/releases/tag/v2.4.5" target="_blank" class="btn-dl">⬇ Download</a>
+    </div>
+  </nav>
 
-  <header>
-    <div class="container nav-wrapper">
-      <a href="index.html" class="brand">
-        <div class="logo-badge">S</div>
-        <div class="brand-text">SPRAV™ <span style="font-size: 0.85rem; color: #a5b4fc; font-weight: 600;">JOB AI</span></div>
-      </a>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <a href="https://svspraveen.vercel.app/" target="_blank" class="back-btn" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.35);">
-          🌐 Portfolio
-        </a>
-        <a href="index.html" class="back-btn">
-          ← Back to Showcase
-        </a>
+  <section class="hero">
+    <div class="hero-eyebrow">📚 Technical Documentation</div>
+    <h1>Documentation Hub</h1>
+    <p>Complete technical guide, API reference, 5-stage workflow diagram, benchmark results, FAQ, and product roadmap for SPrav™ Job AI Pro v2.4.5.</p>
+  </section>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Contents</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-btn active" onclick="showSection('guide', this)">
+          <span class="btn-icon">🚀</span> Quick Start Guide
+        </button>
+        <button class="sidebar-btn" onclick="showSection('reference', this)">
+          <span class="btn-icon">🔧</span> Reference Manual
+        </button>
+        <button class="sidebar-btn" onclick="showSection('api', this)">
+          <span class="btn-icon">⚡</span> API Reference
+        </button>
+        <button class="sidebar-btn" onclick="showSection('workflow', this)">
+          <span class="btn-icon">🔄</span> 5-Stage Workflow
+        </button>
+        <button class="sidebar-btn" onclick="showSection('casestudy', this)">
+          <span class="btn-icon">📊</span> Benchmarks
+        </button>
+        <button class="sidebar-btn" onclick="showSection('faq', this)">
+          <span class="btn-icon">❓</span> FAQ
+        </button>
+        <button class="sidebar-btn" onclick="showSection('roadmap', this)">
+          <span class="btn-icon">🗺️</span> Roadmap
+        </button>
+      </nav>
+
+      <div style="margin-top:2rem;padding:12px 14px;background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.2);border-radius:10px;">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--green);margin-bottom:6px;">📥 Latest Release</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">v2.4.5 Pro — 400 MB Standalone Portable</div>
+        <a href="https://github.com/SVSPraveen/SPrav-Job-AI/releases/tag/v2.4.5" target="_blank" style="font-size:0.82rem;font-weight:700;color:var(--green);text-decoration:none;">⬇ Download Now →</a>
       </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- GUIDE -->
+      <div class="doc-section active" id="sec-guide">
+        <div class="section-hero">
+          <h2>🚀 Quick Start Guide</h2>
+          <p>From zero to autonomous job search in under 60 seconds — no Python, no command line, no dependencies required.</p>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h4>Download &amp; Extract</h4>
+              <p>Download <code>SPrav_Job_AI_Pro_v2.4.5_Portable.zip</code> from the GitHub Release page. Extract the ZIP to any folder on your Windows PC — e.g. <code>C:\Apps\SPravJobAI\</code>. No installer needed.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h4>Launch SPravJobAI.exe</h4>
+              <p>Double-click <code>SPravJobAI.exe</code>. The local server starts automatically and your default browser opens to <code>http://127.0.0.1:8000/</code>. The dashboard authenticates you automatically — no login required.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h4>Upload Your Master Resume</h4>
+              <p>Navigate to <strong>Knowledge Base</strong> and upload your master resume in PDF format. SPrav's 4-engine parser extracts your work history, projects, skills, certifications, and quantified metrics to form your personal ground truth for all AI scoring.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div>
+              <h4>Configure Free Cloud AI or Local Ollama</h4>
+              <p>SPrav supports 100% free operation using either: <strong>Free Cloud AI</strong> (get a free API key from Google AI Studio for Gemini 2.0 Flash, or Groq LPU Console) or <strong>100% Local Air-Gapped AI</strong> — install Ollama and run <code>ollama run qwen2.5-coder:7b</code>. SPrav auto-detects Ollama and routes all inference locally on your GPU with zero internet calls.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div>
+              <h4>Set Your Application Scope</h4>
+              <p>Navigate to <strong>Application Scope</strong> to specify your target job roles (e.g. <em>AI Engineer, Generative AI, Full Stack Developer</em>) and preferred locations (e.g. <em>Remote, India, Bengaluru, San Francisco</em>) using the 1-click 800+ role typeahead and 246-country geo-taxonomy palettes.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">6</div>
+            <div>
+              <h4>Start the Autonomous Loop &amp; Apply</h4>
+              <p>Click <strong>Start Loop</strong> on the Command Center. SPrav continuously scans 28,700+ ATS feeds, scores matches against your resume, and populates <strong>Action Required</strong>. For each high-match job (ATS ≥ 65%), review the tailored cover note and STAR stories, then click <strong>Open &amp; Apply</strong> to dispatch with 1 click.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REFERENCE MANUAL -->
+      <div class="doc-section" id="sec-reference">
+        <div class="section-hero">
+          <h2>🔧 Reference Manual</h2>
+          <p>Exhaustive technical documentation covering all core engine subsystems and architectural components.</p>
+        </div>
+        <div class="info-grid">
+          <div class="info-card">
+            <h4>📡 Autonomous Ingestion Daemon</h4>
+            <p>Continuous background scheduler monitoring 28,700+ 1st-party ATS feeds — Greenhouse, Lever, Ashby, Workday, SmartRecruiters. Runs silently with zero CPU idle usage via SQLite WAL queuing.</p>
+          </div>
+          <div class="info-card">
+            <h4>🎯 Hybrid ATS Matcher</h4>
+            <p>Evaluates 26,062 jobs/second in-memory. Calculates cosine similarity over extracted skill vectors, rubric dimensions, and keyword density. Produces a 0–100% match score per job.</p>
+          </div>
+          <div class="info-card">
+            <h4>🧠 Knowledge Base Engine</h4>
+            <p>Stores a 10-domain semantic skill graph with ground-truth PDF verification. Parses any resume worldwide via 4-engine cascading PDF extraction with zero hardcoding.</p>
+          </div>
+          <div class="info-card">
+            <h4>🛡️ Scope Enforcer</h4>
+            <p>Sub-millisecond in-memory filter validating work mode, location, and target role eligibility before any job enters the scoring queue — preventing irrelevant application spam.</p>
+          </div>
+          <div class="info-card">
+            <h4>📈 Conversion Analytics</h4>
+            <p>Real-time telemetry computing application yield, interview progression rates, response latency per employer, and ghost detection for non-responding ATS portals.</p>
+          </div>
+          <div class="info-card">
+            <h4>📧 Recruiter Outreach Engine</h4>
+            <p>Scrapes technical hiring manager contacts via LinkedIn and company directories, then drafts personalized warm-path connection notes anchored to the specific job context.</p>
+          </div>
+          <div class="info-card">
+            <h4>✍️ Cover Note AI Generator</h4>
+            <p>Generates concise, honest 3-paragraph cover notes anchored to your actual resume achievements — never hallucinates. Capped at 220 words to ensure recruiter readability.</p>
+          </div>
+          <div class="info-card">
+            <h4>🔒 Local Security Boundary</h4>
+            <p>All candidate data stored exclusively in <code>%LOCALAPPDATA%\SPravJobAI</code>. Zero data transmitted to external servers. JWT tokens are local-only, never exfiltrated.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- API REFERENCE -->
+      <div class="doc-section" id="sec-api">
+        <div class="section-hero">
+          <h2>⚡ API Reference</h2>
+          <p>All FastAPI endpoints exposed by the local backend at <code style="color:var(--green);background:rgba(52,211,153,0.1);padding:2px 8px;border-radius:5px;">http://127.0.0.1:8000</code></p>
+        </div>
+        <div class="ref-table-wrap">
+          <table class="ref-table">
+            <thead>
+              <tr>
+                <th style="width:280px">Endpoint</th>
+                <th style="width:100px">Method</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-name"><code>/api/auto-login</code></td>
+                <td><span class="method-badge get">GET</span></td>
+                <td class="td-muted">Returns a local JWT access token automatically. Zero credentials needed — all tokens are local-only and never transmitted.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/metrics</code></td>
+                <td><span class="method-badge get">GET</span></td>
+                <td class="td-muted">Live job discovery counter, action required queue depth, applications sent, interviews, and rejection stats. Used to power the Command Center dashboard cards.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/loop/status</code></td>
+                <td><span class="method-badge get">GET</span></td>
+                <td class="td-muted">Returns current loop telemetry state — <code>active: bool</code> and current <code>state: string</code> (e.g. "Scanning ATS Boards...").</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/loop/start</code></td>
+                <td><span class="method-badge post">POST</span></td>
+                <td class="td-muted">Starts the autonomous discovery and scoring daemon in the background if not already running.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/loop/stop</code></td>
+                <td><span class="method-badge post">POST</span></td>
+                <td class="td-muted">Gracefully stops the discovery loop after the current scraping cycle completes.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/jobs</code></td>
+                <td><span class="method-badge get">GET</span></td>
+                <td class="td-muted">Paginated job portal endpoint. Supports <code>?status=action_required</code>, <code>?search=</code>, <code>?page=</code>, and <code>?limit=</code> query parameters.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/jobs/{id}/tailor</code></td>
+                <td><span class="method-badge post">POST</span></td>
+                <td class="td-muted">Triggers AI tailoring for a specific job — generates cover letter, rewrites resume bullets, builds STAR stories, and evaluates ATS match rubric.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/kb/upload</code></td>
+                <td><span class="method-badge post">POST</span></td>
+                <td class="td-muted">Accepts a master resume PDF. Triggers the 4-engine extraction pipeline and rebuilds the candidate knowledge base and skill graph.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/scope</code></td>
+                <td><span class="method-badge get">GET</span></td>
+                <td class="td-muted">Returns the current application scope configuration — target roles array, locations array, and remote/hybrid/on-site work mode filter.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/scope</code></td>
+                <td><span class="method-badge post">POST</span></td>
+                <td class="td-muted">Updates the application scope. Triggers immediate re-evaluation of all existing jobs against the new scope criteria.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/system/readiness</code></td>
+                <td><span class="method-badge get">GET</span></td>
+                <td class="td-muted">Returns system readiness status — <code>kb_ready</code>, <code>scope_ready</code>, <code>ai_configured</code>. Used to power the FTUX setup guard on the Command Center.</td>
+              </tr>
+              <tr>
+                <td class="td-name"><code>/api/history</code></td>
+                <td><span class="method-badge get">GET</span></td>
+                <td class="td-muted">Application history log — all dispatched jobs with timestamps, employer info, tailored cover note, and application outcome status.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WORKFLOW -->
+      <div class="doc-section" id="sec-workflow">
+        <div class="section-hero">
+          <h2>🔄 5-Stage Operational Workflow</h2>
+          <p>How every job transitions from initial discovery across 28,700+ ATS feeds to a successfully dispatched, tailored application.</p>
+        </div>
+        <div class="workflow">
+          <div class="wf-step">
+            <div class="wf-icon" style="background:rgba(56,189,248,0.1);">📡</div>
+            <div class="wf-body">
+              <h4>Stage 1 — Autonomous Ingestion Daemon</h4>
+              <p>Continuously scrapes 28,700+ verified tech company ATS boards (Greenhouse, Lever, Ashby, Workday), community job feeds (HN, WeWorkRemotely, Himalayas), and company career pages via Playwright Stealth browser.</p>
+            </div>
+            <div class="wf-arrow">↓</div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-icon" style="background:rgba(251,191,36,0.1);">🛡️</div>
+            <div class="wf-body">
+              <h4>Stage 2 — Scope Enforcer Gate</h4>
+              <p>Each discovered job is instantly evaluated against your Application Scope — work mode (Remote/Hybrid/On-site), target locations (246-country geo-taxonomy), and 800+ standardized target role titles. Irrelevant jobs are filtered in &lt;1ms without consuming AI quota.</p>
+            </div>
+            <div class="wf-arrow">↓</div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-icon" style="background:rgba(139,92,246,0.1);">🎯</div>
+            <div class="wf-body">
+              <h4>Stage 3 — Hybrid ATS Matcher &amp; Rubric Scoring</h4>
+              <p>In-scope jobs are scored via cosine similarity over extracted skill vectors against your Knowledge Base graph. A full 8-dimension rubric (Technical Depth, Culture Fit, Impact Quantification, etc.) is evaluated using your chosen AI provider, producing a 0–100% match score.</p>
+            </div>
+            <div class="wf-arrow">↓</div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-icon" style="background:rgba(52,211,153,0.1);">⭐</div>
+            <div class="wf-body">
+              <h4>Stage 4 — Guided 1-Click Dispatch (Action Required)</h4>
+              <p>High-fidelity matches (ATS ≥ 65%) surface in the Action Required queue. For each job, SPrav generates: a tailored 220-word cover note, 3 STAR behavioral interview stories, rewritten bullet points in Google XYZ format, and a contact outreach draft. You review, approve with 1 click, and the job opens for immediate application.</p>
+            </div>
+            <div class="wf-arrow">↓</div>
+          </div>
+          <div class="wf-step">
+            <div class="wf-icon" style="background:rgba(244,114,182,0.1);">📋</div>
+            <div class="wf-body">
+              <h4>Stage 5 — Application History &amp; Conversion Analytics</h4>
+              <p>Every dispatched application is archived in local SQLite with full metadata — tailored content, timestamp, employer contacts, and outcome status. Conversion analytics compute yield rates, response latency per company, ghost detection, and interview progression tracking.</p>
+            </div>
+            <div class="wf-arrow" style="opacity:0;">↓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BENCHMARKS -->
+      <div class="doc-section" id="sec-casestudy">
+        <div class="section-hero">
+          <h2>📊 Engineering Benchmarks &amp; Performance</h2>
+          <p>Measured under real-world load conditions on a Windows 11 machine with 16 GB RAM. All tests are reproducible using the included <code>tests/stress_test.py</code>.</p>
+        </div>
+        <div class="bench-grid">
+          <div class="bench-card">
+            <div class="bench-val" style="color:var(--green);">154.4</div>
+            <div class="bench-label">Requests / Second</div>
+            <div class="bench-sub">100 concurrent API calls, 100% success rate</div>
+          </div>
+          <div class="bench-card">
+            <div class="bench-val" style="color:var(--purple-light);">26,062</div>
+            <div class="bench-label">Jobs / Second Filtered</div>
+            <div class="bench-sub">7,230 jobs evaluated in-memory in 277ms</div>
+          </div>
+          <div class="bench-card">
+            <div class="bench-val" style="color:var(--blue);">57.1 ms</div>
+            <div class="bench-label">Median API Latency</div>
+            <div class="bench-sub">Lightweight FastAPI local backend</div>
+          </div>
+          <div class="bench-card">
+            <div class="bench-val" style="color:var(--yellow);">17.7 ms</div>
+            <div class="bench-label">DB Query Latency</div>
+            <div class="bench-sub">14,600+ indexed jobs, SQLite WAL mode</div>
+          </div>
+          <div class="bench-card">
+            <div class="bench-val" style="color:var(--green);">0 Locks</div>
+            <div class="bench-label">SQLite Contentions</div>
+            <div class="bench-sub">40 concurrent read/write transactions</div>
+          </div>
+          <div class="bench-card">
+            <div class="bench-val" style="color:var(--pink);">~120 MB</div>
+            <div class="bench-label">RAM Footprint</div>
+            <div class="bench-sub">75% lighter than Electron alternatives</div>
+          </div>
+          <div class="bench-card">
+            <div class="bench-val" style="color:var(--blue);">&lt;1.2s</div>
+            <div class="bench-label">Cold Launch Time</div>
+            <div class="bench-sub">From exe click to browser dashboard ready</div>
+          </div>
+          <div class="bench-card">
+            <div class="bench-val" style="color:var(--green);">0.0%</div>
+            <div class="bench-label">Personal Data Leakage</div>
+            <div class="bench-sub">100% local SQLite WAL storage</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.4rem;">
+          <div style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;">
+            <strong style="color:#fff;">⚡ Note on the 26,062 Jobs/Sec metric:</strong> This measures in-memory scope filtering throughput — evaluating job title substring matches, 27 active roles, and 10 locations within a pre-loaded Python list. It does <em>not</em> represent network download speed; live ATS scraping is naturally rate-limited by individual corporate server response times.
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="doc-section" id="sec-faq">
+        <div class="section-hero">
+          <h2>❓ Frequently Asked Questions</h2>
+          <p>The most common questions from candidates downloading and using SPrav™ Job AI for the first time.</p>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Is SPrav™ Job AI truly free? <span class="chevron">▼</span>
+            </div>
+            <div class="faq-a">
+              Yes — 100% free freeware. There are no subscriptions, credits, paywalls, or hidden fees of any kind. The AI scoring uses free-tier API keys from Google AI Studio (Gemini 2.0 Flash) or Groq, both of which provide generous free daily quotas sufficient for active job searching. You can also run entirely offline using local Ollama at zero cost.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Where is my resume and personal data stored? <span class="chevron">▼</span>
+            </div>
+            <div class="faq-a">
+              All data is stored exclusively on your local machine in <code>%LOCALAPPDATA%\SPravJobAI</code>. This includes your resume, extracted knowledge base, job database, and application history. <strong>Zero data is ever transmitted to any external server</strong> — not even SPrav's own servers. The application is fully offline for all personal data operations.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Do I need an internet connection to run SPrav™? <span class="chevron">▼</span>
+            </div>
+            <div class="faq-a">
+              <strong>An active internet connection is required for job discovery</strong> — scanning live ATS feeds (Greenhouse, Lever, Ashby), career pages, and submitting applications. However, for all AI scoring, STAR generation, and ATS rubric evaluation, you can run 100% locally using <strong>Local Ollama</strong> on your GPU — no internet calls needed for the AI component.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              What Python version / OS does it require? <span class="chevron">▼</span>
+            </div>
+            <div class="faq-a">
+              <strong>No Python or any other software installation is required.</strong> The portable ZIP includes a self-contained Python 3.13 runtime. Just extract and double-click <code>SPravJobAI.exe</code>. Currently Windows-only. macOS and Linux distributions are planned for a future release.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Will SPrav™ apply to jobs automatically without my review? <span class="chevron">▼</span>
+            </div>
+            <div class="faq-a">
+              <strong>No — SPrav is designed as a guided dispatch system, not a fully autonomous applier.</strong> The engine discovers, scores, and pre-tailors applications, but you always review the cover note, STAR stories, and ATS match before dispatching with 1 click. This keeps your applications high-quality and prevents spam that would damage your reputation with employers.
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              The job counter seems stuck — is something broken? <span class="chevron">▼</span>
+            </div>
+            <div class="faq-a">
+              Not broken — this is expected behavior during the <strong>Playwright Watchlist phase</strong>. After fast ATS feeds are ingested (quick count jump), the engine switches to headless browser rendering of custom company career pages. This phase takes 1–3 minutes per cycle as each page loads, executes JavaScript, and is snapshot-diffed. The counter will resume updating when the engine advances to the next ATS ingestion cycle.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROADMAP -->
+      <div class="doc-section" id="sec-roadmap">
+        <div class="section-hero">
+          <h2>🗺️ Product Status &amp; Roadmap</h2>
+          <p>Current production capabilities and planned future milestones. Future releases are prioritized by real candidate feedback.</p>
+        </div>
+        <div class="roadmap-grid">
+          <div class="roadmap-col">
+            <h4>✅ v2.4.5 Pro — Current Release</h4>
+            <ul>
+              <li>✅ React 19 glassmorphic Command Center dashboard</li>
+              <li>✅ Universal zero-hardcoding resume parser (any country/university)</li>
+              <li>✅ 800+ standardized role types with typeahead search</li>
+              <li>✅ 246-country geo-taxonomy and Remote Country Barrier</li>
+              <li>✅ Dual-Engine AI Router (Free Gemini / Groq + Local Ollama)</li>
+              <li>✅ FTUX 2-step setup guard on Command Center</li>
+              <li>✅ 1-Click Quick-Add Role &amp; Location Palettes</li>
+              <li>✅ Real-time Weekly Digest, Application History, and Conversion Analytics</li>
+              <li>✅ Playwright Stealth company career page watcher</li>
+              <li>✅ Windows Portable Standalone (zero install, 400 MB)</li>
+            </ul>
+          </div>
+          <div class="roadmap-col">
+            <h4>🗺️ v3.0+ Future Roadmap</h4>
+            <ul>
+              <li>🔄 Autonomous PDF / LaTeX Resume Generator with per-application section reordering</li>
+              <li>🔄 MoE Multi-Agent Resume Optimization Pipeline</li>
+              <li>🔄 Direct ATS Connector Submissions &amp; webhook dispatching</li>
+              <li>🔄 Cross-platform macOS &amp; Linux native distributions</li>
+              <li>🔄 Multi-candidate mode (agency / career coach edition)</li>
+              <li>🔄 Interview Scheduler Integration (Google Calendar, Calendly)</li>
+              <li>🔄 Salary Intelligence &amp; Negotiation Advisor</li>
+              <li>🔄 Mobile companion app (iOS / Android) for on-the-go review</li>
+            </ul>
+          </div>
+        </div>
+        <div style="margin-top:1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.2rem 1.4rem;">
+          <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6;">Have a feature request or found a bug? Open an issue on <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" style="color:var(--blue);font-weight:700;">GitHub</a> or connect with me on <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" style="color:var(--purple-light);font-weight:700;">LinkedIn</a>. Future capabilities are prioritized dynamically based on real candidate feedback.</p>
+        </div>
+        <div class="link-pills">
+          <a href="https://svspraveen.vercel.app/" target="_blank" class="link-pill lp-purple">🌐 Portfolio</a>
+          <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" class="link-pill lp-blue">💼 LinkedIn</a>
+          <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" class="link-pill lp-green">🐙 GitHub</a>
+          <a href="index.html" class="link-pill lp-gray">← Back to Showcase</a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer class="page-footer">
+    <p>SPrav™ Job AI Pro v2.4.5 &nbsp;·&nbsp; Local-First Autonomous Career Intelligence Platform</p>
+    <div class="link-pills" style="justify-content:center;">
+      <a href="index.html" class="link-pill lp-blue">Home</a>
+      <a href="credits.html" class="link-pill lp-purple">Credits</a>
+      <a href="https://github.com/SVSPraveen/SPrav-Job-AI/releases/tag/v2.4.5" target="_blank" class="link-pill lp-green">Release v2.4.5</a>
     </div>
-  </header>
-
-  <main class="container">
-    <div class="hero-heading">
-      <div class="badge">📖 Official Documentation</div>
-      <h1>SPrav™ Job AI Documentation Hub</h1>
-      <p class="hero-subtitle">
-        Everything you need to master autonomous job discovery, free AI configuration, and precision application dispatch.
-      </p>
-    </div>
-
-    <div class="docs-layout">
-      <!-- Sidebar Navigation -->
-      <aside class="sidebar-nav">
-        <button class="tab-btn active" onclick="showTab('guide')">📖 User Guide</button>
-        <button class="tab-btn" onclick="showTab('reference')">📘 Reference Manual</button>
-        <button class="tab-btn" onclick="showTab('workflow')">🔄 Workflow Architecture</button>
-        <button class="tab-btn" onclick="showTab('casestudy')">📊 Case Study &amp; Benchmarks</button>
-        <button class="tab-btn" onclick="showTab('faq')">❓ Frequently Asked Questions</button>
-        <button class="tab-btn" onclick="showTab('roadmap')">🗺️ Product Roadmap</button>
-      </aside>
-
-      <!-- Content Area -->
-      <section class="doc-content" id="docContent">
-        <h2>📖 User Guide &amp; Quick Start</h2>
-        <p>Welcome to <strong>SPrav™ Job AI</strong>. Follow these instructions to launch your autonomous job search in under 60 seconds.</p>
-
-        <h3>1. Installation &amp; Running</h3>
-        <ol style="padding-left: 1.25rem;">
-          <li>Download <code>SPrav_Job_AI_Pro_v2.4_Portable.zip</code> from the official Google Drive link.</li>
-          <li>Extract the ZIP archive to any folder on your Windows PC (e.g. <code>C:\Apps\SPravJobAI</code>).</li>
-          <li>Double-click <code>SPrav Job AI.exe</code> to launch the Command Center.</li>
-        </ol>
-
-        <h3>2. Uploading Your Master Resume</h3>
-        <p>In the <strong>Dashboard</strong> or <strong>Knowledge Base</strong>, upload your master resume in PDF format. SPrav automatically parses your work experience, projects, skills, and metrics to form your personal ground truth.</p>
-
-        <h3>3. Configuring Free Cloud AI or Local Ollama</h3>
-        <p>SPrav supports 100% free operation using either:</p>
-        <ul>
-          <li><strong>Free Cloud AI</strong>: Get a free API key from Google AI Studio (Gemini 2.0 Flash) or Groq LPU Console. Paste it into Settings.</li>
-          <li><strong>100% Local Air-Gapped AI</strong>: Install Ollama on your PC and run <code>ollama run qwen2.5-coder:7b</code>. SPrav routes all scoring locally on your GPU with zero internet calls.</li>
-        </ul>
-
-        <h3>4. Setting Your Application Scope</h3>
-        <p>Navigate to <strong>Application Scope</strong> to specify target job roles (e.g. <em>AI Engineer, Generative AI, Full Stack Developer</em>) and preferred locations (e.g. <em>Remote, India, Bengaluru, San Francisco</em>) using the 1-click quick-add palettes.</p>
-
-        <h3>5. Guided 1-Click Dispatch</h3>
-        <p>Open <strong>Action Required</strong> to review pre-screened, high-match opportunities ($\text{ATS} \ge 65\%$). For each job, inspect the tailored cover note, STAR behavioral alignment, and click <strong>Open &amp; Apply</strong> to dispatch with 1 click!</p>
-      </section>
-    </div>
-  </main>
+  </footer>
 
   <script>
-    const docs = {
-      guide: `
-        <h2>📖 User Guide & Quick Start</h2>
-        <p>Welcome to <strong>SPrav™ Job AI</strong>. Follow these instructions to launch your autonomous job search in under 60 seconds.</p>
-        <h3>1. Installation & Running</h3>
-        <ol style="padding-left: 1.25rem;">
-          <li>Download <code>SPrav_Job_AI_Pro_v2.4_Portable.zip</code> from the official Google Drive link.</li>
-          <li>Extract the ZIP archive to any folder on your Windows PC (e.g. <code>C:\\Apps\\SPravJobAI</code>).</li>
-          <li>Double-click <code>SPrav Job AI.exe</code> to launch the Command Center.</li>
-        </ol>
-        <h3>2. Uploading Your Master Resume</h3>
-        <p>In the <strong>Dashboard</strong> or <strong>Knowledge Base</strong>, upload your master resume in PDF format. SPrav automatically parses your work experience, projects, skills, and metrics to form your personal ground truth.</p>
-        <h3>3. Configuring Free Cloud AI or Local Ollama</h3>
-        <p>SPrav supports 100% free operation using either:</p>
-        <ul>
-          <li><strong>Free Cloud AI</strong>: Get a free API key from Google AI Studio (Gemini 2.0 Flash) or Groq LPU Console. Paste it into Settings.</li>
-          <li><strong>100% Local Air-Gapped AI</strong>: Install Ollama on your PC and run <code>ollama run qwen2.5-coder:7b</code>. SPrav routes all scoring locally on your GPU with zero internet calls.</li>
-        </ul>
-        <h3>4. Setting Your Application Scope</h3>
-        <p>Navigate to <strong>Application Scope</strong> to specify target job roles (e.g. <em>AI Engineer, Generative AI, Full Stack Developer</em>) and preferred locations using the 1-click quick-add palettes.</p>
-      `,
-      reference: `
-        <h2>📘 Reference Manual</h2>
-        <p>Exhaustive technical documentation covering all core subsystems in SPrav™ Job AI.</p>
-        <h3>Core Subsystems</h3>
-        <ul>
-          <li><strong>Autonomous Ingestion Daemon</strong>: Continuous background scheduler monitoring 28,700+ 1st-party ATS feeds.</li>
-          <li><strong>Hybrid ATS Matcher</strong>: Calculates cosine similarity over extracted skill vectors and rubric dimensions.</li>
-          <li><strong>Knowledge Base Engine</strong>: Stores 6-category semantic skill graphs with ground-truth PDF verification.</li>
-          <li><strong>Conversion Analytics</strong>: Real-time telemetry computing application yield, interview progression, and response latency.</li>
-          <li><strong>Recruiter Outreach Engine</strong>: Scrapes technical hiring manager contacts and drafts personalized connection notes.</li>
-        </ul>
-      `,
-      workflow: `
-        <h2>🔄 Operational Workflow & State Machine</h2>
-        <p>How a job transitions from initial discovery to successful application dispatch.</p>
-        <pre>
-[Ingestion Daemon] -> Scrapes 28,700+ ATS Feeds (Greenhouse, Lever, Ashby)
-        ↓
-[Scope Enforcer]   -> Validates Work Mode, Location & Target Roles
-        ↓
-[Hybrid Matcher]   -> Computes Cosine Similarity & Rubric Scores
-        ↓
-[Action Required]  -> High-Fidelity Opportunities (ATS >= 65%)
-        ↓
-[1-Click Dispatch] -> Candidate reviews tailored cover note & STAR stories
-        ↓
-[Dispatched Vault] -> Archived in SQLite Database & Application History
-        </pre>
-      `,
-      casestudy: `
-        <h2>📊 Engineering Case Study & Performance Benchmarks</h2>
-        <p>Architectural decisions and high-throughput benchmarks achieved by SPrav™ Job AI.</p>
-        <pre>
-┌────────────────────────────────────────────────────────────────────────┐
-│                      SPRAV™ ENGINE PERFORMANCE                        │
-├────────────────────────────────────────────────────────────────────────┤
-│  ⚡ Database Query Latency:    17.7 ms (across 14,600+ indexed jobs)   │
-│  🧠 Memory Footprint (RAM):    ~120 MB (75% less than Electron apps)   │
-│  🚀 Cold Launch Time:          <1.2 seconds                            │
-│  🔒 Personal Data Leakage:     0.0% (100% Local SQLite WAL Storage)    │
-│  💰 Lifetime Subscription Fee: ₹0 / $0 (Free Freeware)                 │
-└────────────────────────────────────────────────────────────────────────┘
-        </pre>
-      `,
-      faq: `
-        <h2>❓ Frequently Asked Questions</h2>
-        <h3>Is SPrav™ Job AI truly free?</h3>
-        <p>Yes. SPrav is 100% free freeware. There are no subscriptions, credits, paywalls, or hidden fees.</p>
-        <h3>Where is my resume and personal data stored?</h3>
-        <p>All data is stored exclusively on your local computer in <code>%LOCALAPPDATA%\\SPravJobAI</code>. Zero data is sent to external servers.</p>
-        <h3>Do I need an internet connection to run SPrav?</h3>
-        <p><strong>Yes, an active internet connection is required to discover new jobs from online career portals, scan live ATS feeds (Greenhouse, Lever, Ashby), and submit applications.</strong> However, for AI scoring, STAR achievement generation, and ATS rubric evaluation, you can run 100% locally and privately using <strong>Local Ollama</strong> on your GPU, or choose free Cloud AI (Gemini / Groq).</p>
-      `,
-      roadmap: `
-        <h2>🗺️ Product Status &amp; Release Notes</h2>
-        <h3>Current Production Release (v2.4 Pro)</h3>
-        <ul>
-          <li>✅ React 19 glassmorphic user interface with Lucide iconography and 1-by-1 live counters.</li>
-          <li>✅ Dual-Engine LLM Router (Free Gemini / Groq + Local Ollama Qwen 2.5).</li>
-          <li>✅ 1-Click Quick-Add Role &amp; Tech Hub Palettes with Typeahead Autocomplete.</li>
-          <li>✅ Real-time Weekly Digest, Master Job Portal, and Conversion Analytics.</li>
-          <li>✅ Clean multi-pass HTML unescaping and structured formatting for job descriptions.</li>
-        </ul>
-        <h3 style="margin-top: 1.5rem;">🔮 Planned Future Milestones (v3.0+ Roadmap)</h3>
-        <ul>
-          <li>⏳ Autonomous PDF / LaTeX Resume Generator with per-application section reordering.</li>
-          <li>⏳ MoE Multi-Agent Resume Optimization Pipeline.</li>
-          <li>⏳ Direct ATS Connector Submissions and webhook dispatching.</li>
-          <li>⏳ Cross-platform native macOS &amp; Linux distributions.</li>
-        </ul>
-        <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-top: 1rem;">
-          Future releases and capability enhancements are prioritized dynamically based on real candidate feedback and community suggestions. Have an idea or need support for a specific ATS platform? Feel free to open an issue or reach out via GitHub!
-        </p>
-      `
-    };
+    function showSection(key, btn) {
+      document.querySelectorAll('.doc-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('sec-' + key).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-    function showTab(key) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById('docContent').innerHTML = docs[key];
+    function toggleFaq(el) {
+      const item = el.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
     }
   </script>
+
 </body>
 </html>
