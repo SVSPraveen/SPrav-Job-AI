@@ -58,7 +58,7 @@ The redesigned **Command Center** provides an ultra-premium operational cockpit:
 1. **Phase 1: Autonomous Discovery (`scraper.py`)**  
    Continuously monitors Greenhouse, Lever, Ashby, Workday, SmartRecruiters, Y Combinator, and Hacker News.
 2. **Phase 2: Application Scope Gate (`scope_enforcer.py`)**  
-   Evaluates discovered roles against your active titles, cities, and remote barriers in `< 1ms` (26,000+ jobs/sec).
+   Evaluates discovered roles against your active titles, cities, and remote barriers with sub-millisecond in-memory matching.
 3. **Phase 3: ATS Match Scoring (`ats_matcher.py`)**  
    Scores the job description against your Master Resume skills and highlights missing keywords.
 4. **Phase 4: Resume Tailoring & Verifier Loop (`tailor.py` & `fact_checker.py`)**  

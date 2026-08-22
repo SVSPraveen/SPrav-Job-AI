@@ -41,8 +41,7 @@ SPrav Job AI is an autonomous, local-first career intelligence system. It elimin
 ### 2.2 Application Scope & Geo-Taxonomy (`engine/scope_enforcer.py`)
 * **Standardized Job Taxonomy:** Over 800 curated technical, engineering, and domain job titles (`engine/job_roles_taxonomy.py`).
 * **Global Geo-Spatial Taxonomy:** Over 246 countries, states, and major global tech hubs (`engine/location_taxonomy.py`).
-* **Remote Country Barrier (`RemoteCountryBarrier`):** Intelligent screening preventing disqualification from international remote roles.
-* **Throughput:** Evaluates `26,000+ jobs/second` in-memory.
+* **Evaluation Latency:** Evaluates discovered roles in-memory with sub-millisecond matching.
 
 ### 2.3 First-Time User Experience (FTUX) Safety Guard (`api.py`)
 * Dual-step readiness check (`GET /api/system/readiness`):

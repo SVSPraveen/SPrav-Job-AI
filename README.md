@@ -51,7 +51,7 @@
 * **800+ Standardized Career Titles:** Standardized tech roles taxonomy with instant multi-select typeahead search (`RoleTypeahead.jsx`).
 * **246-Country Geo-Spatial Engine:** Standardized location taxonomy covering all countries, regions, and tech hubs (`LocationTypeahead.jsx`).
 * **Intelligent Remote Country Barrier (`RemoteCountryBarrier`):** Screens out location-restricted international remote jobs while preserving eligible roles.
-* **Ultra-Fast In-Memory Filtering:** Evaluates 26,000+ jobs/second with sub-millisecond latency.
+* **In-Memory Filtering:** Evaluates target roles, locations, and negative filters with sub-millisecond latency.
 
 ### 3. 🛡️ First-Time User Experience (FTUX) Setup Guard
 * Interactive 2-step setup banner on the Command Center ensuring both Master Resume and Application Scope are active before launching the autonomous engine.
@@ -64,7 +64,6 @@
 
 ### 5. ⚡ Enterprise Benchmark Performance
 * **154.4 Requests / Second** under 100-request high-concurrency API stress testing (0 failed requests).
-* **26,062 Jobs / Second** in-memory scope evaluation throughput.
 * **0 SQLite Database Locks** under 40 simultaneous read/write WAL transactions.
 
 ---

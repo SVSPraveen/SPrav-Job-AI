@@ -26,8 +26,8 @@ SPrav™ Job AI was built to solve the fundamental friction in technical job hun
 
 ## ⚙️ Architectural Highlights (v2.4.5 Pro)
 
-- **Continuous Discovery Engine:** Asynchronous scrapers monitoring 28,700+ verified corporate job boards with sub-second deterministic SHA-1 deduplication.
-- **Semantic ATS Matcher:** Vector cosine similarity running at 26,062 jobs/second with 6-pillar dynamic skill classification.
+- **Continuous Discovery Engine:** Asynchronous scrapers monitoring direct verified corporate job boards with deterministic SHA-1 deduplication.
+- **Semantic ATS Matcher:** Vector cosine similarity and dynamic 6-pillar skill inference against verified master resume evidence.
 - **Guided 1-Click Dispatch:** 3-tier triage (🌟 Best Matches, 💜 Solid Near-Miss, 📋 Reviewable) for candidate review and immediate application.
 - **FastAPI Core:** Python async backend delivering 57.1ms median latency and 154.4 requests/second throughput with SQLite WAL mode.
-- **Windows Portable Standalone:** Single-click zero-install runtime packaging Python 3.13, React 19, and all dependencies in a lightweight 367 MB ZIP.
+- **Windows Portable Standalone:** Single-click zero-install runtime packaging Python 3.13, React 19, and all dependencies in a lightweight portable ZIP.
