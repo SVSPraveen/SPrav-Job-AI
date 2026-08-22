@@ -1,7 +1,7 @@
 # 📊 SPrav™ Job AI — Technical Case Study & Architecture Overview
 
 **Author:** SVS Praveen  
-**Project:** SPrav™ Job AI (v2.4.0 Pro Edition)  
+**Project:** SPrav™ Job AI (v2.4.5 Pro Edition)  
 **Classification:** Autonomous Desktop Career Intelligence Engine  
 **Release Date:** August 2026  
 
@@ -75,4 +75,4 @@ In the modern tech hiring landscape, software engineers spend an average of **20
 
 * **Architect & Developer:** SVS Praveen
 * **Contact Email:** [svspraveens@gmail.com](mailto:svspraveens@gmail.com)
-* **Official Google Drive Binary Release:** [Download v2.4 Pro](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)
+* **Official Google Drive Binary Release:** [Download v2.4.5 Pro](https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing)

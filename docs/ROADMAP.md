@@ -4,7 +4,7 @@ This document details current release capabilities and the community-driven deve
 
 ---
 
-## 🚀 Current Production Release: v2.4.0 Pro Edition
+## 🚀 Current Production Release: v2.4.5 Pro Edition
 
 * [x] **Autonomous 1st-Party Ingestion**: Greenhouse, Lever, Ashby, Workday, SmartRecruiters, and verified career portals.
 * [x] **Hybrid ATS & Cosine Matcher**: 549+ domain skill dictionaries with 115-node inference graph with cosine embedding similarity.
