@@ -898,6 +898,31 @@
           Test the exact semantic skill scoring algorithm that powers SPrav™ Job AI. Edit candidate and job skills in real time:
         </p>
 
+        
+        <!-- Preset Skill Selector Pills -->
+        <div style="margin-bottom: 1.25rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+            ⚡ Quick-Test Role Presets:
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" onclick="loadPreset('ai')" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.35); color: #c084fc; padding: 5px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              🤖 AI &amp; LLM Engineer
+            </button>
+            <button type="button" onclick="loadPreset('fullstack')" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; padding: 5px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              ⚡ Full-Stack Developer
+            </button>
+            <button type="button" onclick="loadPreset('backend')" style="background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.35); color: #34d399; padding: 5px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              🐍 Python Backend Engineer
+            </button>
+            <button type="button" onclick="loadPreset('data')" style="background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.35); color: #fbbf24; padding: 5px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              📊 Data &amp; ML Engineer
+            </button>
+            <button type="button" onclick="loadPreset('cloud')" style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35); color: #f43f5e; padding: 5px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              ☁️ Cloud &amp; DevOps
+            </button>
+          </div>
+        </div>
+
         <div class="sim-grid">
           <div class="sim-col">
             <label>Candidate Master Skills (Extracted from PDF)</label>
@@ -1267,6 +1292,52 @@
         closeLightbox();
       }
     });
+
+    
+    function loadPreset(type) {
+      const presets = {
+        'ai': {
+          cand: 'Python, PyTorch, RAG, LangChain, LlamaIndex, Vector Databases, ChromaDB, Hugging Face, FastAPI, Docker, Fine-Tuning, TypeScript',
+          job: 'Python, PyTorch, RAG, LangChain, Vector Databases, Docker, FastAPI, Kubernetes, AWS, LLM Evaluation'
+        },
+        'fullstack': {
+          cand: 'React, TypeScript, Node.js, Next.js, Tailwind CSS, PostgreSQL, GraphQL, REST APIs, Redis, Docker, Git, CI/CD',
+          job: 'React, TypeScript, Next.js, PostgreSQL, REST APIs, Docker, AWS, Tailwind CSS, System Design'
+        },
+        'backend': {
+          cand: 'Python, FastAPI, Django, PostgreSQL, SQLAlchemy, Redis, Celery, Docker, Microservices, RabbitMQ, PyTest, Linux',
+          job: 'Python, FastAPI, PostgreSQL, Redis, Docker, Microservices, AWS, PyTest, Kafka'
+        },
+        'data': {
+          cand: 'Python, SQL, Apache Spark, Pandas, NumPy, Scikit-Learn, Airflow, Snowflake, Databricks, ETL Pipelines, Docker',
+          job: 'Python, SQL, Apache Spark, Airflow, Snowflake, ETL Pipelines, Docker, AWS, Data Warehousing'
+        },
+        'cloud': {
+          cand: 'Terraform, AWS, Kubernetes, Docker, GitHub Actions, Linux, Python, CI/CD, Prometheus, Grafana, Nginx, Bash',
+          job: 'Terraform, AWS, Kubernetes, Docker, CI/CD, Linux, Python, Helm, Security Compliance'
+        }
+      };
+      
+      if (presets[type]) {
+        document.getElementById('candSkills').value = presets[type].cand;
+        document.getElementById('jobSkills').value = presets[type].job;
+        calculateMatch();
+      }
+    }
+
+    function copyToClipboard(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        const origText = btnElement.innerText;
+        btnElement.innerText = "✓ Copied!";
+        btnElement.style.color = "#34d399";
+        btnElement.style.borderColor = "#34d399";
+        setTimeout(() => {
+          btnElement.innerText = origText;
+          btnElement.style.color = "";
+          btnElement.style.borderColor = "";
+        }, 2000);
+      });
+    }
 
     function calculateMatch() {
       const candRaw = document.getElementById('candSkills').value;
