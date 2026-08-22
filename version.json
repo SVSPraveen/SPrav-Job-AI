@@ -1,7 +1,7 @@
-﻿{
-    "latest_version":  "2.4.0",
-    "app_name":  "SPrav Job AI Pro",
-    "release_date":  "2026-08-19",
-    "download_url":  "https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing",
-    "release_notes":  "SPrav Job AI Pro v2.4 Release featuring 1st-party ATS Discovery (Greenhouse, Lever, Ashby, SmartRecruiters, Workday), Local Qwen 2.5 Coder 7B AI engine, and 0ms optimistic Action Required dispatch."
+{
+  "latest_version": "2.4.5",
+  "app_name": "SPrav Job AI Pro",
+  "release_date": "2026-08-19",
+  "download_url": "https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing",
+  "release_notes": "SPrav Job AI Pro v2.4.5 Global Release featuring 14 Direct Discovery Engines (WeWorkRemotely, Recruitee ATS, Greenhouse, Lever, Ashby, Workday, SmartRecruiters, Himalayas, Arbeitnow, Remotive, Jobicy), Global Tech Hub Geo-Taxonomy, Universal View Posting Links, and Calibrated ATS Matching."
 }

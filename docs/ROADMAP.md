@@ -7,7 +7,7 @@ This document details current release capabilities and the community-driven deve
 ## 🚀 Current Production Release: v2.4.0 Pro Edition
 
 * [x] **Autonomous 1st-Party Ingestion**: Greenhouse, Lever, Ashby, Workday, SmartRecruiters, and verified career portals.
-* [x] **Hybrid ATS & Cosine Matcher**: 120+ domain skill dictionaries with cosine embedding similarity.
+* [x] **Hybrid ATS & Cosine Matcher**: 549+ domain skill dictionaries with 115-node inference graph with cosine embedding similarity.
 * [x] **Guided 1-Click Dispatch Pipeline**: Tailored cover notes, STAR alignment, and recruiter discovery.
 * [x] **100% Local Air-Gapped Storage**: SQLite WAL mode in `%LOCALAPPDATA%\SPravJobAI`.
 * [x] **Dual-Engine AI Router**: Google Gemini 2.0 Flash, Groq, and local Ollama Qwen 2.5 Coder.

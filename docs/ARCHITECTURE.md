@@ -1,74 +1,63 @@
-# 🏗️ SPrav™ Architecture & Engineering Rationale
-
-This document explains the technical architecture of **SPrav™ Job AI** and why specific engineering decisions were made over traditional alternatives.
+# SPrav Job AI — Architecture Specification (v2.4.5 Pro)
 
 ---
 
-## 1. Why "Guided 1-Click Dispatch" over "100% Blind Auto-Spam"?
+## 1. High-Level System Architecture
 
-### The Failure of Blind Auto-Apply Bots:
-Many modern browser extensions promise *"Apply to 500 jobs while you sleep"*. In practice, this creates devastating consequences:
-1. **ATS Disqualification**: Enterprise ATS portals (Workday, Greenhouse, Lever) flag mass-submissions with low semantic relevance and auto-reject candidate emails.
-2. **Loss of Candidate Reputation**: Submitting to mismatched roles damages the candidate's standing with technical recruiters.
-3. **Ghosting & Zero Follow-up Context**: When a candidate has no idea which jobs were applied to, they cannot prepare for recruiter screening calls.
+SPrav Job AI is designed with a **modular, local-first architecture** running on FastAPI, SQLite (WAL mode), and React 18:
 
-### The SPrav Solution: Human-in-the-Loop 1-Click Dispatch
-* SPrav does **99% of the computational heavy lifting**:
-  - Scans 28,700+ verified career boards continuously.
-  - Scores job descriptions against candidate skills with cosine similarity.
-  - Generates tailored cover notes and STAR project bullet suggestions.
-* However, **the final application trigger requires your 1-click permission**.
-* This preserves candidate integrity, maximizes interview conversion, and keeps you fully aware of every submission.
-
----
-
-## 2. Why "Local Desktop Freeware" over a "Cloud SaaS"?
-
-| Architectural Vector | Traditional Cloud SaaS | SPrav™ Desktop Architecture |
-|---|---|---|
-| **Resume & Data Privacy** | Candidate resumes, contact info, and API keys stored on 3rd-party servers. | **100% Local Storage**: Everything stays in `%LOCALAPPDATA%\SPravJobAI`. |
-| **Pricing & Subscriptions** | $20 – $50 / month recurring charges. | **₹0 Free Forever**: Freeware with zero subscription fees. |
-| **Data Ownership** | If the SaaS shuts down, your search history is lost. | **SQLite Database**: Candidate owns their `.db` file and application history. |
-| **Latency & Performance** | Slow cloud queues and rate limits. | **Sub-millisecond Local Queries**: Fast, responsive desktop UI. |
-
----
-
-## 3. The Multi-Tier Semantic Filtering Pipeline
-
-SPrav uses a 3-stage funnel to isolate genuine opportunities from thousands of raw postings:
-
-```text
-┌───────────────────────────────────────────────────────────┐
-│ 1. Autonomous Ingestion & Deduplication                   │
-│    Scans Greenhouse, Lever, Ashby, Workday, RSS feeds     │
-└─────────────────────────────┬─────────────────────────────┘
-                              ▼
-┌───────────────────────────────────────────────────────────┐
-│ 2. Application Scope Matrix Filter                        │
-│    Enforces Target Roles, Seniority, Tech Stacks, Locs    │
-└─────────────────────────────┬─────────────────────────────┘
-                              ▼
-┌───────────────────────────────────────────────────────────┐
-│ 3. Hybrid ATS & Cosine Matcher (ATS Score >= 65% - 80%+)  │
-│    Scores resume embeddings & skills against job specs    │
-└─────────────────────────────┬─────────────────────────────┘
-                              ▼
-┌───────────────────────────────────────────────────────────┐
-│ 4. Action Required (Guided 1-Click Dispatch Queue)        │
-│    Surfaces high-fidelity roles with tailored cover notes │
-└───────────────────────────────────────────────────────────┘
+```
+[Master Resume PDF] ──────► [Universal KB Extractor] ──────► [knowledge_base/me.json]
+                                                                     │
+[28,700+ Career Boards] ──► [Discovery Scraper]                      │
+                                   │                                 │
+                                   ▼                                 │
+                        [Application Scope Gate]                     │
+                         (Roles, Geo & Remote)                       │
+                                   │ (In Scope)                      │
+                                   ▼                                 │
+                        [Hybrid ATS Match Scorer] ◄──────────────────┤
+                                   │                                 │
+                                   ▼                                 │
+                        [Tailor & Verifier Loop] ◄───────────────────┘
+                                   │
+                                   ▼
+                       [Guided 1-Click Dispatch] ──► [Playwright Automation]
 ```
 
 ---
 
-## 4. Multi-Engine AI Support (Local GPU + Free Cloud)
+## 2. Directory Layout & Module Structure
 
-To ensure that anyone with any PC can use SPrav without hardware barriers:
-* **Cloud-First Mode (Recommended)**: Utilizes Google Gemini 2.0 Flash or Groq (GPT-OSS 120B) via free personal API keys. Generates tailored cover notes in under 1 second with 0% CPU/GPU overhead.
-* **Local GPU Mode (Optional)**: Connects directly to local **Ollama** instances (`qwen2.5-coder:7b` / `deepseek-r1:8b`) for complete offline, air-gapped execution.
+```
+SPrav-Job-AI/
+├── api.py                    # FastAPI server & route handlers
+├── launcher.py               # Desktop system-tray launcher & process supervisor
+├── engine/
+│   ├── continuous_loop.py    # Background autonomous discovery & scoring loop
+│   ├── kb_extractor.py       # Universal zero-hardcoding resume intelligence parser
+│   ├── scope_enforcer.py     # In-memory Application Scope gating (< 1ms per job)
+│   ├── job_roles_taxonomy.py # 800+ standardized career titles
+│   ├── location_taxonomy.py  # 246-country geo-taxonomy & Remote Country Barrier
+│   ├── tailor.py             # Resume & cover letter tailoring engine
+│   ├── fact_checker.py       # Automated verifier loop preventing hallucinations
+│   └── llm_provider.py       # Hybrid local Ollama & Groq Cloud MoE router
+├── discovery/
+│   ├── scraper.py            # Multi-portal scraper (Greenhouse, Lever, Workday, etc.)
+│   └── db.py                 # SQLite database models & state management
+└── frontend/
+    ├── src/
+    │   ├── App.jsx           # SPrav™ Command Center Dashboard & Navigation
+    │   ├── CommandCenter.css # Glassmorphic design system tokens & animations
+    │   └── pages/
+    │       ├── ApplicationScope.jsx  # Multi-select typeahead scope manager
+    │       ├── MasterJobPortal.jsx   # Searchable ATS job portal
+    │       └── KnowledgeBaseEditor.jsx # Candidate ground truth profile editor
+```
 
 ---
 
-## 5. Creator Vision & Independence
+## 3. Data Flow & Security Model
 
-SPrav™ was engineered by **SVS Praveen** as an independent personal initiative to give technical candidates a professional, uncompromised tool for career growth.
+* **Local-First Privacy:** Candidate resumes, API keys, and application histories are stored locally on the user's machine (`%LOCALAPPDATA%/SPravJobAI`).
+* **Deterministic Verification:** Tailored bullet points are validated against `me.json` ground truth before applications are dispatched.

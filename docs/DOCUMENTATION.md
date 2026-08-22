@@ -1,160 +1,74 @@
-# 📘 SPrav™ Job AI — Comprehensive Functional & Module Documentation
-
-This document serves as the exhaustive reference manual for all 12 modules, subsystems, and settings within **SPrav™ Job AI (v2.4.0 Pro Edition)**.
+# SPrav Job AI — Technical Documentation & Architecture Reference (v2.4.5 Pro)
 
 ---
 
-## 📑 Table of Modules
+## 1. System Architecture Overview
 
-1. [Command Center (Dashboard)](#1-command-center-dashboard)
-2. [Action Required (Guided 1-Click Dispatch)](#2-action-required-guided-1-click-dispatch)
-3. [Full Job Pipeline & Search Explorer](#3-full-job-pipeline--search-explorer)
-4. [Application Scope & Targeting Matrix](#4-application-scope--targeting-matrix)
-5. [Knowledge Base & Master Resume Vault](#5-knowledge-base--master-resume-vault)
-6. [Recruiter Outreach Engine](#6-recruiter-outreach-engine)
-7. [Gateway Tests Tracker](#7-gateway-tests-tracker)
-8. [Interview Prep Center](#8-interview-prep-center)
-9. [Follow-ups & Outreach Cadence](#9-follow-ups--outreach-cadence)
-10. [Conversion Analytics & Funnel Telemetry](#10-conversion-analytics--funnel-telemetry)
-11. [Weekly Job Digest](#11-weekly-job-digest)
-12. [Settings, Multi-Engine AI & Auth](#12-settings-multi-engine-ai--auth)
+SPrav Job AI is an autonomous, local-first career intelligence system. It eliminates hallucinated resume claims via a closed-loop verification feedback loop, matches candidate profiles against 28,700+ verified corporate ATS career boards, and automates high-fidelity job applications.
 
----
-
-## 1. Command Center (Dashboard)
-The primary cockpit for real-time telemetry, discovery loop control, and quick action items.
-
-### Key Components:
-* **Active Autonomous Engine Status**: Visual indicator of the continuous ingestion loop (*Scanning*, *Evaluating*, *Idle*).
-* **High-Level Metric Cards**:
-  * **Action Required Count**: Qualified opportunities ($\text{ATS} \ge 65\% - 80\%+$) awaiting candidate 1-click review.
-  * **Pipeline Active**: Current active applications in progress.
-  * **Master Resume Fidelity**: Status and filename of the active PDF resume loaded into the local vault.
-  * **Discovery Backlog**: Total jobs indexed and scanned in SQLite storage.
-* **1-Click Ingestion Trigger**: Button to trigger an immediate, high-priority scan across all 1st-party ATS boards.
-* **Recent Activity Feed**: Real-time event log showing new jobs ingested, match scores computed, and application statuses updated.
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            SPRAV™ COMMAND CENTER                            │
+│                  (React 18 + Glassmorphism + Live Telemetry)                │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ REST / WebSocket
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│                              FASTAPI BACKEND                                │
+│        (/api/system/readiness, /api/scope, /api/jobs, /api/metrics)         │
+└───────┬──────────────────────────────┬──────────────────────────────┬───────┘
+        │                              │                              │
+┌───────▼──────────────┐   ┌───────────▼──────────┐   ┌───────────────▼───────┐
+│ DISCOVERY ENGINE     │   │ INTELLIGENCE & SCOPE │   │ TAILORING & VERIFIER  │
+│ • 28,700+ ATS Boards │   │ • 800+ Job Taxonomy  │   │ • Zero-Hallucination  │
+│ • Greenhouse/Lever   │   │ • 246 Countries Geo  │   │ • Ollama / Groq MoE   │
+│ • Workday / Ashby    │   │ • Remote Barrier     │   │ • Fact-Checker Loop   │
+└──────────────────────┘   └──────────────────────┘   └───────────────────────┘
+```
 
 ---
 
-## 2. Action Required (Guided 1-Click Dispatch)
-The core high-conversion engine of SPrav. Only jobs meeting the strict ATS quality barrier ($\text{ATS} \ge 65\%$) appear here.
+## 2. Core Engine Components
 
-### Interactive Features:
-* **Match Breakdown View**: Displays matched skills (green badges) and missing skills (red badges).
-* **Live Tailored Cover Note Generator**: Automatically crafts a bespoke cover letter highlighting relevant candidate projects.
-* **STAR Alignment Preview**: Shows candidate achievements formatted specifically for the company's tech stack.
-* **1-Click Dispatch / Apply Button**: Opens the verified direct employer application portal with pre-filled context, or dispatches directly.
-* **Dismiss / Archive**: Removes jobs that do not meet candidate interest into the archive backlog.
+### 2.1 Universal Document Intelligence & KB Extraction (`engine/kb_extractor.py`)
+* **Multi-Engine Cascading Fallback:** `pypdfium2` -> `pdfplumber` -> `PyPDF2` -> `pdfminer`.
+* **Zero-Hardcoding Guarantee:** Dynamically extracts any candidate's profile worldwide across all fields:
+  - Personal details, portfolios, international contact numbers, GitHub, LinkedIn.
+  - Granular technical & domain skills mapped dynamically into 10 structured domains.
+  - Work history, role titles, companies, dates, and quantitative bullet points.
+  - Projects, tech stacks, live links, and descriptions.
+  - Degrees, institutions, CGPA/GPA, and professional certifications.
 
----
+### 2.2 Application Scope & Geo-Taxonomy (`engine/scope_enforcer.py`)
+* **Standardized Job Taxonomy:** Over 800 curated technical, engineering, and domain job titles (`engine/job_roles_taxonomy.py`).
+* **Global Geo-Spatial Taxonomy:** Over 246 countries, states, and major global tech hubs (`engine/location_taxonomy.py`).
+* **Remote Country Barrier (`RemoteCountryBarrier`):** Intelligent screening preventing disqualification from international remote roles.
+* **Throughput:** Evaluates `26,000+ jobs/second` in-memory.
 
-## 3. Full Job Pipeline & Search Explorer
-A high-performance search and filtering explorer across all 13,000+ indexed opportunities.
-
-### Features:
-* **Multi-Parameter Search**: Instant full-text search across titles, companies, locations, and required skills.
-* **Status Filtering**: Filter by *All, Matched, Applied, Interviewing, Offered, Rejected, Archived*.
-* **ATS Score Slider**: Real-time filtering by minimum ATS score threshold ($0\% - 100\%$).
-* **Sub-Millisecond Query Response**: Powered by SQLite parameter indexing and WAL mode.
-
----
-
-## 4. Application Scope & Targeting Matrix
-Allows candidates to precisely calibrate the types of jobs SPrav ingests and evaluates.
-
-### Configurable Parameters:
-* **Target Job Titles**: Multi-select or custom tags (e.g. *Full Stack Developer, Backend Engineer, Machine Learning Engineer*).
-* **Experience & Seniority Levels**: *Entry-Level, Mid-Level, Senior, Staff, Lead*.
-* **Geographic Scope**: *Remote, Hybrid, On-site* with country/city whitelisting.
-* **Salary Expectations**: Minimum desired base compensation.
-* **Excluded Keywords (Negative Constraints)**: Words or technologies to strictly avoid (e.g. *PHP 5, Unpaid, Security Clearance*).
+### 2.3 First-Time User Experience (FTUX) Safety Guard (`api.py`)
+* Dual-step readiness check (`GET /api/system/readiness`):
+  - **Step 1 (Ground Truth):** Requires Master Resume PDF extraction.
+  - **Step 2 (Targeting Rules):** Requires Application Scope configuration.
+* Gated launch (`POST /api/loop/start`) blocks autonomous runs until both steps are complete.
 
 ---
 
-## 5. Knowledge Base & Master Resume Vault
-The "Ground Truth" candidate profile that powers all semantic matching and cover letter tailoring.
+## 3. API Reference
 
-### Capabilities:
-* **Master PDF Resume Upload**: Parses `.pdf` resumes locally using PyMuPDF and regex heuristic tokenizers.
-* **Semantic Skill Graph**: Groups candidate skills into 6 domain categories:
-  * AI & Agentic Systems
-  * Retrieval & Search Systems
-  * LLMs & Vector Databases
-  * ML Evaluation & Quality
-  * Full Stack & Backend Engineering
-  * Cloud, DevOps & Security
-* **Work History & Projects Vault**: Stores detailed quantifiable bullet points, STAR stories, GitHub project links, and portfolio URLs.
-* **100% Local Storage**: Everything is written to `%LOCALAPPDATA%\SPravJobAI\knowledge_base\me.json` with zero cloud leakage.
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/system/readiness` | `GET` | Returns readiness status for Master Resume & Scope |
+| `/api/loop/start` | `POST` | Starts autonomous continuous discovery and scoring |
+| `/api/loop/stop` | `POST` | Stops autonomous background loop |
+| `/api/metrics` | `GET` | Returns live Single-Source-of-Truth pipeline counts |
+| `/api/jobs` | `GET` | Lists discovered jobs with status filtering and pagination |
+| `/api/scope` | `GET/POST` | Reads and updates active Application Scope |
+| `/api/settings/master-resume` | `POST` | Uploads and triggers AI extraction for Master Resume PDF |
+| `/api/analytics/conversion` | `GET` | Returns conversion funnel stats across application stages |
 
 ---
 
-## 6. Recruiter Outreach Engine
-Direct access to technical hiring managers and engineering leads.
+## 4. Benchmark Performance Metrics
 
-### Features:
-* **Recruiter Discovery**: Finds verified recruiters and engineering leads associated with target companies.
-* **Personalized Outreach Templates**: Generates bespoke LinkedIn connection notes (300 characters) and cold outreach emails referencing specific open roles.
-* **Cadence Tracker**: Logs outreach dates and reminds candidates when to send follow-up messages.
-
----
-
-## 7. Gateway Tests Tracker
-Manages take-home technical assessments, HackerRank/LeetCode challenges, and coding tests.
-
-### Capabilities:
-* **Deadline Tracking**: Countdown timers for pending coding assessments.
-* **Test Status Management**: *Received, In Progress, Submitted, Passed, Failed*.
-* **Platform Notes**: Stores problem statements, repository links, and submission artifacts.
-
----
-
-## 8. Interview Prep Center
-A role-specific interview preparation sandbox generated for any matching job.
-
-### Features:
-* **Role-Specific Technical Questions**: Predicts the top 10 technical questions likely to be asked based on the job description.
-* **System Design Scenarios**: Generates architectural challenges tailored to the company's domain.
-* **STAR Story Matcher**: Matches the job requirements to the candidate's actual projects from the Knowledge Base.
-
----
-
-## 9. Follow-ups & Outreach Cadence
-Automated scheduler ensuring applications never go cold.
-
-### Features:
-* **Smart Follow-up Windows**: Recommends optimal follow-up timing (typically 5–7 business days post-dispatch).
-* **Contextual Follow-up Drafter**: Generates polite, professional check-in emails referencing the original application date.
-
----
-
-## 10. Conversion Analytics & Funnel Telemetry
-Visual telemetry charts tracking candidate conversion efficiency.
-
-### Metrics Tracked:
-* **Application-to-Screening Ratio**: Percentage of dispatched applications resulting in recruiter calls.
-* **ATS Score vs. Interview Correlation**: Scatter plot showing which match score ranges produce the highest interview yield.
-* **Weekly Activity Trends**: Number of jobs discovered, reviewed, and dispatched over time.
-
----
-
-## 11. Weekly Job Digest
-A clean, curated summary of the week's highest-matching opportunities and market trends.
-
-### Features:
-* Top 10 High-Fidelity Matches of the week.
-* Tech Stack Demand Trends: Which frameworks and tools are surging across your target companies.
-* Summary of Dispatched vs. Responded applications.
-
----
-
-## 12. Settings, Multi-Engine AI & Auth
-The configuration hub for AI providers, local storage, and desktop preferences.
-
-### Subsystems:
-* **Multi-Engine AI Switcher**:
-  * **Google Gemini 2.0 Flash (Recommended)**: Free cloud API key with sub-second response times.
-  * **Groq (GPT-OSS 120B / Llama 3.3)**: Ultra-fast free cloud inference.
-  * **Ollama (Qwen 2.5 Coder 7B)**: 100% offline local GPU execution.
-* **Auto-Update Verifier**: 1-click update check that updates application binaries while preserving 100% of candidate resumes and SQLite databases.
-* **Theme Switcher**: Dark Mode / Light Mode toggle.
-* **Local Storage Inspector**: View database path and storage utilization.
+* **Concurrent API Throughput:** `154.4 requests/second` with 0 dropped connections.
+* **Scope Evaluation Speed:** Evaluates `7,230 jobs` across 27 roles and 10 locations in `277.4 ms`.
+* **Database Concurrency:** 40 simultaneous SQLite WAL transactions with 0 lock contentions.
