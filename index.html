@@ -4,32 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPrav™ Job AI — Autonomous Career Intelligence &amp; 1-Click Dispatch</title>
-  <meta name="description" content="Autonomous job discovery, high-fidelity ATS scoring, and guided 1-click dispatch for software and AI engineers. 100% Free, Local-First, and Private.">
+  <meta name="description" content="Autonomous job search, high-fidelity ATS scoring, and guided 1-click dispatch for software and AI engineers. 100% Free and Private.">
 
-  <!-- Open Graph / Social Meta Tags -->
+  <!-- Open Graph / LinkedIn Meta Tags -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://sprav-job-ai.pages.dev/">
+  <meta property="og:url" content="https://svspraveen.github.io/SPrav-Job-AI/">
   <meta property="og:title" content="SPrav™ Job AI — Autonomous Career Intelligence &amp; 1-Click Dispatch">
-  <meta property="og:description" content="Autonomous AI career engine — scans 28,700+ verified corporate career boards, evaluates fit against your master resume, and generates tailored pitches for 1-click dispatch. 100% Free.">
-  <meta property="og:image" content="assets/screenshots/dashboard.png">
-  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <meta property="og:description" content="Autonomous AI career engine — scrapes Greenhouse, Lever, Ashby, Workday &amp; SmartRecruiters directly, scores jobs via cosine similarity + LLM rubrics, and generates STAR-tailored pitches for 1-click review. 100% Free.">
+  <meta property="og:image" content="https://svspraveen.github.io/SPrav-Job-AI/assets/screenshots/dashboard.png">
 
-  <!-- Fonts -->
+  <!-- Twitter / X Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="svspraveen.github.io">
+  <meta property="twitter:url" content="https://svspraveen.github.io/SPrav-Job-AI/">
+  <meta name="twitter:title" content="SPrav™ Job AI — Autonomous Career Intelligence &amp; 1-Click Dispatch">
+  <meta name="twitter:description" content="Autonomous AI career engine — scrapes Greenhouse, Lever, Ashby, Workday &amp; SmartRecruiters directly, scores jobs via cosine similarity + LLM rubrics, and generates STAR-tailored pitches for 1-click review. 100% Free.">
+  <meta name="twitter:image" content="https://svspraveen.github.io/SPrav-Job-AI/assets/screenshots/dashboard.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #070a12;
-      --bg-card: rgba(15, 23, 42, 0.7);
-      --border-card: rgba(139, 92, 246, 0.22);
+      --bg-dark: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(99, 102, 241, 0.22);
       --primary: #6366f1;
-      --primary-glow: rgba(99, 102, 241, 0.45);
+      --primary-glow: rgba(99, 102, 241, 0.4);
       --accent: #a855f7;
       --success: #10b981;
-      --warning: #fbbf24;
-      --text-main: #f8fafc;
+      --text: #f8fafc;
       --text-muted: #94a3b8;
     }
 
@@ -37,323 +40,350 @@
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-dark);
-      color: var(--text-main);
+      color: var(--text);
       line-height: 1.6;
       overflow-x: hidden;
-      padding-bottom: 80px;
+      padding-bottom: 70px;
     }
 
-    /* Ambient Glowing Atmosphere */
+    /* Ambient Glow */
     .ambient-glow {
       position: fixed;
       top: -150px;
       left: 50%;
       transform: translateX(-50%);
-      width: 1100px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.22) 0%, rgba(99, 102, 241, 0.15) 35%, transparent 70%);
-      filter: blur(120px);
+      width: 1000px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.15) 40%, transparent 70%);
+      filter: blur(100px);
       z-index: 0;
       pointer-events: none;
     }
 
     .container {
-      max-width: 1240px;
+      max-width: 1260px;
       margin: 0 auto;
       padding: 0 1.5rem;
       position: relative;
       z-index: 1;
     }
 
-    /* Sticky Navigation Header */
+    /* Header */
     header {
-      padding: 0.85rem 0;
+      padding: 0.95rem 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(14px);
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(7, 10, 18, 0.88);
+      background: rgba(9, 13, 22, 0.92);
     }
-    .header-inner {
+    .nav-wrapper {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1.5rem;
     }
-    .logo-area {
+    .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
       color: #fff;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
     .logo-badge {
-      background: linear-gradient(135deg, #8b5cf6, #6366f1);
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.15rem;
       font-weight: 800;
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
-    }
-    .logo-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
       font-size: 1.15rem;
-      letter-spacing: -0.02em;
+      box-shadow: 0 4px 14px var(--primary-glow);
+      flex-shrink: 0;
     }
-    .ver-chip {
-      background: rgba(139, 92, 246, 0.18);
-      border: 1px solid rgba(139, 92, 246, 0.4);
-      color: #c084fc;
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 6px;
-      margin-left: 6px;
+    .brand-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.22rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: 0.9rem;
+      flex-wrap: nowrap;
     }
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      transition: color 0.2s;
+      white-space: nowrap;
+      transition: color 0.2s, background 0.2s;
     }
     .nav-links a:hover { color: #fff; }
-    .nav-btn-download {
-      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      color: #fff !important;
-      padding: 0.45rem 1.1rem;
-      border-radius: 10px;
-      font-weight: 700 !important;
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.35);
-      transition: transform 0.2s, box-shadow 0.2s !important;
+
+    .nav-icon-link {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1 !important;
+      transition: all 0.2s ease !important;
+      flex-shrink: 0;
     }
-    .nav-btn-download:hover {
+    .nav-icon-link:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+      color: #fff !important;
       transform: translateY(-1px);
-      box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+    }
+    .nav-icon-link.linkedin-icon:hover {
+      background: rgba(56, 189, 248, 0.2) !important;
+      color: #38bdf8 !important;
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+    .nav-icon-link.portfolio-icon:hover {
+      background: rgba(168, 85, 247, 0.2) !important;
+      color: #c084fc !important;
+      border-color: rgba(168, 85, 247, 0.4);
     }
 
-    /* Hero Section */
-    .hero {
-      text-align: center;
-      padding: 4.5rem 0 2.5rem 0;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(139, 92, 246, 0.12);
-      border: 1px solid rgba(139, 92, 246, 0.35);
-      padding: 0.35rem 1.1rem;
-      border-radius: 9999px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #c084fc;
-      margin-bottom: 1.5rem;
-    }
-    .hero h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 3.4rem;
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      margin-bottom: 1.25rem;
-      background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #a5b4fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero p {
-      font-size: 1.15rem;
-      color: var(--text-muted);
-      max-width: 780px;
-      margin: 0 auto 2.25rem auto;
-      line-height: 1.6;
-    }
-    .hero-cta {
+    .nav-download-btn {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      color: #fff !important;
+      padding: 0.48rem 1rem;
+      border-radius: 10px;
+      font-weight: 700 !important;
+      font-size: 0.84rem !important;
+      box-shadow: 0 0 16px rgba(139, 92, 246, 0.4);
       display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      flex-shrink: 0;
+      animation: pulseGlow 2.5s infinite;
     }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.35); }
+      50% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.65); transform: translateY(-1px); }
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 0.85rem 1.8rem;
+      padding: 0.75rem 1.5rem;
       border-radius: 12px;
-      font-size: 0.98rem;
       font-weight: 700;
+      font-size: 0.98rem;
       text-decoration: none;
+      transition: all 0.2s;
       cursor: pointer;
-      transition: all 0.2s ease;
+      border: none;
     }
     .btn-hero-download {
       background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       color: #fff;
-      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+      padding: 0.9rem 1.8rem;
+      font-size: 1.05rem;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: inline-flex;
       flex-direction: column;
-      padding: 0.75rem 2rem;
+      align-items: center;
     }
     .btn-hero-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.6);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px -5px rgba(139, 92, 246, 0.7);
     }
-    .btn-hero-sub {
+    .btn-hero-subtext {
       font-size: 0.75rem;
       font-weight: 500;
-      opacity: 0.85;
+      color: #e2e8f0;
       margin-top: 2px;
     }
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fff;
-      padding: 0.75rem 1.75rem;
-      flex-direction: column;
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(139, 92, 246, 0.5);
-    }
 
-    /* Key Stats Bar */
-    .hero-stats-bar {
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-2px); }
+
+    /* Hero Section */
+    .hero {
+      padding: 4.5rem 0 3rem 0;
+      text-align: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 18px;
+      border-radius: 30px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #c084fc;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 3.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 760px;
+      margin: 0 auto 2.5rem auto;
+      line-height: 1.6;
+    }
+    .hero-cta {
       display: flex;
       justify-content: center;
-      gap: 2rem;
-      font-size: 0.88rem;
-      color: var(--text-muted);
+      align-items: center;
+      gap: 1.25rem;
       flex-wrap: wrap;
-      padding: 1rem 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      max-width: 960px;
-      margin: 0 auto;
+      margin-bottom: 2rem;
     }
-    .hero-stats-bar strong { color: #fff; }
 
-    /* Credentials & Access Box */
-    .credentials-box {
-      background: linear-gradient(135deg, rgba(30, 27, 75, 0.55), rgba(15, 23, 42, 0.85));
-      border: 1px solid rgba(139, 92, 246, 0.35);
+    /* 60-Second Quick Start Banner */
+    .quickstart-banner {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(99, 102, 241, 0.28);
       border-radius: 18px;
       padding: 1.75rem 2rem;
-      margin: 2.5rem auto 0 auto;
-      max-width: 980px;
-      text-align: left;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      margin: 3rem 0 4rem 0;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     }
-    .cred-title {
+    .quickstart-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.25rem;
       font-weight: 700;
       color: #fff;
+      margin-bottom: 1.25rem;
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 0.6rem;
+      justify-content: center;
+      gap: 8px;
     }
-    .cred-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-      margin-top: 1rem;
-    }
-    .cred-card {
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-    }
-    .cred-card h4 {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #a5b4fc;
-      margin-bottom: 0.35rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .cred-val {
-      font-family: 'JetBrains Mono', monospace;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(139, 92, 246, 0.3);
-      padding: 4px 10px;
-      border-radius: 6px;
-      color: #34d399;
-      font-size: 0.85rem;
-      display: inline-block;
-      margin-top: 4px;
-    }
-
-    /* 2-Step Onboarding Guide */
-    .onboarding-section {
-      padding: 3.5rem 0 2rem 0;
-    }
-    .onboarding-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem;
-      margin-top: 1.5rem;
-    }
-    .onboarding-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-radius: 16px;
-      padding: 1.75rem;
-      position: relative;
-    }
-    .step-badge {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #818cf8;
-      margin-bottom: 0.5rem;
-    }
-
-    /* Benchmark Stress Test Grid */
-    .benchmarks-grid {
+    .quickstart-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.25rem;
-      margin-top: 1.5rem;
+      text-align: left;
     }
-    .bench-card {
-      background: rgba(15, 23, 42, 0.6);
+    .step-card {
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 1.5rem;
-      text-align: center;
+      border-radius: 12px;
+      padding: 1.2rem;
     }
-    .bench-val {
+    .step-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #818cf8;
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .step-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+    .step-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Grid & Cards */
+    .features { padding: 3rem 0; }
+    .section-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 2.2rem;
       font-weight: 800;
-      margin-bottom: 0.25rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
     }
-    .bench-val.green { color: #10b981; }
-    .bench-val.purple { color: #c084fc; }
-    .bench-val.amber { color: #fbbf24; }
-    .bench-val.blue { color: #38bdf8; }
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 3rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(99, 102, 241, 0.5);
+    }
+    .card-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: rgba(99, 102, 241, 0.18);
+      color: #a5b4fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      margin-bottom: 1rem;
+    }
+    .card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+    .card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
 
     /* Interactive Simulator */
     .sim-section { padding: 3rem 0; }
     .sim-box {
       background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(139, 92, 246, 0.35);
+      border: 1px solid rgba(99, 102, 241, 0.35);
       border-radius: 18px;
       padding: 2.25rem;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
@@ -373,7 +403,7 @@
     }
     .sim-col textarea {
       width: 100%;
-      height: 100px;
+      height: 110px;
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 10px;
@@ -386,7 +416,38 @@
     }
     .sim-col textarea:focus { border-color: var(--primary); }
 
-    /* Screenshots Showcase */
+    .sim-result {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .sim-score-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .score-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.15);
+      border: 2px solid var(--success);
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+
+    /* Screenshots Gallery */
     .screenshots-section { padding: 3rem 0; }
     .gallery-grid {
       display: grid;
@@ -394,53 +455,145 @@
       gap: 1.5rem;
     }
     .gallery-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 14px;
       overflow: hidden;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     .gallery-card:hover {
       transform: translateY(-4px);
-      border-color: rgba(139, 92, 246, 0.55);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
     }
-    .gallery-img-wrap {
+    .gallery-img-wrapper {
       position: relative;
-      cursor: pointer;
+      cursor: zoom-in;
+      overflow: hidden;
       background: #000;
-      aspect-ratio: 16/10;
     }
-    .gallery-img-wrap img {
+    .gallery-img-wrapper img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
       display: block;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .gallery-img-wrapper:hover img {
+      transform: scale(1.03);
+      filter: brightness(1.06);
+    }
+    .gallery-img-wrapper .expand-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .gallery-img-wrapper:hover .expand-badge {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .gallery-card-body {
+      padding: 1.25rem;
+    }
+    .gallery-card-body h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+    .gallery-card-body p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
     }
 
-    /* Documentation Hub */
-    .docs-section { padding: 3rem 0; }
-    .docs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-    }
-    .doc-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-card);
-      border-radius: 14px;
+    /* Lightbox Modal */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 15, 0.92);
+      backdrop-filter: blur(16px);
+      z-index: 100000;
+      display: none;
+      align-items: center;
+      justify-content: center;
       padding: 1.5rem;
-      text-decoration: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .lightbox-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+    .lightbox-content {
+      position: relative;
+      max-width: 95vw;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: modalScale 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalScale {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 82vh;
+      border-radius: 12px;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95);
+      object-fit: contain;
+    }
+    .lightbox-caption {
+      margin-top: 14px;
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 6px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(30, 41, 59, 0.9);
       color: #fff;
-      display: block;
-      transition: transform 0.2s, border-color 0.2s;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: background 0.2s, transform 0.2s;
     }
-    .doc-card:hover {
-      transform: translateY(-3px);
-      border-color: #8b5cf6;
+    .lightbox-close:hover {
+      background: #ef4444;
+      transform: scale(1.1);
     }
-    .doc-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
-    .doc-card h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem; color: #fff; }
-    .doc-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; }
 
     /* Sticky Floating Download Pill */
     .floating-download-bar {
@@ -448,7 +601,7 @@
       bottom: 20px;
       right: 24px;
       z-index: 999;
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(16px);
       border: 1px solid rgba(139, 92, 246, 0.45);
       border-radius: 9999px;
@@ -481,7 +634,11 @@
       gap: 6px;
       box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
     }
+    .floating-btn:hover {
+      box-shadow: 0 0 25px rgba(139, 92, 246, 0.7);
+    }
 
+    /* Footer */
     footer {
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       padding: 2.5rem 0;
@@ -490,10 +647,14 @@
       font-size: 0.9rem;
     }
 
+    @media (max-width: 1024px) {
+      .nav-links a:not(.nav-download-btn):not(.nav-icon-link) { display: none; }
+    }
+
     @media (max-width: 768px) {
       .hero h1 { font-size: 2.3rem; }
       .floating-download-bar { left: 16px; right: 16px; bottom: 16px; }
-      .nav-links a:not(.nav-btn-download) { display: none; }
+      .gallery-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -501,68 +662,102 @@
 
   <div class="ambient-glow"></div>
 
+  <!-- Persistent Floating Download Pill -->
+  <div class="floating-download-bar">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="floating-badge">v2.4 Pro</span>
+      <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">SPrav™ Job AI</span>
+    </div>
+    <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="floating-btn">
+      📥 Download Free (385MB)
+    </a>
+  </div>
+
   <!-- Header -->
   <header>
-    <div class="container header-inner">
-      <a href="#" class="logo-area">
-        <div class="logo-badge">⚡</div>
-        <span class="logo-title">SPrav™ Job AI</span>
-        <span class="ver-chip">v2.4.5 Pro</span>
+    <div class="container nav-wrapper">
+      <a href="#" class="brand">
+        <div class="logo-badge">S</div>
+        <div class="brand-text">SPRAV™ <span style="font-size: 0.82rem; color: #a5b4fc; font-weight: 600; background: rgba(99, 102, 241, 0.2); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.35);">JOB AI</span></div>
       </a>
-
       <nav class="nav-links">
-        <a href="#quickstart">Quickstart</a>
-        <a href="#credentials">Credentials</a>
-        <a href="#simulator">Simulator</a>
-        <a href="#benchmarks">Benchmarks</a>
-        <a href="#docs">Docs</a>
-        <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank">GitHub</a>
-        <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="nav-btn-download">
-          ⬇️ Download Free App
+        <a href="#features">Features</a>
+        <a href="#simulator">ATS Matcher</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#requirements">Specs</a>
+        <a href="docs.html">Docs</a>
+        <a href="credits.html">Credits</a>
+        <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" class="nav-icon-link" title="GitHub Repository">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" class="nav-icon-link linkedin-icon" title="LinkedIn Profile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+        </a>
+        <a href="https://svspraveen.vercel.app/" target="_blank" class="nav-icon-link portfolio-icon" title="Personal Portfolio (svspraveen.vercel.app)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </a>
+        <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="nav-download-btn">
+          📥 Download (v2.4)
         </a>
       </nav>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-badge">
-        ✨ v2.4.5 Pro Edition — 100% Free, Local-First &amp; Private
+  <main class="container">
+    <section class="hero">
+      <div class="badge">
+        ✨ 100% Free Freeware • Zero Cloud Subscriptions • 100% Air-Gapped Local Storage
       </div>
-
-      <h1>
-        Autonomous Career Intelligence.<br>
-        Guided 1-Click Dispatch.
-      </h1>
+      <h1>Autonomous Career Intelligence<br/>&amp; Guided 1-Click Dispatch</h1>
+      
+      <!-- Creator Attribution Badge -->
+      <div style="margin: 0.85rem 0 1.25rem 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); padding: 6px 18px; border-radius: 30px; font-size: 0.88rem; flex-wrap: wrap;">
+        <span style="color: #cbd5e1;">Architected &amp; Engineered by <strong>SVS Praveen</strong></span>
+        <span style="color: rgba(255,255,255,0.3);">•</span>
+        <a href="https://svspraveen.vercel.app/" target="_blank" style="color: #c084fc; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Portfolio
+        </a>
+        <span style="color: rgba(255,255,255,0.3);">•</span>
+        <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" style="color: #a5b4fc; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub Repo
+        </a>
+        <span style="color: rgba(255,255,255,0.3);">•</span>
+        <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          LinkedIn Profile
+        </a>
+      </div>
 
       <p>
-        SPrav Job AI continuously monitors 28,700+ corporate career boards (Greenhouse, Lever, Ashby, Workday, SmartRecruiters), evaluates fit against your Master Resume, eliminates hallucinations, and stages tailored applications for 1-click review.
+        Scans 28,700+ verified tech career portals, calculates cosine embedding similarity against your master PDF resume, and prepares tailored applications for your 1-click review.
       </p>
-
-      <div class="hero-cta">
-        <a href="https://github.com/SVSPraveen/SPrav-Job-AI/releases/latest" target="_blank" class="btn btn-hero-download">
-          <span>⬇️ Download via GitHub (v2.4.5 Pro)</span>
-          <span class="btn-hero-sub">Standalone ZIP • Zero Installation • Double-Click Launch</span>
+      
+      <div class="hero-cta" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="https://github.com/SVSPraveen/SPrav-Job-AI/releases/tag/v2.4.5" target="_blank" class="btn btn-hero-download">
+          <span>📥 Download via GitHub (v2.4.5)</span>
+          <span class="btn-hero-subtext">Standalone ZIP • Zero Install • Double-Click Launch</span>
         </a>
-        <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="btn btn-secondary">
-          <span style="font-weight: 700; color: #fff;">💾 Google Drive Fast Mirror</span>
-          <span class="btn-hero-sub">Direct Portable ZIP Archive</span>
+        <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="btn btn-secondary" style="border: 1px solid rgba(139, 92, 246, 0.5); padding: 0.85rem 1.75rem; border-radius: 12px; display: flex; flex-direction: column; justify-content: center;">
+          <span style="font-weight: 700; color: #fff;">☁️ Google Drive Mirror</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Direct Portable Download</span>
         </a>
       </div>
 
-      <div class="hero-stats-bar">
-        <span>⚡ <strong>154.4 RPS</strong> API Burst Rate</span>
+      <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 20px; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap;">
+        <span>✓ <strong>17.7ms</strong> SQLite Query Latency</span>
         <span>•</span>
-        <span>🚀 <strong>26,000+</strong> Jobs / Sec Filtering</span>
+        <span>✓ <strong>&lt;120MB</strong> RAM Footprint</span>
         <span>•</span>
-        <span>🔒 <strong>100% Local-First</strong> Privacy</span>
+        <span>✓ <strong>Local Ollama / Free Gemini</strong></span>
         <span>•</span>
-        <span>🤖 <strong>Local Ollama / Free Gemini / Groq</strong></span>
+        <span>✓ <strong>100% Private</strong></span>
       </div>
 
-      <!-- Hero Video / GIF Walkthrough -->
-      <div style="text-align: center; margin: 3rem 0 1rem 0;">
+      <!-- Hero Live Animated Showcase Walkthrough -->
+      <div style="text-align: center; margin: 2.75rem 0 1rem 0; position: relative;">
         <div style="position: relative; display: inline-block; width: 100%; max-width: 980px;">
           <video 
             autoplay 
@@ -573,130 +768,131 @@
             style="width: 100%; border-radius: 18px; border: 1px solid rgba(139, 92, 246, 0.4); box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85); display: block;"
           >
             <source src="assets/SPrav%20Job%20AI%20video.mp4" type="video/mp4">
-            <img src="assets/SPrav%20Job%20AI%20gif.gif" alt="SPrav Job AI Live Workflow" style="width: 100%; border-radius: 18px;" />
+            <img src="assets/SPrav%20Job%20AI%20gif.gif" alt="SPrav Job AI Live Autonomous Ingestion and Dispatch Workflow" style="width: 100%; border-radius: 18px;" />
           </video>
+          <div style="position: absolute; bottom: 16px; right: 16px; background: rgba(9, 13, 22, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; color: #a5b4fc; font-weight: 600; display: flex; align-items: center; gap: 6px; pointer-events: none;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; animation: pulseGlow 1.5s infinite;"></span> Ultra-HD Pro v2.4.5 Walkthrough
+          </div>
         </div>
       </div>
+    </section>
 
-      <!-- Dedicated Credentials & Access Box -->
-      <div id="credentials" class="credentials-box">
-        <div class="cred-title">
-          🔐 Default Access &amp; Authentication Credentials
+    <!-- Creator Story / Why I Built This Section -->
+    
+    <!-- Dedicated Access & Default Credentials Section -->
+    <section id="credentials" style="max-width: 980px; margin: 1.5rem auto 2.5rem auto; padding: 0 1rem;">
+      <div style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.65), rgba(15, 23, 42, 0.85)); backdrop-filter: blur(16px); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 18px; padding: 1.75rem 2rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);">
+        <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; margin-bottom: 0.6rem;">
+          <span>🔐</span> Default Access &amp; Authentication Credentials
         </div>
         <p style="font-size: 0.9rem; color: #94a3b8; line-height: 1.5; margin-bottom: 1rem;">
-          SPrav Job AI is designed with a <strong>zero-friction local security model</strong>. Everything runs securely on your machine with air-gapped data persistence.
+          SPrav Job AI is designed with a <strong>zero-friction local security model</strong>. Everything runs securely on your local PC with air-gapped data isolation.
         </p>
-
-        <div class="cred-grid">
-          <div class="cred-card">
-            <h4>🌐 Web Dashboard URL</h4>
-            <div style="font-size: 0.82rem; color: #cbd5e1;">Access your local web interface at:</div>
-            <div class="cred-val">http://127.0.0.1:8000/</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+          <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1rem 1.25rem;">
+            <div style="font-size: 0.9rem; font-weight: 700; color: #a5b4fc; margin-bottom: 0.35rem;">🌐 Local Web Interface</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 6px;">Open in any browser:</div>
+            <div style="font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.5); border: 1px solid rgba(139, 92, 246, 0.3); padding: 4px 10px; border-radius: 6px; color: #34d399; font-size: 0.85rem; display: inline-block;">http://127.0.0.1:8000/</div>
           </div>
-
-          <div class="cred-card">
-            <h4>🔑 Authentication / Token</h4>
-            <div style="font-size: 0.82rem; color: #cbd5e1;">Auto-authenticated via local session:</div>
-            <div class="cred-val">Auto-Login Enabled (Zero Password Needed)</div>
+          <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1rem 1.25rem;">
+            <div style="font-size: 0.9rem; font-weight: 700; color: #a5b4fc; margin-bottom: 0.35rem;">🔑 Session Authentication</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 6px;">Automatic local session:</div>
+            <div style="font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.5); border: 1px solid rgba(139, 92, 246, 0.3); padding: 4px 10px; border-radius: 6px; color: #34d399; font-size: 0.85rem; display: inline-block;">Auto-Login Enabled (Zero Password)</div>
           </div>
-
-          <div class="cred-card">
-            <h4>☁️ AI Provider Keys</h4>
-            <div style="font-size: 0.82rem; color: #cbd5e1;">Free Google Gemini or Groq Cloud Key:</div>
-            <div class="cred-val">100% Free / Optional Local Ollama</div>
+          <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1rem 1.25rem;">
+            <div style="font-size: 0.9rem; font-weight: 700; color: #a5b4fc; margin-bottom: 0.35rem;">☁️ AI Provider Inference</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 6px;">Free Cloud Key or Local:</div>
+            <div style="font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.5); border: 1px solid rgba(139, 92, 246, 0.3); padding: 4px 10px; border-radius: 6px; color: #34d399; font-size: 0.85rem; display: inline-block;">Free Gemini / Groq / Local Ollama</div>
           </div>
         </div>
       </div>
+    </section>
 
-    </div>
-  </section>
-
-  <!-- 2-Step Onboarding Guide -->
-  <section id="quickstart" class="onboarding-section">
-    <div class="container">
-      <div style="text-align: center; margin-bottom: 2rem;">
-        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem;">
-          🚀 Quickstart in 60 Seconds
-        </h2>
-        <p style="color: var(--text-muted); font-size: 1rem;">
-          Complete 2 quick setup steps on first launch to unlock the autonomous discovery engine.
+    <section id="why-i-built" style="max-width: 980px; margin: 2rem auto; padding: 0 1rem;">
+      <div style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.55), rgba(15, 23, 42, 0.75)); backdrop-filter: blur(16px); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 20px; padding: 2.25rem 2rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem;">
+          <span style="font-size: 1.8rem;">💬</span>
+          <div>
+            <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.45rem; color: #fff; margin: 0;">Why I Built SPrav™ Job AI</h2>
+            <p style="font-size: 0.85rem; color: #a5b4fc; margin: 2px 0 0 0;">A Personal Mission for Students, Graduates, and Job Seekers</p>
+          </div>
+        </div>
+        <p style="font-size: 1.05rem; line-height: 1.75; color: #e2e8f0; margin-bottom: 1.25rem; font-style: italic; border-left: 3px solid #8b5cf6; padding-left: 1.25rem;">
+          "I built this because I was tired of searching for jobs the hard way. As a job seeker, spending hours jumping between dozens of different ATS portals, filling out repetitive forms, and wondering if an application ever gets seen is exhausting. I built SPrav Job AI as a 100% free standalone application so that students, new grads, and developers like me can cut through the noise and find verified opportunities with 1 click."
         </p>
-      </div>
-
-      <div class="onboarding-grid">
-        <div class="onboarding-card">
-          <div class="step-badge">Step 1 • Ground Truth</div>
-          <h3 style="color: #fff; font-size: 1.25rem; margin-bottom: 0.5rem;">Upload Master Resume PDF</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.55;">
-            Drop your Master Resume PDF. The Universal AI Document Intelligence engine automatically parses all your skills into 10 domains, work history, quantitative bullets, and live projects without dropping a single detail.
-          </p>
-        </div>
-
-        <div class="onboarding-card">
-          <div class="step-badge">Step 2 • Targeting Rules</div>
-          <h3 style="color: #fff; font-size: 1.25rem; margin-bottom: 0.5rem;">Configure Application Scope</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.55;">
-            Select from 800+ standardized career titles and 246 countries. Set your preferred work mode (Remote/Onsite). The engine safely restricts matching to only roles you want.
-          </p>
-        </div>
-
-        <div class="onboarding-card">
-          <div class="step-badge">Step 3 • Autonomous Execution</div>
-          <h3 style="color: #fff; font-size: 1.25rem; margin-bottom: 0.5rem;">Click "Start Loop" &amp; Apply</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.55;">
-            The autonomous engine scans 28,700+ verified career boards, qualifies 80%+ matches, and stages them under <strong>Action Required</strong> for guided 1-click application review.
-          </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #38bdf8); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 0.9rem;">SP</div>
+            <div>
+              <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">SVS Praveen</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Creator of SPrav™ Job AI</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <a href="https://svspraveen.vercel.app/" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 8px; color: #c084fc; font-size: 0.85rem; font-weight: 600; text-decoration: none;">
+              👨‍💻 Portfolio
+            </a>
+            <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 8px; color: #38bdf8; font-size: 0.85rem; font-weight: 600; text-decoration: none;">
+              LinkedIn
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Benchmark Stress Test Section -->
-  <section id="benchmarks" style="padding: 3rem 0;">
-    <div class="container">
-      <div style="text-align: center; margin-bottom: 1.5rem;">
-        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem;">
-          ⚡ Benchmark Stress Test Performance
-        </h2>
-        <p style="color: var(--text-muted); font-size: 1rem;">
-          Engineered for industrial speed, zero database lock contentions, and sub-millisecond in-memory evaluations.
+    <!-- 60-Second Quick Start & How to Use Section -->
+    <section id="quickstart" class="quickstart-banner">
+      <div class="quickstart-title">
+        ⚡ How to Run in 60 Seconds (3 Simple Steps)
+      </div>
+      <div class="quickstart-grid">
+        <div class="step-card">
+          <div class="step-number">Step 1</div>
+          <div class="step-title">📥 Download &amp; Extract</div>
+          <div class="step-desc">Grab the portable ZIP from <a href="https://github.com/SVSPraveen/SPrav-Job-AI/releases/tag/v2.4.5" target="_blank" style="color:#c084fc;">GitHub</a> or <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" style="color:#38bdf8;">Google Drive</a>. Extract anywhere with zero installation.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">Step 2</div>
+          <div class="step-title">📄 Upload Master Resume</div>
+          <div class="step-desc">Drop your PDF resume once — the AI automatically indexes your verified experience, tech stacks, and domain skills.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-number">Step 3</div>
+          <div class="step-title">🚀 Set Target Roles &amp; Start</div>
+          <div class="step-desc">Select your target roles, click <strong>"Start Loop"</strong>, and let the autonomous scanner match against 28,000+ career boards!</div>
+        </div>
+      </div>
+
+      <!-- What 1-Click Really Means Deep Dive -->
+      <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem; text-align: left;">
+        <h3 style="color: #38bdf8; font-size: 1.1rem; margin: 0 0 0.75rem 0; display: flex; align-items: center; gap: 8px;">
+          <span>⚡ What Does "Guided 1-Click" Really Mean?</span>
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 0.75rem;">
+          It is <strong>NOT</strong> blind bot-spamming that ruins your candidate reputation. Instead, SPrav AI continuously discovers live roles from Greenhouse, Lever, Ashby, and Workday, evaluates fit against your master resume, and queues verified 80%+ matches under <strong>"Action Required"</strong>.
         </p>
-      </div>
-
-      <div class="benchmarks-grid">
-        <div class="bench-card">
-          <div class="bench-val green">154.4</div>
-          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Requests / Sec</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">100% Success Rate (0 Failed)</div>
-        </div>
-
-        <div class="bench-card">
-          <div class="bench-val purple">26,062</div>
-          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Jobs / Sec Filtered</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">7,230 jobs evaluated in 277ms</div>
-        </div>
-
-        <div class="bench-card">
-          <div class="bench-val amber">57.1 ms</div>
-          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">Median API Latency</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Lightweight FastAPI Backend</div>
-        </div>
-
-        <div class="bench-card">
-          <div class="bench-val blue">0 Locks</div>
-          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">SQLite WAL Mode</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">40 Concurrent Transactions</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem;">
+          <div style="background: rgba(0,0,0,0.3); padding: 0.85rem 1rem; border-radius: 10px; border-left: 3px solid #34d399;">
+            <div style="font-weight: 700; color: #34d399; font-size: 0.88rem; margin-bottom: 4px;">🎯 STAR Impact Note</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1;">Synthesizes STAR-aligned impact notes customized for the role.</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 0.85rem 1rem; border-radius: 10px; border-left: 3px solid #38bdf8;">
+            <div style="font-weight: 700; color: #38bdf8; font-size: 0.88rem; margin-bottom: 4px;">🔍 Recruiter Discovery</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1;">Surfaces hiring contacts, team leaders, and verified outreach endpoints.</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 0.85rem 1rem; border-radius: 10px; border-left: 3px solid #c084fc;">
+            <div style="font-weight: 700; color: #c084fc; font-size: 0.88rem; margin-bottom: 4px;">🚀 Direct Gateway</div>
+            <div style="font-size: 0.82rem; color: #cbd5e1;">Opens direct application portal with your pre-crafted materials ready to submit.</div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Interactive Simulator -->
-  <section id="simulator" class="sim-section">
-    <div class="container">
+    <!-- Interactive Simulator -->
+    <section id="simulator" class="sim-section">
       <div class="sim-box">
-        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; color: #fff; margin-bottom: 0.5rem;">
-          🧪 Interactive ATS Match Simulator
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px;">
+          ⚡ Interactive In-Browser ATS Match Simulator
         </h2>
         <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
           Test the exact semantic skill scoring algorithm that powers SPrav™ Job AI. Edit candidate and job skills in real time:
@@ -705,94 +901,207 @@
         <div class="sim-grid">
           <div class="sim-col">
             <label>Candidate Master Skills (Extracted from PDF)</label>
-            <textarea id="candSkills" oninput="calculateMatch()">Python, FastAPI, PyTorch, RAG, LangChain, Vector Databases, Docker, AWS, PostgreSQL, TypeScript</textarea>
+            <textarea id="candSkills" oninput="calculateMatch()" placeholder="e.g. Python, FastAPI, PyTorch, RAG, LangChain, Docker, AWS, SQL">Python, FastAPI, React, PyTorch, RAG, LangChain, Vector Databases, Docker, AWS, PostgreSQL, TypeScript</textarea>
           </div>
           <div class="sim-col">
             <label>Job Description Requirements (Parsed from ATS Feed)</label>
-            <textarea id="jobSkills" oninput="calculateMatch()">Python, FastAPI, RAG, LangChain, Vector Databases, Docker, Kubernetes, AWS, Redis</textarea>
+            <textarea id="jobSkills" oninput="calculateMatch()" placeholder="e.g. Python, FastAPI, RAG, Docker, AWS, SQL">Python, FastAPI, RAG, LangChain, Vector Databases, Docker, Kubernetes, AWS, Redis</textarea>
           </div>
         </div>
 
+        <!-- Live Skill Gap Breakdown Matrix -->
         <div id="simMatrix" style="background: rgba(0,0,0,0.3); padding: 1rem 1.25rem; border-radius: 12px; margin: 1.25rem 0; border: 1px solid rgba(255,255,255,0.08); display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
           <div>
-            <div style="font-size: 0.82rem; font-weight: 700; color: #34d399; margin-bottom: 8px;">✅ Matched Skills:</div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: #34d399; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>✓ Matched Skills:</span>
+            </div>
             <div id="matchedChips" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
           </div>
           <div>
-            <div style="font-size: 0.82rem; font-weight: 700; color: #f87171; margin-bottom: 8px;">⚠️ Missing Requirements:</div>
+            <div id="missingHeader" style="font-size: 0.82rem; font-weight: 700; color: #f87171; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <span>⚠️ Missing Requirements:</span>
+            </div>
             <div id="missingChips" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
           </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-          <div style="display: flex; align-items: center; gap: 14px;">
-            <div id="scoreCircle" style="width: 56px; height: 56px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; color: #10b981; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 800;">
-              88%
-            </div>
+        <div class="sim-result">
+          <div class="sim-score-box">
+            <div class="score-circle" id="scoreValue">100%</div>
             <div>
-              <div id="matchStatus" style="font-weight: 700; font-size: 1.05rem; color: #fff;">High-Fidelity Match (88%)</div>
-              <div style="font-size: 0.82rem; color: var(--text-muted);">Qualified for Guided 1-Click Application Dispatch</div>
+              <div style="font-weight: 700; font-size: 1.05rem; color: #fff;" id="matchStatus">High-Fidelity Match (100%)</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);" id="matchAction">Queued for Guided 1-Click Dispatch • Candidate Fit: 5.0 / 5.0</div>
             </div>
           </div>
-          <button onclick="calculateMatch()" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
-            🔄 Recalculate Score
-          </button>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn btn-secondary" onclick="calculateMatch()" style="padding: 0.6rem 1.1rem; font-size: 0.88rem;">
+              🔄 Recalculate
+            </button>
+            <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="btn btn-primary" style="padding: 0.6rem 1.1rem; font-size: 0.88rem;">
+              📥 Download Free App
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Screenshots Showcase -->
-  <section id="screenshots" class="screenshots-section">
-    <div class="container">
-      <div style="text-align: center; margin-bottom: 2.5rem;">
-        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem;">
-          📸 Production Interface Showcase
-        </h2>
-        <p style="color: var(--text-muted); font-size: 1rem;">
-          Engineered with an ultra-premium glassmorphic aesthetic and dark-mode workspace.
-        </p>
+    <!-- Core Features Grid -->
+    <section id="features" class="features">
+      <h2 class="section-title">Engineered for High-Precision Applications</h2>
+      <p class="section-subtitle">Why job seekers and senior software engineers choose SPrav™ Job AI over blind auto-apply bots.</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Continuous 28.7K+ Ingestion</h3>
+          <p>Autonomously parses 1st-party endpoints including Greenhouse, Lever, AshbyHQ, Workday, and custom career portals.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <h3>Application Scope Matrix</h3>
+          <p>Calibrate target engineering titles, 1-click role palettes, remote preferences, and hard negative keywords.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">📄</div>
+          <h3>Guided 1-Click Dispatch</h3>
+          <p>Generates tailored cover notes and STAR achievement stories anchored strictly against your Master Resume PDF.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>100% Air-Gapped Storage</h3>
+          <p>Your resume, credentials, and application history stay strictly on your local PC in <code>%LOCALAPPDATA%\SPravJobAI</code>.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">💡</div>
+          <h3>₹0 Cloud or Local AI</h3>
+          <p>Runs seamlessly with free Google Gemini 2.0 Flash / Groq cloud keys or offline with local Ollama (Qwen 2.5 Coder).</p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🏢</div>
+          <h3>Recruiter Outreach Engine</h3>
+          <p>Finds technical hiring managers and drafts personalized cold outreach messages directly inside your dashboard.</p>
+        </div>
       </div>
+    </section>
+
+    <!-- Screenshots Showcase -->
+    <section id="screenshots" class="screenshots-section">
+      <h2 class="section-title">Production Interface Showcase</h2>
+      <p class="section-subtitle">Click any screenshot to expand and inspect the high-fidelity user interface in full detail.</p>
 
       <div class="gallery-grid">
         <div class="gallery-card">
-          <div class="gallery-img-wrap">
-            <img src="assets/screenshots/dashboard.png" alt="Command Center Dashboard" loading="lazy">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/dashboard.png', 'Command Center Dashboard — Real-time discovery telemetry &amp; ingestion controls')">
+            <img src="assets/screenshots/dashboard.png" alt="Command Center Dashboard" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
           </div>
-          <div style="padding: 1.25rem;">
-            <h4 style="font-size: 1.05rem; color: #fff; margin-bottom: 4px;">Command Center Dashboard</h4>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Real-time telemetry, 4-card metric cockpit, and autonomous continuous loop controls.</p>
-          </div>
-        </div>
-
-        <div class="gallery-card">
-          <div class="gallery-img-wrap">
-            <img src="assets/screenshots/application_scope.png" alt="Application Scope Matrix" loading="lazy">
-          </div>
-          <div style="padding: 1.25rem;">
-            <h4 style="font-size: 1.05rem; color: #fff; margin-bottom: 4px;">Application Scope Matrix</h4>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">800+ standardized career titles, 246 countries, in-place typeaheads, and remote barriers.</p>
+          <div class="gallery-card-body">
+            <h4>Command Center Dashboard</h4>
+            <p>Real-time telemetry, master resume fidelity badge, and ingestion controls.</p>
           </div>
         </div>
 
         <div class="gallery-card">
-          <div class="gallery-img-wrap">
-            <img src="assets/screenshots/guided_dispatch.png" alt="Guided 1-Click Dispatch" loading="lazy">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/guided_dispatch.png', 'Guided 1-Click Dispatch Queue — High-match opportunities with tailored pitches')">
+            <img src="assets/screenshots/guided_dispatch.png" alt="Guided 1-Click Dispatch" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
           </div>
-          <div style="padding: 1.25rem;">
-            <h4 style="font-size: 1.05rem; color: #fff; margin-bottom: 4px;">Guided 1-Click Dispatch</h4>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Review 80%+ qualified matches, inspect tailored STAR pitches, and dispatch with 1 click.</p>
+          <div class="gallery-card-body">
+            <h4>Guided 1-Click Dispatch Queue</h4>
+            <p>High-match opportunities with auto-tailored cover notes and STAR behavioral alignment.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/Job%20Portal.png', 'Master Job Portal &amp; Telemetry — Unified registry of 18,980+ live postings')">
+            <img src="assets/screenshots/Job%20Portal.png" alt="Master Job Portal" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
+          <div class="gallery-card-body">
+            <h4>Master Job Portal &amp; Telemetry</h4>
+            <p>Unified registry of 18,980+ scanned job board postings with live skill chips and deep audits.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/analytics.png', 'Conversion Analytics &amp; Yields — Screening yields and salary benchmark insights')">
+            <img src="assets/screenshots/analytics.png" alt="Conversion Analytics" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
+          <div class="gallery-card-body">
+            <h4>Conversion Analytics &amp; Yields</h4>
+            <p>Funnel conversion yields, salary benchmarks, and company response rates.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/application_scope.png', 'Application Scope Matrix — Role palettes, remote toggles &amp; location filters')">
+            <img src="assets/screenshots/application_scope.png" alt="Application Scope Matrix" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
+          <div class="gallery-card-body">
+            <h4>Application Scope Matrix</h4>
+            <p>1-Click Quick-Add role palettes, remote switches, and location targeting.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/knowledge_base.png', 'Knowledge Base &amp; Skills Arsenal — Categorized skill chips &amp; Master Resume ground-truth')">
+            <img src="assets/screenshots/knowledge_base.png" alt="Knowledge Base &amp; Skills Arsenal" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
+          <div class="gallery-card-body">
+            <h4>Knowledge Base &amp; Skills Arsenal</h4>
+            <p>Dynamic domain skills chips, verified impact bullets, and Master Resume ground-truth profile.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/recruiter_outreach.png', 'Recruiter Outreach &amp; Pitch Generator — Executive cold message templates')">
+            <img src="assets/screenshots/recruiter_outreach.png" alt="Recruiter Outreach Engine" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
+          <div class="gallery-card-body">
+            <h4>Recruiter Outreach Engine</h4>
+            <p>Identify specialized recruiters and draft personalized cold outreach notes in seconds.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/Settings%20&%20Cloud%20AI%20Authentication.png', 'Settings &amp; Cloud AI Authentication — Local Ollama &amp; Free Cloud AI configuration')">
+            <img src="assets/screenshots/Settings%20&%20Cloud%20AI%20Authentication.png" alt="Settings & Cloud AI Authentication" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
+          <div class="gallery-card-body">
+            <h4>Settings &amp; Cloud AI Authentication</h4>
+            <p>Configure local air-gapped Ollama execution or free Cloud AI (Gemini 2.0 Flash / Groq).</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrapper" onclick="openLightbox('assets/screenshots/about.png', 'About &amp; System Architecture — System telemetry, MIT license, and creator credits')">
+            <img src="assets/screenshots/about.png" alt="About &amp; System Architecture" loading="lazy" />
+            <div class="expand-badge">🔍 Click to Expand</div>
+          </div>
+          <div class="gallery-card-body">
+            <h4>About &amp; System Architecture</h4>
+            <p>Version manifests, engine telemetry, MIT license, and architectural credits.</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Documentation Hub Section -->
-  <section id="docs" class="docs-section">
-    <div class="container">
+    <!-- System Requirements & Hardware Specifications -->
+    
+    <!-- Documentation Hub Section -->
+    <section id="docs" style="max-width: 1240px; margin: 3.5rem auto; padding: 0 1.5rem;">
       <div style="text-align: center; margin-bottom: 2rem;">
-        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem;">
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">
           📚 Official Documentation &amp; Technical Guides
         </h2>
         <p style="color: var(--text-muted); font-size: 1rem;">
@@ -800,87 +1109,286 @@
         </p>
       </div>
 
-      <div class="docs-grid">
-        <a href="docs/USER_GUIDE.md" target="_blank" class="doc-card">
-          <div class="doc-icon">📖</div>
-          <h4>User Guide</h4>
-          <p>Step-by-step tutorial on First-Time Setup, Master Resume extraction, and 1-click dispatching.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+        <a href="docs/USER_GUIDE.md" target="_blank" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.5rem; text-decoration: none; color: #fff; display: block; transition: transform 0.2s, border-color 0.2s;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📖</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem; color: #fff;">User Guide</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45;">Step-by-step tutorial on First-Time Setup, Master Resume extraction, and 1-click dispatching.</p>
         </a>
 
-        <a href="docs/DOCUMENTATION.md" target="_blank" class="doc-card">
-          <div class="doc-icon">📋</div>
-          <h4>Technical API Reference</h4>
-          <p>Complete FastAPI endpoint schemas, readiness endpoints, and benchmark metrics.</p>
+        <a href="docs/DOCUMENTATION.md" target="_blank" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.5rem; text-decoration: none; color: #fff; display: block; transition: transform 0.2s, border-color 0.2s;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📋</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem; color: #fff;">Technical API Reference</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45;">Complete FastAPI endpoint schemas, readiness endpoints, and benchmark metrics.</p>
         </a>
 
-        <a href="docs/ARCHITECTURE.md" target="_blank" class="doc-card">
-          <div class="doc-icon">🏛️</div>
-          <h4>Architecture Specification</h4>
-          <p>Local-first security boundary, multi-engine document parser, and closed-loop verifier.</p>
+        <a href="docs/ARCHITECTURE.md" target="_blank" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.5rem; text-decoration: none; color: #fff; display: block; transition: transform 0.2s, border-color 0.2s;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🏛️</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem; color: #fff;">Architecture Specification</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45;">Local-first security boundary, multi-engine document parser, and closed-loop verifier.</p>
         </a>
 
-        <a href="docs/WORKFLOW.md" target="_blank" class="doc-card">
-          <div class="doc-icon">🔄</div>
-          <h4>5-Stage Workflow</h4>
-          <p>Detailed execution lifecycle from 28,700+ ATS discovery to Playwright dispatch.</p>
+        <a href="docs/WORKFLOW.md" target="_blank" style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.5rem; text-decoration: none; color: #fff; display: block; transition: transform 0.2s, border-color 0.2s;">
+          <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔄</div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem; color: #fff;">5-Stage Workflow</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45;">Detailed execution lifecycle from 28,700+ ATS discovery to Playwright dispatch.</p>
         </a>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Sticky Floating Download Bar -->
-  <div class="floating-download-bar">
-    <span class="floating-badge">PRO v2.4.5</span>
-    <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="floating-btn">
-      ⬇️ Direct Download (ZIP)
-    </a>
-  </div>
+    <section id="requirements" style="padding: 3rem 0; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+      <h2 class="section-title">System Requirements &amp; Hardware Specifications</h2>
+      <p class="section-subtitle">Engineered to run seamlessly on standard laptops with 0% cloud cost and zero complex setup.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+        <div class="card" style="border: 1px solid rgba(99, 102, 241, 0.35); background: rgba(17, 24, 39, 0.75);">
+          <div style="font-size: 1.15rem; font-weight: 800; color: #a5b4fc; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px;">
+            <span>⚙️ Minimum Specification</span>
+          </div>
+          <ul style="list-style: none; font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 12px; padding: 0;">
+            <li><strong>Operating System:</strong> Windows 10 (64-bit, Build 19041+) or Windows 11</li>
+            <li><strong>Processor (CPU):</strong> Intel Core i3 / AMD Ryzen 3 or equivalent</li>
+            <li><strong>System Memory (RAM):</strong> 4 GB RAM</li>
+            <li><strong>Storage Space:</strong> 1.5 GB available disk space (SSD recommended)</li>
+            <li><strong>Internet Connection:</strong> Broadband Internet (for live ATS job feeds &amp; discovery)</li>
+            <li><strong>AI Inference:</strong> Free Google Gemini 2.0 Flash or Groq API Key (0% RAM/GPU cost)</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border: 1px solid rgba(16, 185, 129, 0.35); background: rgba(17, 24, 39, 0.75);">
+          <div style="font-size: 1.15rem; font-weight: 800; color: #34d399; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px;">
+            <span>🚀 Recommended Specification</span>
+          </div>
+          <ul style="list-style: none; font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 12px; padding: 0;">
+            <li><strong>Operating System:</strong> Windows 11 (64-bit, latest build)</li>
+            <li><strong>Processor (CPU):</strong> Intel Core i5 / AMD Ryzen 5 or higher</li>
+            <li><strong>System Memory (RAM):</strong> 8 GB+ RAM</li>
+            <li><strong>Storage Space:</strong> 2.5 GB NVMe SSD space</li>
+            <li><strong>Internet Connection:</strong> High-speed Broadband</li>
+            <li><strong>Local Offline AI (Optional):</strong> Local Ollama (Qwen 2.5 Coder 7B with NVIDIA RTX 8GB+ VRAM)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Download CTA -->
+    <section style="padding: 4rem 0 2rem 0; text-align: center;">
+      <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 20px; padding: 3rem 1.5rem;">
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; color: #fff; margin-bottom: 0.75rem;">
+          Ready to Accelerate Your Career Search?
+        </h2>
+        <p style="font-size: 1.05rem; color: var(--text-muted); max-width: 620px; margin: 0 auto 2rem auto;">
+          Download the free Windows portable release and launch your autonomous career search in under 60 seconds.
+        </p>
+        <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" class="btn btn-hero-download" style="padding: 1rem 2.25rem;">
+          <span>📥 Download SPrav™ Job AI (Free Portable ZIP)</span>
+          <span class="btn-hero-subtext">Windows 10 / 11 (x64) • 385 MB • 100% Free Forever</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Open-Source & Data Sources Acknowledgements -->
+    <section style="padding: 2.5rem 0; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 2rem;">
+      <div style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 2rem; text-align: center;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">
+          🙏 Built on Open-Source Foundations &amp; Public ATS Feeds
+        </h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 1.25rem auto; line-height: 1.6;">
+          SPrav™ Job AI proudly stands on the shoulders of the global open-source community, AI researchers, and public hiring gateways including <strong>Greenhouse, Lever, Ashby, Himalayas, Google DeepMind (Gemini), Groq, Ollama, Qwen, FastAPI, SQLite, React,</strong> and <strong>PyMuPDF</strong>.
+        </p>
+        <a href="credits.html" class="btn btn-secondary" style="font-size: 0.88rem; padding: 0.55rem 1.25rem; font-weight: 600;">
+          📖 View Full Credits &amp; Inspirations Breakdown
+        </a>
+      </div>
+    </section>
+  </main>
 
   <!-- Footer -->
   <footer>
     <div class="container">
-      <p style="margin-bottom: 0.5rem;">
-        <strong>SPrav™ Job AI Pro (v2.4.5)</strong> • Built with ❤️ by <strong>SVS Praveen</strong>
+      <p style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 12px;">
+        Architected &amp; Engineered by <strong>SVS Praveen</strong>
       </p>
-      <p style="font-size: 0.82rem; color: var(--text-muted);">
-        100% Free &amp; Open Source • MIT License • Local-First Privacy Protection
+      
+      <div style="display: flex; justify-content: center; gap: 14px; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <a href="https://svspraveen.vercel.app/" target="_blank" class="btn btn-secondary" style="padding: 0.5rem 1.1rem; font-size: 0.85rem; color: #c084fc; border-color: rgba(192, 132, 252, 0.35);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Personal Portfolio
+        </a>
+        <a href="https://github.com/SVSPraveen/SPrav-Job-AI" target="_blank" class="btn btn-secondary" style="padding: 0.5rem 1.1rem; font-size: 0.85rem;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub Repository
+        </a>
+        <a href="https://linkedin.com/in/svs-praveen-s" target="_blank" class="btn btn-secondary" style="padding: 0.5rem 1.1rem; font-size: 0.85rem; color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          LinkedIn Profile
+        </a>
+        <a href="mailto:svspraveens@gmail.com" class="btn btn-secondary" style="padding: 0.5rem 1.1rem; font-size: 0.85rem;">
+          ✉️ svspraveens@gmail.com
+        </a>
+      </div>
+
+      <p style="font-size: 0.8rem; color: #64748b;">
+        SPrav™ Job AI • Free &amp; Open-Source Personal Freeware Project • Official Release: <a href="https://drive.google.com/drive/folders/1JOm-Rth1HoB5xZqDva61JG9-aonj4jae?usp=sharing" target="_blank" style="color: #a5b4fc; text-decoration: none;">Google Drive</a>
       </p>
     </div>
   </footer>
 
+  <!-- Fullscreen Lightbox Modal -->
+  <div id="lightboxModal" class="lightbox-modal" onclick="closeLightbox(event)">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <button class="lightbox-close" onclick="closeLightbox(event)" title="Close (Esc)">✕</button>
+      <img id="lightboxImg" class="lightbox-img" src="" alt="Expanded Preview" />
+      <div id="lightboxCaption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
   <script>
+    function openLightbox(src, caption) {
+      const modal = document.getElementById('lightboxModal');
+      const img = document.getElementById('lightboxImg');
+      const cap = document.getElementById('lightboxCaption');
+      
+      img.src = src;
+      cap.innerHTML = caption || '';
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(event) {
+      if (event) event.stopPropagation();
+      const modal = document.getElementById('lightboxModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+
     function calculateMatch() {
       const candRaw = document.getElementById('candSkills').value;
       const jobRaw = document.getElementById('jobSkills').value;
-      
-      const candList = candRaw.split(/[,\n]/).map(s => s.trim().toLowerCase()).filter(Boolean);
-      const jobList = jobRaw.split(/[,\n]/).map(s => s.trim().toLowerCase()).filter(Boolean);
-      
+
+      const candList = candRaw.split(',').map(s => s.trim()).filter(Boolean);
+      const jobList = jobRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+      const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      // Normalize candidate list with synonyms/sub-words
+      const candMap = new Map();
+      candList.forEach(s => {
+        const norm = normalize(s);
+        candMap.set(norm, s);
+        // Common aliases
+        if (norm === 'sqlite' || norm === 'postgresql' || norm === 'postgres' || norm === 'mysql') candMap.set('sql', s);
+        if (norm === 'agenticsystems' || norm === 'aiagents' || norm === 'agenticrag') candMap.set('agenticai', s);
+        if (norm === 'vectordb' || norm === 'qdrant' || norm === 'pinecone' || norm === 'chromadb') candMap.set('vectordatabases', s);
+        if (norm === 'reactjs' || norm === 'nextjs') candMap.set('react', s);
+        if (norm === 'nodejs' || norm === 'nestjs' || norm === 'express') candMap.set('node', s);
+        if (norm === 'flutter') { candMap.set('dart', s); candMap.set('mobiledevelopment', s); }
+        if (norm === 'reactnative') { candMap.set('react', s); candMap.set('mobiledevelopment', s); }
+        if (norm === 'springboot') { candMap.set('java', s); candMap.set('backend', s); }
+        if (norm === 'kubernetes' || norm === 'k8s') { candMap.set('docker', s); candMap.set('devops', s); }
+        if (norm === 'figma') { candMap.set('uiux', s); candMap.set('design', s); }
+        if (norm === 'cypress' || norm === 'playwright') { candMap.set('testautomation', s); }
+      });
+
+      if (jobList.length === 0) {
+        document.getElementById('scoreValue').innerText = '0%';
+        document.getElementById('matchedChips').innerHTML = '<span style="font-size: 0.8rem; color: var(--text-muted);">None detected</span>';
+        document.getElementById('missingChips').innerHTML = '<span style="font-size: 0.8rem; color: #34d399;">None (0 requirements)</span>';
+        return;
+      }
+
       const matched = [];
       const missing = [];
-      
-      jobList.forEach(req => {
-        if (candList.some(c => c.includes(req) || req.includes(c))) {
-          matched.push(req);
+
+      jobList.forEach(jobSkill => {
+        const norm = normalize(jobSkill);
+        let found = false;
+        
+        if (candMap.has(norm)) {
+          found = true;
         } else {
-          missing.push(req);
+          // Check substring containment
+          for (const [candNorm, orig] of candMap.entries()) {
+            if (candNorm.includes(norm) || norm.includes(candNorm)) {
+              found = true;
+              break;
+            }
+          }
+        }
+
+        if (found) {
+          matched.push(jobSkill);
+        } else {
+          missing.push(jobSkill);
         }
       });
-      
-      const score = jobList.length > 0 ? Math.round((matched.length / jobList.length) * 100) : 0;
-      
-      document.getElementById('scoreCircle').innerText = score + '%';
-      document.getElementById('matchStatus').innerText = `ATS Semantic Match (${score}%)`;
-      
-      const matchedChips = document.getElementById('matchedChips');
-      matchedChips.innerHTML = matched.map(m => `<span style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 0.75rem; padding: 2px 8px; border-radius: 6px;">${m}</span>`).join('') || '<span style="color:#64748b;font-size:0.75rem;">None</span>';
-      
-      const missingChips = document.getElementById('missingChips');
-      missingChips.innerHTML = missing.map(m => `<span style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; font-size: 0.75rem; padding: 2px 8px; border-radius: 6px;">${m}</span>`).join('') || '<span style="color:#34d399;font-size:0.75rem;">All requirements matched!</span>';
+
+      const score = Math.min(100, Math.round((matched.length / jobList.length) * 100));
+      const fitRating = (Math.min(5.0, (score / 20.0))).toFixed(1);
+
+      document.getElementById('scoreValue').innerText = score + '%';
+
+      // Render Matched Chips
+      const matchedContainer = document.getElementById('matchedChips');
+      if (matched.length > 0) {
+        matchedContainer.innerHTML = matched.map(s => 
+          `<span style="background: rgba(52, 211, 153, 0.15); color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; border: 1px solid rgba(52, 211, 153, 0.3); font-weight: 600;">${s}</span>`
+        ).join('');
+      } else {
+        matchedContainer.innerHTML = '<span style="font-size: 0.8rem; color: var(--text-muted);">None detected</span>';
+      }
+
+      // Render Missing Chips
+      const missingContainer = document.getElementById('missingChips');
+      const missingHeader = document.getElementById('missingHeader');
+      if (missing.length > 0) {
+        missingHeader.style.color = '#f87171';
+        missingHeader.innerHTML = '<span>⚠️ Missing Requirements (' + missing.length + '):</span>';
+        missingContainer.innerHTML = missing.map(s => 
+          `<span style="background: rgba(248, 113, 113, 0.15); color: #fca5a5; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; border: 1px solid rgba(248, 113, 113, 0.3);">${s}</span>`
+        ).join('');
+      } else {
+        missingHeader.style.color = '#34d399';
+        missingHeader.innerHTML = '<span>✓ Skill Gap Analysis:</span>';
+        missingContainer.innerHTML = '<span style="font-size: 0.82rem; color: #34d399; font-weight: 600;">None (100% Core Match)</span>';
+      }
+
+      const statusEl = document.getElementById('matchStatus');
+      const actionEl = document.getElementById('matchAction');
+      const circleEl = document.getElementById('scoreValue');
+
+      if (score >= 80) {
+        statusEl.innerText = 'High-Fidelity Match (' + score + '%)';
+        actionEl.innerText = 'Queued for Guided 1-Click Dispatch • Candidate Fit: ' + fitRating + ' / 5.0';
+        statusEl.style.color = '#10b981';
+        circleEl.style.borderColor = '#10b981';
+        circleEl.style.color = '#10b981';
+        circleEl.style.background = 'rgba(16, 185, 129, 0.15)';
+      } else if (score >= 65) {
+        statusEl.innerText = 'Strong Candidate Fit (' + score + '%)';
+        actionEl.innerText = 'Queued in Action Required • Candidate Fit: ' + fitRating + ' / 5.0';
+        statusEl.style.color = '#38bdf8';
+        circleEl.style.borderColor = '#38bdf8';
+        circleEl.style.color = '#38bdf8';
+        circleEl.style.background = 'rgba(56, 189, 248, 0.15)';
+      } else {
+        statusEl.innerText = 'Near-Miss / Low ATS Alignment (' + score + '%)';
+        actionEl.innerText = 'Quarantined in Backlog • Candidate Fit: ' + fitRating + ' / 5.0';
+        statusEl.style.color = '#fbbf24';
+        circleEl.style.borderColor = '#fbbf24';
+        circleEl.style.color = '#fbbf24';
+        circleEl.style.background = 'rgba(251, 191, 36, 0.15)';
+      }
     }
-    
-    // Initial run
-    calculateMatch();
+
+    // Auto-calculate on initial page load
+    document.addEventListener('DOMContentLoaded', calculateMatch);
   </script>
 </body>
 </html>
